@@ -1,5 +1,4 @@
-import { useState, useMemo } from 'react';
-import { useQuery } from 'react-query';
+import { useState } from 'react';
 import {
   Clock,
   MapPin,
@@ -10,252 +9,113 @@ import {
   Activity,
   Bell
 } from 'lucide-react';
-
 import Navbar from '../components/Navbar';
 import { useListings } from '../hooks/useListings';
 import { useAuth } from '../components/AuthContext';
 import { useCategories } from '../hooks/useCategories';
 import { useSkills } from '../hooks/useSkills';
+import { useQuery } from 'react-query';
 import { getPopularData } from '../services/listings';
 
-// Component imports
-import Hero from '../components/Hero';
-import FilterSidebar from '../components/FilterSidebar';
-import PostCard from '../components/PostCard';
-import TrendingSidebar from '../components/TrendingSidebar';
-import QuickMessageModal from '../components/QuickMessageModal';
-import Footer from '../components/Footer';
-import EmptyState from '../components/EmptyState';
-
-interface FilterSidebarProps {
-  filters: {
-    category: string;
-    location: string;
-    skillOffered: string;
-    skillRequested: string;
-  };
-  onFilterChange: (filter: string, value: string) => void;
-  onClearFilters: () => void;
-  onApplyFilters: () => void;
-  categories: { id: number; name: string }[];
-  locations: string[];
-  skills: {
-    id: number;
-    name: string;
-  }[];
-}
-
-const FilterSidebar = ({
-  filters,
-  onFilterChange,
-  onClearFilters,
-  onApplyFilters,
-  categories,
-  locations,
-  skills
-}: FilterSidebarProps) => {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-5 sticky top-4 transition-shadow hover:shadow-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">Filters</h2>
-        <button
-          onClick={onClearFilters}
-          className="text-orange-600 hover:text-orange-800 text-sm font-medium transition-colors duration-300"
-          aria-label="Clear all filters"
-        >
-          Clear All
-        </button>
-      </div>
-
-      <div className="space-y-5">
-        <div>
-          <label htmlFor="category" className="block text-gray-700 mb-2 font-medium">
-            Category
-          </label>
-          <select
-            id="category"
-            value={filters.category}
-            onChange={(e) => onFilterChange('category', e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-200 focus:outline-none transition-shadow duration-300"
-          >
-            <option value="">All Categories</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="location" className="block text-gray-700 mb-2 font-medium">
-            Location
-          </label>
-          <select
-            id="location"
-            value={filters.location}
-            onChange={(e) => onFilterChange('location', e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-200 focus:outline-none transition-shadow duration-300"
-          >
-            <option value="">All Locations</option>
-            {locations.map((location, index) => (
-              <option key={index} value={location}>
-                {location}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="skillOffered" className="block text-gray-700 mb-2 font-medium">
-            Skills Offered
-          </label>
-          <select
-            id="skillOffered"
-            value={filters.skillOffered}
-            onChange={(e) => onFilterChange('skillOffered', e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-200 focus:outline-none transition-shadow duration-300"
-          >
-            <option value="">All Skills</option>
-            {skills.map((skill) => (
-              <option key={skill.id} value={skill.id}>
-                {skill.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="skillRequested" className="block text-gray-700 mb-2 font-medium">
-            Skills Requested
-          </label>
-          <select
-            id="skillRequested"
-            value={filters.skillRequested}
-            onChange={(e) => onFilterChange('skillRequested', e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-200 focus:outline-none transition-shadow duration-300"
-          >
-            <option value="">All Skills</option>
-            {skills.map((skill) => (
-              <option key={skill.id} value={skill.id}>
-                {skill.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-md mt-4 transition-colors duration-300 font-medium"
-          onClick={onApplyFilters}
-        >
-          Apply Filters
-        </button>
-      </div>
-    </div>
-  );
-};
-
 const Home = () => {
-  // Search and filtering state
-  const [filters, setFilters] = useState({
-    category: '',
-    location: '',
-    skillOffered: '',
-    skillRequested: ''
-  });
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterLocation, setFilterLocation] = useState('');
   const [query, setQuery] = useState('');
+  const [filterSkillOffered, setFilterSkillOffered] = useState('');
+  const [filterSkillRequested, setFilterSkillRequested] = useState('');
+  const [isContactLoading, setIsContactLoading] = useState(false);
+  const [quickMessageOpen, setQuickMessageOpen] = useState(false);
+  const [quickMessagePost, setQuickMessagePost] = useState(null);
+  const [quickMessageText, setQuickMessageText] = useState('');
   const [noResultsShake, setNoResultsShake] = useState(false);
 
-  // Message modal state
-  const [quickMessageState, setQuickMessageState] = useState({
-    isOpen: false,
-    post: null,
-    text: '',
-    isLoading: false
-  });
-
-  // Fetch data
   const { data: categories } = useCategories();
+
+  const locations = ['Online', 'San Francisco', 'Chicago', 'Boston', 'New York', 'Los Angeles'];
   const { data: skills } = useSkills();
+
   const { data: posts, isLoading } = useListings(query);
+
+  const trendingSkills = [
+    { skill: 'Spanish Language', count: 18 },
+    { skill: 'Piano Lessons', count: 14 },
+    { skill: 'Python Programming', count: 12 },
+    { skill: 'Gardening', count: 9 },
+    { skill: 'Yoga Instruction', count: 7 }
+  ];
+
+  const clearFilters = () => {
+    setFilterCategory('');
+    setFilterLocation('');
+    setFilterSkillOffered('');
+    setFilterSkillRequested('');
+  };
+
   const { data: popularData, isLoading: popularDataLoading } = useQuery({
     queryFn: getPopularData,
     queryKey: ['popularData']
   });
-  const { currentUser } = useAuth();
 
-  // Locations data
-  const locations = ['Online', 'San Francisco', 'Chicago', 'Boston', 'New York', 'Los Angeles'];
+  // Format date to relative time
+  const formatRelativeTime = (dateString: string) => {
+    const postDate = new Date(dateString);
+    const currentDate = new Date();
+    const diffInDays = Math.floor((currentDate - postDate) / (1000 * 60 * 60 * 24));
+    const diffInHours = Math.floor((currentDate - postDate) / (1000 * 60 * 60));
 
-  // Filter posts based on selected filters
-  const filteredPosts = useMemo(() => {
-    if (!posts) return [];
-
-    return posts.filter((post) => {
-      if (filters.category && post.category_id !== filters.category) return false;
-      if (filters.location && post.location !== filters.location) return false;
-      if (filters.skillOffered && post.offering_skill.id !== filters.skillOffered) return false;
-      if (filters.skillRequested && post.requested_skill.id !== filters.skillRequested)
-        return false;
-      return true;
-    });
-  }, [posts, filters]);
-
-  // Handle filter changes
-  const handleFilterChange = (field, value) => {
-    setFilters((prev) => ({ ...prev, [field]: value }));
+    if (diffInHours < 24) return 'Today';
+    if (diffInDays === 1) return 'Yesterday';
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+    return postDate.toLocaleDateString();
   };
 
-  const clearFilters = () => {
-    setFilters({
-      category: '',
-      location: '',
-      skillOffered: '',
-      skillRequested: ''
-    });
+  // Activity badge logic
+  const getActivityBadge = (post) => {
+    const postDate = new Date(post.created_at);
+    const currentDate = new Date();
+    const diffInHours = Math.floor((currentDate - postDate) / (1000 * 60 * 60));
+    const diffInDays = Math.floor((currentDate - postDate) / (1000 * 60 * 60 * 24));
+
+    if (diffInHours < 24) {
+      return { text: 'NEW', color: 'bg-green-500 text-white' };
+    }
+    if (diffInDays < 2) {
+      return { text: 'ACTIVE TODAY', color: 'bg-orange-500 text-white' };
+    }
+    // Assume some posts are popular based on a property or randomly for demo
+    if (post.id % 3 === 0) {
+      return { text: 'HOT', color: 'bg-red-500 text-white' };
+    }
+    return null;
+  };
+
+  const handleContactClick = (post) => {
+    setQuickMessagePost(post);
+    setQuickMessageOpen(true);
+  };
+
+  const handleSendQuickMessage = () => {
+    setIsContactLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsContactLoading(false);
+      setQuickMessageOpen(false);
+      setQuickMessageText('');
+      // Show success message or navigate to chat
+    }, 1000);
   };
 
   const handleApplyFilters = () => {
-    if (filteredPosts.length === 0) {
+    // If no posts match after filtering, trigger shake animation
+    if (posts?.length === 0) {
       setNoResultsShake(true);
       setTimeout(() => setNoResultsShake(false), 500);
     }
   };
 
-  // Handle quick message modal
-  const openQuickMessage = (post) => {
-    setQuickMessageState({
-      isOpen: true,
-      post,
-      text: '',
-      isLoading: false
-    });
-  };
+  const { currentUser } = useAuth();
 
-  const closeQuickMessage = () => {
-    setQuickMessageState((prev) => ({ ...prev, isOpen: false }));
-  };
-
-  const handleQuickMessageTextChange = (text) => {
-    setQuickMessageState((prev) => ({ ...prev, text }));
-  };
-
-  const handleSendQuickMessage = () => {
-    setQuickMessageState((prev) => ({ ...prev, isLoading: true }));
-
-    // Simulate API call
-    setTimeout(() => {
-      setQuickMessageState({
-        isOpen: false,
-        post: null,
-        text: '',
-        isLoading: false
-      });
-      // Show success notification here
-    }, 1000);
-  };
-
-  // Success stats for banner
   const successStats = {
     swapsThisMonth: 145,
     topSwapper: 'Jane D.',
@@ -266,71 +126,33 @@ const Home = () => {
     <>
       <Navbar />
 
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
-        {/* Hero Section */}
-        <Hero />
+      <div className="bg-gray-100 min-h-screen">
+        {/* Header would go here */}
 
-        {/* Main Content */}
+        {/* Main Content - Three Column Layout */}
         <main className="container mx-auto px-4 py-8">
-          {/* Search and Title Bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-            <h1 className="text-3xl font-bold text-gray-800">Skill Swap Posts</h1>
+          <div className="flex justify-between ">
+            <h1 className="text-3xl font-bold text-gray-800 mb-6">Skill Swap Posts</h1>
 
-            <div className="relative w-full md:w-7/12 lg:w-9/12">
-              <div className="flex items-center border border-gray-300 rounded-lg bg-white shadow-sm overflow-hidden hover:shadow transition-shadow duration-300">
+            <div className="relative mb-6 w-9/12">
+              <div className="flex items-center border border-gray-300 rounded-lg bg-white shadow-sm overflow-hidden">
                 <input
                   type="text"
                   placeholder="Search for skills, categories, or keywords..."
-                  className="w-full py-3 px-4 focus:outline-none focus:ring-2 focus:ring-orange-200"
+                  className="w-full py-3 px-4 focus:outline-none"
                   onChange={(e) => setQuery(e.target.value)}
                   value={query}
-                  aria-label="Search posts"
                 />
-                <button
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 transition-colors duration-300"
-                  aria-label="Search"
-                >
+                <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3">
                   <Search className="h-5 w-5" />
+                  <span className="sr-only">Search</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Quick Filter Pills */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {popularData?.popularCategories?.slice(0, 5).map((category, index) => (
-              <button
-                key={index}
-                className={`px-4 py-2 rounded-full text-sm transition-colors duration-300 ${
-                  filters.category === category.id
-                    ? 'bg-orange-600 text-white'
-                    : 'bg-white hover:bg-orange-100 text-gray-700'
-                }`}
-                onClick={() =>
-                  handleFilterChange(
-                    'category',
-                    category.id === filters.category ? '' : category.id
-                  )
-                }
-              >
-                {category.name}
-              </button>
-            ))}
-            {filters.category ||
-            filters.location ||
-            filters.skillOffered ||
-            filters.skillRequested ? (
-              <button
-                onClick={clearFilters}
-                className="px-4 py-2 rounded-full text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center transition-colors duration-300"
-              >
-                Clear All
-              </button>
-            ) : null}
-          </div>
-
           {/* Success Stories Banner */}
-          <div className="bg-gradient-to-r from-orange-100 to-yellow-100 p-4 rounded-lg mb-6 flex items-center justify-between shadow-sm hover:shadow transition-shadow duration-300">
+          <div className="bg-gradient-to-r from-orange-100 to-yellow-100 p-4 rounded-lg mb-6 flex items-center justify-between">
             <div className="flex items-center">
               <Award className="h-8 w-8 text-orange-500 mr-3" />
               <div>
@@ -349,64 +171,304 @@ const Home = () => {
 
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Left Sidebar - Filters */}
-            <div className="lg:w-1/5">
-              <FilterSidebar
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onClearFilters={clearFilters}
-                onApplyFilters={handleApplyFilters}
-                categories={categories || []}
-                locations={locations}
-                skills={skills || []}
-              />
+            <div className="lg:w-1/4">
+              <div className="bg-white rounded-lg shadow-md p-4 sticky top-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Filters</h2>
+                  <button
+                    onClick={clearFilters}
+                    className="text-orange-600 hover:text-orange-800 text-sm font-medium"
+                  >
+                    Clear All
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Category</label>
+                    <select
+                      value={filterCategory}
+                      onChange={(e) => setFilterCategory(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="">All Categories</option>
+                      {categories?.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Location</label>
+                    <select
+                      value={filterLocation}
+                      onChange={(e) => setFilterLocation(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="">All Locations</option>
+                      {locations.map((location, index) => (
+                        <option key={index} value={location}>
+                          {location}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Skills Offered</label>
+                    <select
+                      value={filterSkillOffered}
+                      onChange={(e) => setFilterSkillOffered(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="">All Skills</option>
+                      {skills?.map((skill) => (
+                        <option key={skill.id} value={skill.id}>
+                          {skill.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Skills Requested</label>
+                    <select
+                      value={filterSkillRequested}
+                      onChange={(e) => setFilterSkillRequested(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="">All Skills</option>
+                      {skills?.map((skill) => (
+                        <option key={skill.id} value={skill.id}>
+                          {skill.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-md mt-2"
+                    onClick={handleApplyFilters}
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
             </div>
 
-            {/* Main Content - Posts */}
             <div
-              className={`lg:w-3/5 flex flex-col gap-5 ${noResultsShake ? 'animate-shake' : ''}`}
+              className={`flex flex-col gap-5 max-w-xl ${noResultsShake ? 'animate-shake' : ''}`}
             >
               {isLoading ? (
                 <div className="flex justify-center items-center h-32">
                   <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
                 </div>
-              ) : filteredPosts.length === 0 ? (
-                <EmptyState onClearFilters={clearFilters} />
+              ) : posts?.length === 0 ? (
+                <div className="col-span-2 text-center py-12 bg-white rounded-lg shadow-md">
+                  <img
+                    src="/api/placeholder/200/200"
+                    alt="No results found"
+                    className="mx-auto mb-4"
+                  />
+                  <p className="text-gray-500 text-lg">No posts match your filter criteria.</p>
+                  <button
+                    onClick={clearFilters}
+                    className="mt-4 bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
               ) : (
-                <>
-                  <p className="text-gray-600 font-medium">{filteredPosts.length} results found</p>
-                  {filteredPosts.map((post) => (
-                    <PostCard
-                      key={post.id}
-                      post={post}
-                      currentUser={currentUser}
-                      onContactClick={openQuickMessage}
-                    />
-                  ))}
-                </>
+                posts?.map((post) => {
+                  const activityBadge = getActivityBadge(post);
+                  return (
+                    <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                      <div className="p-6">
+                        <div className="flex items-center mb-4">
+                          <UserRound className="w-10 h-10 rounded-full mr-3" />
+                          <div>
+                            <h3 className="font-medium text-gray-800">{post.user.fullname}</h3>
+                            <p className="text-gray-500 text-sm">
+                              {formatRelativeTime(post.created_at)}
+                            </p>
+                          </div>
+                          <div className="ml-auto flex items-center">
+                            {activityBadge && (
+                              <span
+                                className={`${activityBadge.color} px-2 py-1 text-xs rounded-full mr-2 flex items-center`}
+                              >
+                                {activityBadge.text === 'HOT' && (
+                                  <Activity className="w-3 h-3 mr-1" />
+                                )}
+                                {activityBadge.text === 'NEW' && <Bell className="w-3 h-3 mr-1" />}
+                                {activityBadge.text}
+                              </span>
+                            )}
+                            {post.user.id === currentUser?.id && (
+                              <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs rounded">
+                                Your Post
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <h2 className="text-xl font-bold mb-3">{post.title}</h2>
+                        <p className="text-gray-600 mb-4">{post.description}</p>
+
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          <span className="bg-green-100 text-green-800 px-3 py-1 rounded text-sm">
+                            Offering: {post.offering_skill.name}
+                          </span>
+                          <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded text-sm">
+                            Seeking: {post.requested_skill.name}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center text-gray-500 text-sm mb-4">
+                          <div className="mr-4 flex items-center">
+                            <MapPin className="mr-1 h-5 w-5" />
+                            {post.location}
+                          </div>
+                          <div className="flex items-center">
+                            <Clock className="mr-1 h-5 w-5" />
+                            {post.duration}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end pt-3 border-t border-gray-200">
+                          <button
+                            className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md flex items-center"
+                            onClick={() => handleContactClick(post)}
+                          >
+                            <MessageCircle className="w-4 h-4 mr-1" />
+                            Send Request
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
 
-            {/* Right Sidebar - Trending */}
-            <div className="lg:w-1/5">
-              <TrendingSidebar popularData={popularData} isLoading={popularDataLoading} />
+            {/* Right Sidebar - "People are also looking for" */}
+            <div className="lg:w-1/4">
+              <div className="bg-white rounded-lg shadow-md p-4 sticky top-4">
+                <h2 className="text-xl font-semibold mb-4">People are also looking for</h2>
+                {popularDataLoading ? (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-orange-500"></div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src="/api/placeholder/120/120"
+                        alt="People exchanging skills"
+                        className="rounded-full"
+                      />
+                    </div>
+                    <ul className="space-y-3">
+                      {popularData?.popularSkills.map((item, index) => (
+                        <li key={index} className="flex justify-between items-center">
+                          <span className="text-gray-700 hover:text-orange-600 cursor-pointer">
+                            {item.name}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="mt-6">
+                  <h3 className="font-medium text-gray-700 mb-3">Popular Categories</h3>
+                  <div className="flex justify-center mb-4">
+                    <img src="/api/placeholder/100/100" alt="Categories" className="rounded" />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {popularData?.popularCategories?.map((category, index) => (
+                      <span
+                        key={index}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm cursor-pointer"
+                      >
+                        {category.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <button className="w-full bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 px-4 rounded-md mt-6">
+                  Create Your Listing
+                </button>
+              </div>
             </div>
           </div>
         </main>
 
         {/* Footer */}
-        <Footer />
+        <footer className="bg-gray-800 text-white p-6 mt-12">
+          <div className="container mx-auto text-center">
+            <p>&copy; 2025 SattaPatta - Skill Swapping Platform</p>
+            <div className="mt-2">
+              <a href="#" className="text-gray-400 hover:text-white mx-2">
+                About
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white mx-2">
+                Privacy Policy
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white mx-2">
+                Terms of Service
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white mx-2">
+                Contact Us
+              </a>
+            </div>
+          </div>
+        </footer>
       </div>
 
       {/* Quick Message Modal */}
-      {quickMessageState.isOpen && (
-        <QuickMessageModal
-          post={quickMessageState.post}
-          messageText={quickMessageState.text}
-          isLoading={quickMessageState.isLoading}
-          onClose={closeQuickMessage}
-          onTextChange={handleQuickMessageTextChange}
-          onSend={handleSendQuickMessage}
-        />
+      {quickMessageOpen && quickMessagePost && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold mb-4">Send a Quick Message</h3>
+            <p className="text-gray-600 mb-4">
+              To: <span className="font-medium">{quickMessagePost.user.fullname}</span> about "
+              {quickMessagePost.title}"
+            </p>
+            <textarea
+              className="w-full border border-gray-300 rounded-md p-3 mb-4 h-32"
+              placeholder="Hi! I'm interested in learning about your skill swap offer..."
+              value={quickMessageText}
+              onChange={(e) => setQuickMessageText(e.target.value)}
+            ></textarea>
+            <div className="flex justify-end space-x-3">
+              <button
+                className="px-4 py-2 border border-gray-300 rounded-md"
+                onClick={() => setQuickMessageOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md flex items-center"
+                onClick={handleSendQuickMessage}
+                disabled={isContactLoading}
+              >
+                {isContactLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle className="w-4 h-4 mr-1" />
+                    Send Message
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

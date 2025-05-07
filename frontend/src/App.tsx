@@ -1,5 +1,4 @@
 import './App.css';
-import Navbar from './components/Navbar';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -13,6 +12,8 @@ import Admin from './pages/Admin';
 import Listings from './pages/CreateListing';
 import MyPosts from './pages/MyPosts';
 import Matches from './pages/Matches';
+import Profile from './pages/Profile';
+import TutorMultiStepForm from './pages/TutorSignupForm';
 
 const client = new QueryClient();
 function App() {
@@ -28,9 +29,11 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/my-posts" element={<MyPosts />} />
+            <Route path="/signup/mentor" element={<TutorMultiStepForm />} />
             <Route path="/matches" element={<Matches />} />
             <Route path="/submit-request" element={<Listings />} />
             <Route path="/admin/*" element={<Admin />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </AuthProvider>
       </QueryClientProvider>

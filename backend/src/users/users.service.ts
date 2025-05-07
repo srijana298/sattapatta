@@ -49,7 +49,9 @@ export class UsersService {
 
     const payload = { sub: user.id, email: user.email };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(payload, {
+        secret: 'your_secret_key',
+      }),
     };
   }
 }

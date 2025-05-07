@@ -4,6 +4,7 @@ export const registerUserSchema = zod
   .object({
     email: zod.string().email().min(5).max(100),
     password: zod.string(),
+    role: zod.string(),
     fullname: zod.string().min(2).max(100),
     confirm_password: zod.string()
   })

@@ -84,22 +84,19 @@ const Navbar = () => {
             <Link to="/messages" className="text-gray-600 hover:text-orange-600 focus-outline">
               Messages
             </Link>
-            <Link
-              to="/submit-request"
-              className="text-gray-600 hover:text-orange-600 focus-outline"
-            >
-              Submit Request
-            </Link>
-            <Link to="/matches" className="text-gray-600 hover:text-orange-600 focus-outline">
-              Matches
-            </Link>
 
             <Link to="/my-posts" className="text-gray-600 hover:text-orange-600 focus-outline">
               My Posts
             </Link>
-            <a href="#testimonials" className="text-gray-600 hover:text-orange-600 focus-outline">
+            <button
+              className="text-gray-600 hover:text-orange-600 focus-outline border border-red-500 px-4 py-3"
+              onClick={() => {
+                localStorage.removeItem('access_token');
+                window.location.reload();
+              }}
+            >
               Logout
-            </a>
+            </button>
           </div>
         )}
       </div>

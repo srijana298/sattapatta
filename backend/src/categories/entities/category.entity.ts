@@ -1,14 +1,31 @@
-import { Listings } from '../../listings/entities/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Skill } from '../../skills/entities/skill.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BaseEntity,
+} from 'typeorm';
 
 @Entity()
-export class Category {
+export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
-  @OneToMany(() => Listings, (listing) => listing.category)
-  listings: Listings[];
+  @Column({ nullable: true })
+  description: string;
+
+  @OneToMany(() => Skill, (skill) => skill.category)
+  skills: Skill[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

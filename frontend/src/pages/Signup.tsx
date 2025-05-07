@@ -1,4 +1,4 @@
-import { Lock, Mail, Regex, UserIcon } from 'lucide-react';
+import { Lock, Mail, UserIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { CreateUser, registerUserSchema } from '../lib/users';
 import { zodResolver } from '@hookform/resolvers/zod/src/zod.js';
@@ -63,6 +63,25 @@ const Signup = () => {
                   />
                   {errors.fullname && (
                     <p className="text-red-500 text-xs mt-1">{errors.fullname.message}</p>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                  Role
+                </label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <select
+                    id="role"
+                    className="block w-full pr-3 py-2 pl-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition"
+                    {...register('role')}
+                  >
+                    <option value="">Select role</option>
+                    <option value="student">Student</option>
+                    <option value="mentor">Mentor</option>
+                  </select>
+                  {errors.role && (
+                    <p className="text-red-500 text-xs mt-1">{errors.role.message}</p>
                   )}
                 </div>
               </div>

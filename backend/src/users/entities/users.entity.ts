@@ -1,10 +1,18 @@
-import { Listings } from '../../listings/entities/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Mentor } from '../../mentor/entities/mentor.entity';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
-export class Users {
+export class Users extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id: number;
 
   @Column()
   fullname: string;
@@ -15,13 +23,12 @@ export class Users {
   @Column()
   password: string;
 
-  @OneToMany(() => Listings, (listing) => listing.user, {
-    onDelete: 'CASCADE',
-  })
-  listings: Listings[];
-
   @OneToMany(() => Users, (user) => user.participatedConversations)
   participatedConversations: Users[];
+
+  @OneToOne(() => Mentor)
+  @JoinColumn()
+  mentor_profile: Mentor;
 }
 
 export type User = Omit<Users, 'password'>;

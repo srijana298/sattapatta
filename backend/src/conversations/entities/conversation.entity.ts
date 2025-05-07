@@ -1,4 +1,3 @@
-import { Listings } from '../../listings/entities/listing.entity';
 import {
   CreateDateColumn,
   Entity,
@@ -20,11 +19,6 @@ export class Conversation {
     (participant) => participant.conversation,
   )
   participants: ConversationParticipant[];
-
-  @ManyToOne(() => Listings, (listing) => listing.conversations, {
-    onDelete: 'CASCADE',
-  })
-  listing: Listings;
 
   @OneToMany(() => Message, (message) => message.conversation)
   messages: Message[];

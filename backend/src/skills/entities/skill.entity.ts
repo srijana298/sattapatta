@@ -1,17 +1,36 @@
-import { Listings } from '../../listings/entities/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Category } from '../../categories/entities/category.entity';
+import { Mentor } from '../../mentor/entities/mentor.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BaseEntity,
+} from 'typeorm';
 
 @Entity()
-export class Skill {
+export class Skill extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
-  @OneToMany(() => Listings, (listing) => listing.offering_skill)
-  offerings: Listings[];
+  @Column({ nullable: true })
+  description: string;
 
-  @OneToMany(() => Listings, (listing) => listing.requested_skill)
-  requests: Listings[];
+  @ManyToOne(() => Category, (category) => category.skills)
+  category: Category;
+
+  @ManyToMany(() => Mentor, (mentor) => mentor.skills)
+  mentors: Mentor[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

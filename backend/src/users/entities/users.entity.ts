@@ -1,3 +1,4 @@
+import { ConversationParticipant } from '../../conversations/entities/participant.entity';
 import { Mentor } from '../../mentor/entities/mentor.entity';
 import {
   Column,
@@ -6,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
   BaseEntity,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -20,14 +20,16 @@ export class Users extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
+  @Column({ default: 'student' })
+  role: string;
+
   @Column()
   password: string;
 
-  @OneToMany(() => Users, (user) => user.participatedConversations)
-  participatedConversations: Users[];
+  @OneToMany(() => ConversationParticipant, (user) => user.user)
+  participatedConversations: ConversationParticipant[];
 
-  @OneToOne(() => Mentor)
-  @JoinColumn()
+  @OneToOne(() => Mentor, (mentor) => mentor.user, { nullable: true })
   mentor_profile: Mentor;
 }
 

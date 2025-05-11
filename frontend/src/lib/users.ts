@@ -18,6 +18,11 @@ export type CreateUser = zod.infer<typeof registerUserSchema>;
 export type CurrentUser = {
   id: string;
   email: string;
+  fullname: string;
+  mentor_profile: {
+    isActive: boolean;
+  };
+  role: 'mentor' | 'student';
 };
 
 export const loginUserSchema = zod.object({

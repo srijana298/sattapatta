@@ -1,460 +1,406 @@
-// import 'reflect-metadata';
-// import { Users } from './src/users/entities/users.entity';
-// import * as bcrypt from 'bcrypt';
-// import { faker } from '@faker-js/faker';
-// import AppDataSource from './src/datasource';
-// import { Listings } from './src/listings/entities/listing.entity';
-// import { Skill } from './src/skills/entities/skill.entity';
-// import { Category } from './src/categories/entities/category.entity';
+import 'reflect-metadata';
+import { Users } from './src/users/entities/users.entity';
+import * as bcrypt from 'bcrypt';
+import AppDataSource from './src/datasource';
+import { Skill } from './src/skills/entities/skill.entity';
+import { Category } from './src/categories/entities/category.entity';
+import { Mentor } from './src/mentor/entities/mentor.entity';
 
-// // Type definitions
-// type GeneratorFunction = () => string;
-// type TemplateFunction1 = (param1: string) => string;
-// type TemplateFunction2 = (param1: string, param2: string) => string;
-// type TemplateFunction = TemplateFunction1 | TemplateFunction2 | (() => string);
-// type NoisyTemplateFunction =
-//   | TemplateFunction1
-//   | TemplateFunction2
-//   | (() => string);
+import { MentorEducation } from './src/mentor/entities/education.entity';
+import { MentorCertificate } from './src/mentor/entities/certificate.entity';
 
-// // Helper function to generate unique skills and categories
-// function generateUniqueItems(
-//   count: number,
-//   generator: GeneratorFunction,
-//   existingNames: Set<string> = new Set(),
-// ): string[] {
-//   const items: string[] = [];
-//   while (items.length < count) {
-//     const name = generator();
-//     if (!existingNames.has(name)) {
-//       existingNames.add(name);
-//       items.push(name);
-//     }
-//   }
-//   return items;
-// }
+// Category generators
+// Interface for createListing parameters
+// Helper function to generate a unique email
+async function seed(): Promise<void> {
+  try {
+    await AppDataSource.initialize();
+    // Create categories
+    const categories = [
+      {
+        name: 'Technology',
+        description:
+          'Technology-related skills including programming, data science, and IT infrastructure',
+      },
+      {
+        name: 'Business',
+        description:
+          'Business skills including management, marketing, entrepreneurship, and finance',
+      },
+      {
+        name: 'Arts & Design',
+        description:
+          'Creative skills including visual arts, design, music, and performing arts',
+      },
+      {
+        name: 'Science',
+        description:
+          'Science disciplines including physics, chemistry, biology, and mathematics',
+      },
+      {
+        name: 'Languages',
+        description:
+          'Language learning and teaching in various world languages',
+      },
+      {
+        name: 'Personal Development',
+        description:
+          'Skills for personal growth including leadership, communication, and emotional intelligence',
+      },
+      {
+        name: 'Health & Wellness',
+        description:
+          'Health-related skills including nutrition, fitness, and mental health',
+      },
+      {
+        name: 'Education',
+        description:
+          'Teaching methods, curriculum development, and educational theory',
+      },
+      {
+        name: 'Finance',
+        description:
+          'Financial skills including investing, personal finance, and financial analysis',
+      },
+      {
+        name: 'Engineering',
+        description:
+          'Engineering disciplines including mechanical, electrical, civil, and chemical engineering',
+      },
+    ];
 
-// // Category generators
-// const categoryTypes: GeneratorFunction[] = [
-//   // Main categories
-//   () => `${faker.commerce.department()}`,
-//   () => `${faker.word.adjective()} Studies`,
-//   () => `${faker.science.chemicalElement().name} Sciences`,
-//   () => `${faker.commerce.productAdjective()} Arts`,
+    const createdCategories: Category[] = [];
+    for (const category of categories) {
+      const newCategory = AppDataSource.manager.create(Category, category);
+      await newCategory.save();
+      createdCategories.push(newCategory);
+    }
 
-//   // Specialize categories
-//   () => `Digital ${faker.commerce.department()}`,
-//   () => `Advanced ${faker.commerce.product()}`,
-//   () => `${faker.company.buzzNoun()} Management`,
-//   () => `${faker.company.buzzAdjective()} Skills`,
-//   () => `${faker.commerce.productAdjective()} Techniques`,
-//   () => `${faker.music.genre()} Education`,
-// ];
+    const skills = [
+      {
+        name: 'JavaScript Programming',
+        description:
+          'Web development with JavaScript, including frameworks like React, Angular, and Node.js',
+        category: createdCategories.find((cat) => cat.name === 'Technology'),
+      },
+      {
+        name: 'Data Science',
+        description:
+          'Analysis and interpretation of complex data using statistical methods and machine learning',
+        category: createdCategories.find((cat) => cat.name === 'Technology'),
+      },
+      {
+        name: 'Digital Marketing',
+        description:
+          'Online marketing strategies including SEO, social media, and content marketing',
+        category: createdCategories.find((cat) => cat.name === 'Business'),
+      },
+      {
+        name: 'Project Management',
+        description:
+          'Planning, organizing, and overseeing projects to accomplish specific goals',
+        category: createdCategories.find((cat) => cat.name === 'Business'),
+      },
+      {
+        name: 'Graphic Design',
+        description:
+          'Visual communication and problem-solving through typography, photography, and illustration',
+        category: createdCategories.find((cat) => cat.name === 'Arts & Design'),
+      },
+      {
+        name: 'UX/UI Design',
+        description:
+          'Creating user-friendly digital interfaces with focus on usability and user experience',
+        category: createdCategories.find((cat) => cat.name === 'Arts & Design'),
+      },
+      {
+        name: 'Physics',
+        description:
+          'Understanding the fundamental principles governing the natural world and universe',
+        category: createdCategories.find((cat) => cat.name === 'Science'),
+      },
+      {
+        name: 'Biology',
+        description:
+          'Study of living organisms and their interactions with each other and the environment',
+        category: createdCategories.find((cat) => cat.name === 'Science'),
+      },
+      {
+        name: 'English Language',
+        description:
+          'English language instruction for non-native speakers, including grammar, vocabulary, and conversation',
+        category: createdCategories.find((cat) => cat.name === 'Languages'),
+      },
+      {
+        name: 'Spanish Language',
+        description:
+          'Spanish language instruction including speaking, reading, writing, and cultural context',
+        category: createdCategories.find((cat) => cat.name === 'Languages'),
+      },
+      {
+        name: 'Leadership Development',
+        description:
+          'Developing leadership skills including decision-making, delegation, and team motivation',
+        category: createdCategories.find(
+          (cat) => cat.name === 'Personal Development',
+        ),
+      },
+      {
+        name: 'Public Speaking',
+        description:
+          'Effective communication in public settings including presentations and speeches',
+        category: createdCategories.find(
+          (cat) => cat.name === 'Personal Development',
+        ),
+      },
+      {
+        name: 'Nutrition',
+        description:
+          'Principles of healthy eating and dietary planning for optimal health',
+        category: createdCategories.find(
+          (cat) => cat.name === 'Health & Wellness',
+        ),
+      },
+      {
+        name: 'Mindfulness & Meditation',
+        description:
+          'Practices for mental clarity, stress reduction, and emotional well-being',
+        category: createdCategories.find(
+          (cat) => cat.name === 'Health & Wellness',
+        ),
+      },
+      {
+        name: 'Teaching Methods',
+        description:
+          'Effective instructional strategies for various learning styles and educational contexts',
+        category: createdCategories.find((cat) => cat.name === 'Education'),
+      },
+      {
+        name: 'Curriculum Design',
+        description:
+          'Development of educational programs with clear learning objectives and assessment strategies',
+        category: createdCategories.find((cat) => cat.name === 'Education'),
+      },
+      {
+        name: 'Investment Strategies',
+        description:
+          'Approaches to investing in stocks, bonds, real estate, and other financial instruments',
+        category: createdCategories.find((cat) => cat.name === 'Finance'),
+      },
+      {
+        name: 'Financial Planning',
+        description:
+          'Comprehensive planning for financial goals including retirement, education, and wealth management',
+        category: createdCategories.find((cat) => cat.name === 'Finance'),
+      },
+      {
+        name: 'Civil Engineering',
+        description:
+          'Design and construction of infrastructure including buildings, roads, and bridges',
+        category: createdCategories.find((cat) => cat.name === 'Engineering'),
+      },
+      {
+        name: 'Electrical Engineering',
+        description:
+          'Study and application of electricity, electronics, and electromagnetism',
+        category: createdCategories.find((cat) => cat.name === 'Engineering'),
+      },
+    ];
 
-// // Skill generators
-// const skillTypes: GeneratorFunction[] = [
-//   // Technical skills
-//   () => `${faker.hacker.adjective()} ${faker.hacker.noun()}`,
-//   () => `${faker.hacker.verb()} ${faker.hacker.noun()}`,
-//   () => `${faker.commerce.productAdjective()} Programming`,
+    const createdSkills: Skill[] = [];
+    for (const skill of skills) {
+      const newSkill = AppDataSource.manager.create(Skill, skill);
+      await newSkill.save();
+      createdSkills.push(newSkill);
+    }
 
-//   // Creative skills
-//   () => `${faker.commerce.productAdjective()} Photography`,
-//   () => `${faker.music.genre()} Composition`,
-//   () => `${faker.commerce.productAdjective()} Design`,
+    // Create users (20 mentors and 5 regular users)
+    const users: Users[] = [];
 
-//   // Languages
-//   () => `${faker.location.country()} Language`,
+    // Create 5 regular users
+    for (let i = 1; i <= 5; i++) {
+      const hashedPassword = await bcrypt.hash('password123', 10);
+      const user = AppDataSource.manager.create(Users, {
+        fullname: `Student User ${i}`,
+        email: `student${i}@example.com`,
+        role: 'student',
+        password: hashedPassword,
+      });
+      await user.save();
+      users.push(user);
+    }
 
-//   // Business skills
-//   () => `${faker.company.buzzAdjective()} Marketing`,
-//   () => `${faker.company.buzzVerb()} Management`,
+    // Create 20 mentor users
+    for (let i = 1; i <= 20; i++) {
+      const hashedPassword = await bcrypt.hash('password123', 10);
+      const user = Users.create({
+        fullname: `Mentor User ${i}`,
+        email: `mentor${i}@example.com`,
+        role: 'mentor',
+        password: hashedPassword,
+      });
+      await user.save();
+      users.push(user);
+    }
 
-//   // Miscellaneous skills
-//   () => `Professional ${faker.person.jobType()}`,
-//   () => `${faker.commerce.productAdjective()} Cooking`,
-//   () => `${faker.vehicle.type()} Maintenance`,
-//   () => `${faker.commerce.productAdjective()} Fitness`,
-// ];
+    // Create mentor profiles linked to users
+    const countries = [
+      'United States',
+      'United Kingdom',
+      'Canada',
+      'Australia',
+      'Germany',
+      'France',
+      'India',
+      'Japan',
+      'Brazil',
+      'Singapore',
+    ];
+    const universities = [
+      'Harvard University',
+      'Stanford University',
+      'MIT',
+      'University of Oxford',
+      'University of Cambridge',
+      'ETH Zurich',
+      'National University of Singapore',
+      'University of Tokyo',
+      'University of Toronto',
+      'Technical University of Munich',
+    ];
+    const degrees = [
+      'Computer Science',
+      'Business Administration',
+      'Engineering',
+      'Psychology',
+      'Education',
+      'Design',
+      'Finance',
+      'Medicine',
+      'Physics',
+      'Biology',
+    ];
+    const degreeTypes = [
+      'Bachelor',
+      'Master',
+      'PhD',
+      'Associate',
+      'Certificate',
+    ];
+    const certificateIssuers = [
+      'Microsoft',
+      'Google',
+      'Amazon Web Services',
+      'Adobe',
+      'Project Management Institute',
+      'Cisco',
+      'CompTIA',
+      'Salesforce',
+      'Oracle',
+      'International Finance Corporation',
+    ];
+    const certificateNames = [
+      'Certified Professional',
+      'Associate Developer',
+      'Expert Certification',
+      'Master Certification',
+      'Foundation Certificate',
+      'Advanced Practitioner',
+      'Professional Trainer',
+      'Specialist Certification',
+      'Leadership Certification',
+      'Technical Expert',
+    ];
 
-// // Titles for listings
-// const titleTemplates: TemplateFunction2[] = [
-//   // Original templates
-//   (offer: string, request: string) => `I can teach ${offer}`,
-//   (offer: string, request: string) => `Looking to swap my ${offer} skills`,
-//   (offer: string, request: string) =>
-//     `Happy to mentor in ${offer} — in return, I'd love to learn ${request}.`,
-//   (offer: string, request: string) =>
-//     `Can offer ${offer} tips and tricks, seeking guidance in ${request}!`,
+    const getRandomItem = <T>(array: T[]): T =>
+      array[Math.floor(Math.random() * array.length)];
+    // Helper function to get random year
+    const getRandomYear = (min: number, max: number) =>
+      Math.floor(Math.random() * (max - min + 1) + min);
 
-//   // New templates
-//   (offer: string, request: string) =>
-//     `${offer} expert seeking ${request} lessons`,
-//   (offer: string, request: string) => `Trade: My ${offer} for your ${request}`,
-//   (offer: string, request: string) =>
-//     `${offer} skills to share, want to learn ${request}`,
-//   (offer: string, request: string) =>
-//     `Experienced in ${offer}, beginner at ${request}`,
-//   (offer: string, request: string) => `Skill exchange: ${offer} ↔ ${request}`,
-//   (offer: string, request: string) =>
-//     `${offer} mentor looking for ${request} guidance`,
-//   (offer: string, request: string) =>
-//     `Let's learn together: my ${offer} for your ${request}`,
-//   (offer: string, request: string) => `${offer} pro seeking ${request} tutor`,
-//   (offer: string, request: string) =>
-//     `Let me help with ${offer}, you help with ${request}`,
-//   (offer: string, request: string) =>
-//     `Knowledge exchange: ${offer} for ${request}`,
-// ];
+    const mentorUsers = users.filter((user) => user.role === 'mentor');
+    for (let i = 0; i < mentorUsers.length; i++) {
+      const mentorUser = mentorUsers[i];
+      const randomSkill = createdSkills[i % createdSkills.length]; // Distribute skills evenly
+      const randomCategory = randomSkill.category;
 
-// // Duration options for listings
-// const durationTemplates: string[] = [
-//   // Original templates
-//   '1-2 hours daily',
-//   '1-2 hours weekly',
-//   '1-2 hours monthly',
+      const mentor = AppDataSource.manager.create(Mentor, {
+        countryOfBirth: getRandomItem(countries),
+        skill_category: randomCategory,
+        skills: randomSkill,
+        subject: randomSkill.name,
+        profilePhotoUrl: `https://randomuser.me/api/portraits/${i % 2 === 0 ? 'men' : 'women'}/${i + 1}.jpg`,
+        introduction: `Experienced ${randomSkill.name} professional with a passion for mentoring others in the field.`,
+        experience: `Over ${Math.floor(Math.random() * 15) + 3} years of experience in ${randomSkill.name}, working with organizations such as ${getRandomItem(['Google', 'Microsoft', 'Amazon', 'Apple', 'Facebook', 'IBM', 'Oracle', 'Adobe', 'Salesforce', 'Twitter'])}.`,
+        motivation: `I believe in empowering others through knowledge sharing and personalized guidance. My goal is to help mentees achieve their full potential in ${randomSkill.name}.`,
+        headline: `${getRandomItem(['Expert', 'Professional', 'Specialist', 'Passionate'])} ${randomSkill.name} Mentor`,
+        has_education: true,
+        has_certificate: Math.random() > 0.3, // 70% chance of having certificates
+        isVerified: Math.random() > 0.2, // 80% chance of being verified
+        isActive: Math.random() > 0.1, // 90% chance of being active
+        user: mentorUser,
+      });
 
-//   // New templates
-//   '30 minutes twice a week',
-//   '1 hour every weekend',
-//   '3 hours weekly',
-//   '45 minutes, three times a week',
-//   'Flexible, 2-3 hours weekly',
-//   '4 hours monthly',
-//   'Twice monthly, 2 hours each',
-//   'One intensive weekend session',
-//   '20-30 minutes daily',
-//   'Bi-weekly 90-minute sessions',
-//   'Once a week, duration flexible',
-//   '2-3 hours every two weeks',
-// ];
+      await mentor.save();
 
-// // Descriptions for listings
-// const sentenceTemplates: TemplateFunction2[] = [
-//   // Original templates
-//   (offer: string, request: string) =>
-//     `I can teach ${offer} if someone helps me with ${request}.`,
-//   (offer: string, request: string) =>
-//     `Looking to swap my ${offer} skills for some lessons in ${request}.`,
-//   (offer: string, request: string) =>
-//     `Happy to mentor in ${offer} — in return, I'd love to learn ${request}.`,
-//   (offer: string, request: string) =>
-//     `Can offer ${offer} tips and tricks, seeking guidance in ${request}!`,
+      const educationCount = Math.floor(Math.random() * 2) + 1; // 1-2 education records per mentor
+      for (let j = 0; j < educationCount; j++) {
+        const startYear = getRandomYear(2000, 2015).toString();
+        const endYear = getRandomYear(parseInt(startYear) + 2, 2023).toString();
 
-//   // New templates
-//   (offer: string, request: string) =>
-//     `I've been practicing ${offer} for years and would love to share my knowledge while picking up some ${request} skills.`,
-//   (offer: string, request: string) =>
-//     `Expert in ${offer} looking to expand my horizons with ${request} - let's help each other grow!`,
-//   (offer: string, request: string) =>
-//     `I believe in the power of skill exchange - my ${offer} expertise for your ${request} knowledge.`,
-//   (offer: string, request: string) =>
-//     `Passionate about teaching ${offer} and equally enthusiastic about learning ${request}.`,
-//   (offer: string, request: string) =>
-//     `Let's create a win-win situation: I'll share everything I know about ${offer} while you teach me ${request}.`,
-//   (offer: string, request: string) =>
-//     `I've mastered ${offer} and now want to challenge myself with ${request} - can you help?`,
-//   (offer: string, request: string) =>
-//     `Ready to exchange skills? I'm proficient in ${offer} and eager to learn ${request}.`,
-//   (offer: string, request: string) =>
-//     `My journey with ${offer} has been rewarding, and I'm ready to start a new one with ${request}.`,
-//   (offer: string, request: string) =>
-//     `${offer} has been my passion for years - would love to trade lessons for ${request} instruction.`,
-//   (offer: string, request: string) =>
-//     `Seeking a mutually beneficial arrangement: my ${offer} knowledge for your ${request} expertise.`,
-//   (offer: string, request: string) =>
-//     `I can guide you through the intricacies of ${offer} while you introduce me to ${request}.`,
-//   (offer: string, request: string) =>
-//     `Let's build skills together - I'll share my ${offer} techniques while learning your ${request} methods.`,
-// ];
+        const education = AppDataSource.manager.create(MentorEducation, {
+          university: getRandomItem(universities),
+          degree: getRandomItem(degrees),
+          degree_type: getRandomItem(degreeTypes),
+          start_year: startYear,
+          end_year: endYear,
+          mentor: mentor,
+        });
 
-// // "Bad data" templates that break the clear exchange pattern
-// const noisyDescriptionTemplates: NoisyTemplateFunction[] = [
-//   (offer: string): string =>
-//     `I'm really good at ${offer} but not sure what I want to learn.`,
-//   (request: string): string =>
-//     `I'm desperately seeking to learn ${request}, open to any exchange.`,
-//   (offer: string, request: string): string =>
-//     `${offer} expert available. By the way, someday I'd like to learn ${request}.`,
-//   (offer: string, request: string): string =>
-//     `Can teach ${offer} or ${request}, flexible with what I learn in return.`,
-//   (offer: string): string => `Free ${offer} lessons for anyone interested!`,
-//   (request: string): string =>
-//     `Looking for ${request} tutoring, willing to pay or barter.`,
-//   (): string =>
-//     `Open to various skill exchanges, contact me to discuss possibilities.`,
-//   (offer: string, request: string): string =>
-//     `Primarily offering ${offer}, but also know ${request}. Let's talk!`,
-// ];
+        await education.save();
+      }
 
-// // Noise generation functions
-// const generateNoisySkillRequests = (
-//   skill1: Skill,
-//   skill2: Skill,
-//   skill3: Skill,
-// ): string => {
-//   const templates: (() => string)[] = [
-//     () => `${skill1.name} or maybe ${skill2.name}`,
-//     () => `either ${skill1.name} or ${skill3.name}`,
-//     () => `${skill1.name}, ${skill2.name}, or ${skill3.name}`,
-//     () => `primarily ${skill1.name}, but also interested in ${skill2.name}`,
-//   ];
-//   return faker.helpers.arrayElement(templates)();
-// };
+      // Create certificate records if mentor has certificates
+      if (mentor.has_certificate) {
+        const certificateCount = Math.floor(Math.random() * 3) + 1; // 1-3 certificates per mentor
+        for (let j = 0; j < certificateCount; j++) {
+          const startYear = getRandomYear(2010, 2020).toString();
+          const endYear =
+            Math.random() > 0.3
+              ? getRandomYear(parseInt(startYear) + 1, 2025).toString()
+              : ''; // Some certificates don't expire
 
-// // Interface for createListing parameters
-// interface CreateListingParams {
-//   user: Users;
-//   offeringSkill: Skill;
-//   requestedSkill: Skill;
-//   category: Category;
-//   isNoisy?: boolean;
-// }
+          const name = `${getRandomItem(certificateNames)} in ${randomSkill.name}`;
 
-// // Helper to create listings with potentially "noisy" data
-// const createListing = async ({
-//   user,
-//   offeringSkill,
-//   requestedSkill,
-//   category,
-//   isNoisy = false,
-// }: CreateListingParams): Promise<Listings> => {
-//   const listing = new Listings();
+          const certificate = AppDataSource.manager.create(MentorCertificate, {
+            subject: randomSkill.name,
+            name,
+            description: `Professional certification demonstrating expertise in ${randomSkill.name} principles and applications.`,
+            issuedBy: getRandomItem(certificateIssuers),
+            start_year: startYear,
+            end_year: endYear,
+            mentor,
+            // subject: randomSkill.name,
+            // name: `${getRandomItem(certificateNames)} in ${randomSkill.name}`,
+            // description: `Professional certification demonstrating expertise in ${randomSkill.name} principles and applications.`,
+            // issuedBy: getRandomItem(certificateIssuers),
+            // start_year: startYear,
+            // end_year: endYear,
+            // mentor: mentor,
+          });
 
-//   if (isNoisy) {
-//     // 30% chance to have a completely different approach
-//     if (Math.random() < 0.3) {
-//       const noisyTemplate = faker.helpers.arrayElement<NoisyTemplateFunction>(
-//         noisyDescriptionTemplates,
-//       );
+          await certificate.save();
+        }
+      }
+    }
 
-//       // Check function arity to determine how to call it
-//       if (noisyTemplate.length === 0) {
-//         listing.description = (noisyTemplate as () => string)();
-//       } else if (noisyTemplate.length === 1) {
-//         listing.description = (noisyTemplate as TemplateFunction1)(
-//           offeringSkill.name,
-//         );
-//       } else {
-//         listing.description = (noisyTemplate as TemplateFunction2)(
-//           offeringSkill.name,
-//           requestedSkill.name,
-//         );
-//       }
+    console.log('Seeding completed successfully');
+    console.log('Seeding completed successfully!');
+  } catch (error) {
+    console.error('Error during seeding:', error);
+  } finally {
+    await AppDataSource.destroy();
+  }
+}
 
-//       // Sometimes make the title vague or not clearly matching the offering/requesting pattern
-//       if (Math.random() < 0.5) {
-//         listing.title = `Looking to connect over ${offeringSkill.name}`;
-//       } else {
-//         listing.title = faker.helpers.arrayElement<string>([
-//           `Skill sharing opportunity`,
-//           `Let's learn together!`,
-//           `${offeringSkill.name} enthusiast here`,
-//           `Teaching and learning journey`,
-//         ]);
-//       }
-//     } else {
-//       // Normal title but slightly ambiguous description
-//       listing.title = faker.helpers.arrayElement<TemplateFunction2>(
-//         titleTemplates,
-//       )(offeringSkill.name, requestedSkill.name);
-//       listing.description = faker.helpers.arrayElement<TemplateFunction2>(
-//         sentenceTemplates,
-//       )(offeringSkill.name, requestedSkill.name);
-
-//       // Add some noise to the description
-//       if (Math.random() < 0.4) {
-//         listing.description += ` Also, I'm somewhat familiar with other topics like ${faker.hacker.noun()} and ${faker.music.genre()}.`;
-//       }
-//     }
-
-//     // Randomize duration (sometimes leaving it empty)
-//     if (Math.random() < 0.15) {
-//       listing.duration = '';
-//     } else if (Math.random() < 0.2) {
-//       listing.duration = `Variable, depends on our schedules`;
-//     } else {
-//       listing.duration = faker.helpers.arrayElement<string>(durationTemplates);
-//     }
-
-//     // Occasionally use invalid locations
-//     if (Math.random() < 0.1) {
-//       listing.location = 'Remote only';
-//     } else if (Math.random() < 0.05) {
-//       listing.location = '';
-//     } else {
-//       listing.location = faker.location.city();
-//     }
-//   } else {
-//     // Standard clean listing
-//     listing.title = faker.helpers.arrayElement<TemplateFunction2>(
-//       titleTemplates,
-//     )(offeringSkill.name, requestedSkill.name);
-//     listing.description = faker.helpers.arrayElement<TemplateFunction2>(
-//       sentenceTemplates,
-//     )(offeringSkill.name, requestedSkill.name);
-//     listing.duration = faker.helpers.arrayElement<string>(durationTemplates);
-//     listing.location = faker.location.city();
-//   }
-
-//   // Set standard fields
-//   listing.user = user;
-//   listing.category = category;
-//   listing.offering_skill = offeringSkill;
-//   listing.requested_skill = requestedSkill;
-
-//   return await AppDataSource.manager.save(listing);
-// };
-
-// // Helper function to generate a unique email
-// const generateUniqueEmail = (existingEmails: Set<string>): string => {
-//   let email: string;
-//   do {
-//     email = faker.internet.email();
-//   } while (existingEmails.has(email));
-
-//   existingEmails.add(email);
-//   return email;
-// };
-
-// async function seed(): Promise<void> {
-//   try {
-//     await AppDataSource.initialize();
-//     console.log('Database connected.');
-
-//     // Create 20 categories
-//     const existingCategoryNames: Set<string> = new Set();
-//     const categoryNames: string[] = generateUniqueItems(
-//       20,
-//       (): string => {
-//         const generator =
-//           faker.helpers.arrayElement<GeneratorFunction>(categoryTypes);
-//         return generator();
-//       },
-//       existingCategoryNames,
-//     );
-
-//     for (const name of categoryNames) {
-//       const category = new Category();
-//       category.name = name;
-//       await AppDataSource.manager.save(category);
-//     }
-//     console.log('Created 20 categories');
-
-//     // Create 20 skills
-//     const existingSkillNames: Set<string> = new Set();
-//     const skillNames: string[] = generateUniqueItems(
-//       20,
-//       (): string => {
-//         const generator =
-//           faker.helpers.arrayElement<GeneratorFunction>(skillTypes);
-//         return generator();
-//       },
-//       existingSkillNames,
-//     );
-
-//     for (const name of skillNames) {
-//       const skill = new Skill();
-//       skill.name = name;
-//       await AppDataSource.manager.save(skill);
-//     }
-//     console.log('Created 20 skills');
-
-//     // Fetch all categories and skills
-//     const skills: Skill[] = await AppDataSource.manager.find(Skill);
-//     const categories: Category[] = await AppDataSource.manager.find(Category);
-
-//     // Track existing emails to ensure uniqueness
-//     const existingEmails: Set<string> = new Set();
-
-//     // Create 500 listing pairs with their users
-//     for (let i = 0; i < 200; i++) {
-//       // Select skills and categories
-//       const skillA: Skill = faker.helpers.arrayElement<Skill>(skills);
-//       let skillB: Skill = faker.helpers.arrayElement<Skill>(skills);
-
-//       while (skillA.id === skillB.id) {
-//         skillB = faker.helpers.arrayElement<Skill>(skills);
-//       }
-
-//       const skillC: Skill = faker.helpers.arrayElement<Skill>(
-//         skills.filter((s: Skill) => s.id !== skillA.id && s.id !== skillB.id),
-//       );
-
-//       const categoryA: Category =
-//         faker.helpers.arrayElement<Category>(categories);
-//       const categoryB: Category =
-//         faker.helpers.arrayElement<Category>(categories);
-
-//       // First user: offers A, requests B
-//       const userA = new Users();
-//       userA.fullname = faker.person.fullName();
-//       userA.email = generateUniqueEmail(existingEmails);
-//       userA.password = bcrypt.hashSync('password', 10);
-//       await AppDataSource.manager.save(userA);
-
-//       // Second user: offers B, requests A
-//       const userB = new Users();
-//       userB.fullname = faker.person.fullName();
-//       userB.email = generateUniqueEmail(existingEmails);
-//       userB.password = bcrypt.hashSync('password', 10);
-//       await AppDataSource.manager.save(userB);
-
-//       // Determine if these listings should have "noisy" data
-//       const isNoisyA: boolean = Math.random() < 0.2; // 20% chance for noisy data
-//       const isNoisyB: boolean = Math.random() < 0.2;
-
-//       // Create listings with potential noise
-//       await createListing({
-//         user: userA,
-//         offeringSkill: skillA,
-//         requestedSkill: skillB,
-//         category: categoryA,
-//         isNoisy: isNoisyA,
-//       });
-
-//       await createListing({
-//         user: userB,
-//         offeringSkill: skillB,
-//         requestedSkill: skillA,
-//         category: categoryB,
-//         isNoisy: isNoisyB,
-//       });
-
-//       // Create some one-sided listings that don't have matches (about 15% of the total)
-//       if (Math.random() < 0.15) {
-//         // Random user who only offers without matching request
-//         const randomUser = new Users();
-//         randomUser.fullname = faker.person.fullName();
-//         randomUser.email = generateUniqueEmail(existingEmails);
-//         randomUser.password = bcrypt.hashSync('password', 10);
-//         await AppDataSource.manager.save(randomUser);
-
-//         // Pick a random skill and category
-//         const randomSkill: Skill = faker.helpers.arrayElement<Skill>(skills);
-//         const randomRequestSkill: Skill = faker.helpers.arrayElement<Skill>(
-//           skills.filter((s: Skill) => s.id !== randomSkill.id),
-//         );
-//         const randomCategory: Category =
-//           faker.helpers.arrayElement<Category>(categories);
-
-//         // Create listing with high chance of noise
-//         await createListing({
-//           user: randomUser,
-//           offeringSkill: randomSkill,
-//           requestedSkill: randomRequestSkill,
-//           category: randomCategory,
-//           isNoisy: Math.random() < 0.6,
-//         });
-//       }
-//     }
-
-//     console.log('Seeding completed successfully!');
-//   } catch (error) {
-//     console.error('Error during seeding:', error);
-//   } finally {
-//     await AppDataSource.destroy();
-//   }
-// }
-
-// seed().catch((error: Error) => console.error('Fatal error:', error));
+seed().catch((error: Error) => console.error('Fatal error:', error));

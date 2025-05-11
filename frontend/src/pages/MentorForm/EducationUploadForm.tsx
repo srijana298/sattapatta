@@ -1,64 +1,68 @@
-import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Trash2 } from 'lucide-react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod/src/zod.js';
+import { Education, educationSchema } from '../../lib/profile';
+import { useMutation, useQuery } from 'react-query';
+import { createEducation, getEducations } from '../../services/users';
+import { useEffect } from 'react';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 export default function EducationUploadForm() {
-  const [educationSections, setEducationSections] = useState([
-    {
-      id: 1,
-      hasHigherEducation: true,
-      university: '',
-      degree: '',
-      degreeType: '',
-      specialization: '',
-      startYear: '',
-      endYear: ''
+  const { data, isLoading } = useQuery({
+    queryFn: getEducations,
+    queryKey: 'get_educations'
+  });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    reset,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(educationSchema),
+    defaultValues: {
+      has_education: false,
+      educations: [
+        {
+          university: '',
+          degree: '',
+          degree_type: '',
+          start_year: '',
+          end_year: ''
+        }
+      ]
     }
-  ]);
+  });
+  useEffect(() => {
+    if (data) {
+      const { has_education, educations } = data;
+      reset({
+        has_education,
+        educations
+      });
+    }
+  }, [data, reset]);
+
+  const { append, remove, fields } = useFieldArray({
+    control,
+    name: 'educations'
+  });
 
   const addEducationSection = () => {
-    const newId = educationSections.length + 1;
-    setEducationSections([
-      ...educationSections,
-      {
-        id: newId,
-        hasHigherEducation: true,
-        university: '',
-        degree: '',
-        degreeType: '',
-        specialization: '',
-        startYear: '',
-        endYear: ''
-      }
-    ]);
+    append({
+      university: '',
+      degree: '',
+      degree_type: '',
+      start_year: '',
+      end_year: ''
+    });
   };
 
-  const handleCheckboxChange = (id) => {
-    setEducationSections(
-      educationSections.map((section) => {
-        if (section.id === id) {
-          return {
-            ...section,
-            hasHigherEducation: !section.hasHigherEducation
-          };
-        }
-        return section;
-      })
-    );
-  };
-
-  const handleInputChange = (id, field, value) => {
-    setEducationSections(
-      educationSections.map((section) => {
-        if (section.id === id) {
-          return {
-            ...section,
-            [field]: value
-          };
-        }
-        return section;
-      })
-    );
-  };
+  const { mutateAsync } = useMutation({
+    mutationFn: (data: Partial<Education>) => createEducation(data)
+  });
 
   const yearOptions = [
     '2025',
@@ -79,152 +83,171 @@ export default function EducationUploadForm() {
     '2010'
   ];
 
+  const hasEducation = watch('has_education');
+
   const degreeTypes = ["Bachelor's", "Master's", 'PhD', "Associate's", 'Diploma', 'Certificate'];
 
+  const onSubmit = async (values: Education) => {
+    await mutateAsync(values);
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      {educationSections.map((section, index) => (
-        <div key={section.id} className="mb-8 pb-8 border-b border-gray-200">
-          {index > 0 && <h2 className="text-xl font-bold mb-6">Education #{index + 1}</h2>}
-          {index === 0 && <h1 className="text-2xl font-bold mb-6 text-center">Education</h1>}
+    <form className="max-w-3xl mx-auto p-6" onSubmit={handleSubmit(onSubmit)}>
+      <h1 className="text-2xl font-bold mb-6 text-center">Education Qualifications</h1>
 
-          <p className="mb-4 text-gray-700">
-            Tell students more about the higher education that you've completed or are working on
-          </p>
+      <p className="mb-4 text-gray-700">
+        Do you have education qualifications ? If so, describe them to enhance your profile
+        credibility and get more students.
+      </p>
 
-          <div className="mb-6">
-            <label className="flex items-center">
+      <div className="mb-6">
+        <label className="flex items-center">
+          <Controller
+            control={control}
+            name="has_education"
+            render={({ field }) => (
               <input
                 type="checkbox"
                 className="w-4 h-4 border border-gray-300 rounded"
-                checked={!section.hasHigherEducation}
-                onChange={() => handleCheckboxChange(section.id)}
+                checked={field.value}
+                onChange={field.onChange}
               />
-              <span className="ml-2">I don't have a higher education degree</span>
-            </label>
-          </div>
+            )}
+          />
+          <span className="ml-2">I don't have education qualifications</span>
+        </label>
+      </div>
 
-          {section.hasHigherEducation && (
-            <>
-              <div className="mb-4">
-                <label className="block mb-2">University</label>
-                <input
-                  type="text"
-                  placeholder="E.g. Mount Royal University"
-                  className="w-full px-3 py-2 border border-gray-300 rounded"
-                  value={section.university}
-                  onChange={(e) => handleInputChange(section.id, 'university', e.target.value)}
+      {!hasEducation &&
+        fields.map((section, index) => (
+          <div key={index} className="mb-8 pb-8 border-b border-b-gray-200">
+            <div className="bg-gray-50 py-2 mb-4 rounded flex items-center justify-between">
+              <h3 className="font-medium">Education #{index + 1}</h3>
+              <button
+                type="button"
+                onClick={() => remove(index)}
+                className="text-red-500 hover:text-red-700 p-1"
+                title="Delete certificate"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2">University</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded"
+                {...register(`educations.${index}.university`)}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-2">Degree</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded"
+                {...register(`educations.${index}.degree`)}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-2">Degree Type</label>
+              <div className="relative w-1/2 mr-2">
+                <Controller
+                  control={control}
+                  name={`educations.${index}.degree_type`}
+                  render={({ field }) => (
+                    <select
+                      className="w-full px-3 py-2 border border-gray-300 rounded appearance-none pr-10"
+                      value={field.value}
+                      onChange={field.onChange}
+                    >
+                      <option value="">Select</option>
+                      {degreeTypes.map((degree) => (
+                        <option key={degree} value={degree}>
+                          {degree}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 />
-              </div>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <ChevronDown size={20} />
+                </div>
+              </div>{' '}
+            </div>
 
-              <div className="mb-4">
-                <label className="block mb-2">Degree</label>
-                <input
-                  type="text"
-                  placeholder="E.g. Bachelor's degree in the English Language"
-                  className="w-full px-3 py-2 border border-gray-300 rounded"
-                  value={section.degree}
-                  onChange={(e) => handleInputChange(section.id, 'degree', e.target.value)}
-                />
-              </div>
+            <div className="mb-4">
+              <label className="block mb-2">Years of study</label>
+              <div className="flex items-center">
+                <div className="relative w-1/2 mr-2">
+                  <Controller
+                    control={control}
+                    name={`educations.${index}.start_year`}
+                    render={({ field }) => (
+                      <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded appearance-none pr-10"
+                        value={field.value}
+                        onChange={field.onChange}
+                      >
+                        <option value="">Select</option>
+                        {yearOptions.map((year) => (
+                          <option key={`start-${year}`} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown size={20} />
+                  </div>
+                </div>
 
-              <div className="mb-4">
-                <label className="block mb-2">Degree type</label>
-                <div className="relative">
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded appearance-none pr-10"
-                    value={section.degreeType}
-                    onChange={(e) => handleInputChange(section.id, 'degreeType', e.target.value)}
-                  >
-                    <option value="">Choose degree type...</option>
-                    {degreeTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
+                <span className="mx-2">-</span>
+
+                <div className="relative w-1/2 ml-2">
+                  <Controller
+                    control={control}
+                    name={`educations.${index}.end_year`}
+                    render={({ field }) => (
+                      <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded appearance-none pr-10"
+                        value={field.value}
+                        onChange={field.onChange}
+                      >
+                        <option value="">Select</option>
+                        {yearOptions.map((year) => (
+                          <option key={`end-${year}`} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  />
                   <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                     <ChevronDown size={20} />
                   </div>
                 </div>
               </div>
-
-              <div className="mb-4">
-                <label className="block mb-2">Specialization</label>
-                <input
-                  type="text"
-                  placeholder="E.g. Teaching English as a Foreign Language"
-                  className="w-full px-3 py-2 border border-gray-300 rounded"
-                  value={section.specialization}
-                  onChange={(e) => handleInputChange(section.id, 'specialization', e.target.value)}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block mb-2">Years of study</label>
-                <div className="flex items-center">
-                  <div className="relative w-1/2 mr-2">
-                    <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded appearance-none pr-10"
-                      value={section.startYear}
-                      onChange={(e) => handleInputChange(section.id, 'startYear', e.target.value)}
-                    >
-                      <option value="">Select</option>
-                      {yearOptions.map((year) => (
-                        <option key={`start-${year}`} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <ChevronDown size={20} />
-                    </div>
-                  </div>
-
-                  <span className="mx-2">-</span>
-
-                  <div className="relative w-1/2 ml-2">
-                    <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded appearance-none pr-10"
-                      value={section.endYear}
-                      onChange={(e) => handleInputChange(section.id, 'endYear', e.target.value)}
-                    >
-                      <option value="">Select</option>
-                      {yearOptions.map((year) => (
-                        <option key={`end-${year}`} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <ChevronDown size={20} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded mt-6 mb-4">
-                <h3 className="font-semibold mb-2">Get a "Diploma verified" badge</h3>
-                <p className="text-sm mb-4">
-                  Upload your diploma to boost your credibility! Our team will review it and add the
-                  badge to your profile. Once reviewed, your files will be deleted.
-                </p>
-                <p className="text-sm mb-4">JPG or PNG format; maximum size of 20MB.</p>
-                <button className="border border-gray-300 rounded px-4 py-2 text-sm">Upload</button>
-              </div>
-            </>
-          )}
-        </div>
-      ))}
+            </div>
+          </div>
+        ))}
 
       <button onClick={addEducationSection} className="text-blue-600 font-medium mb-6">
-        Add another education
+        Add another Education
       </button>
 
       <div className="flex justify-between mt-4">
-        <button className="border border-gray-300 rounded px-6 py-2">Back</button>
-        <button className="bg-pink-500 text-white rounded px-6 py-2">Save and continue</button>
+        <button className="border border-gray-300 rounded px-6 py-2" type="button">
+          Back
+        </button>
+        <button className="bg-orange-500 text-white rounded px-6 py-2">Save and continue</button>
       </div>
-    </div>
+    </form>
   );
 }

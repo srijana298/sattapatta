@@ -4,6 +4,7 @@ import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from './entities/users.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { Mentor } from 'src/mentor/entities/mentor.entity';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
         expiresIn: '24h',
       },
     }),
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Users, Mentor]),
   ],
   providers: [UsersService],
   controllers: [UsersController],

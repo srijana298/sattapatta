@@ -4,16 +4,14 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  BaseEntity,
 } from 'typeorm';
 import { Mentor } from './mentor.entity';
 
 @Entity()
-export class MentorEducation {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
-  hasHigherEducation: boolean;
+export class MentorEducation extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ nullable: true })
   university: string;
@@ -22,24 +20,15 @@ export class MentorEducation {
   degree: string;
 
   @Column({ nullable: true })
-  degreeType: string;
+  degree_type: string;
 
   @Column({ nullable: true })
-  specialization: string;
+  start_year: string;
 
   @Column({ nullable: true })
-  startYear: string;
+  end_year: string;
 
-  @Column({ nullable: true })
-  endYear: string;
-
-  @Column({ nullable: true })
-  diplomaVerified: boolean;
-
-  @Column({ nullable: true })
-  diplomaFileUrl: string;
-
-  @ManyToOne(() => Mentor, (mentor) => mentor.education, {
+  @ManyToOne(() => Mentor, (mentor) => mentor.educations, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()

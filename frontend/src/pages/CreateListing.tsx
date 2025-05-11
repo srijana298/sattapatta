@@ -22,7 +22,7 @@ export default function SkillSwapForm() {
     mutationKey: ['createListing'],
     onSuccess: () => {
       toast.success('Listing created successfully');
-      navigate('/home');
+      navigate('/');
     },
     onError: (error) => {
       console.error('Error creating listing:', error);

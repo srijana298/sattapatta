@@ -4,22 +4,20 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  BaseEntity,
 } from 'typeorm';
 import { Mentor } from './mentor.entity';
 
 @Entity()
-export class MentorCertificate {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
-  hasTeachingCertificate: boolean;
+export class MentorCertificate extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ nullable: true })
   subject: string;
 
   @Column({ nullable: true })
-  certificateName: string;
+  name: string;
 
   @Column({ type: 'text', nullable: true })
   description: string;
@@ -28,10 +26,10 @@ export class MentorCertificate {
   issuedBy: string;
 
   @Column({ nullable: true })
-  startYear: string;
+  start_year: string;
 
   @Column({ nullable: true })
-  endYear: string;
+  end_year: string;
 
   @Column({ default: false })
   certificateVerified: boolean;

@@ -1,48 +1,38 @@
-import { Star, Play, Info, MessageSquare, Smile, Gauge, ClipboardCheck } from 'lucide-react';
+import { Star, Play, Info, MessageSquare, Smile, Gauge, ClipboardCheck, Code } from 'lucide-react';
+import { useState } from 'react';
 import Navbar from '../components/Navbar';
 
 export default function TutorProfile() {
+  const [activeTab, setActiveTab] = useState('reviews');
+
   return (
     <>
       <Navbar />
-      <div className="max-w-6xl mx-auto bg-white pb-10 flex flex-col md:flex-row gap-6">
+      <div className="max-w-6xl mx-auto bg-white pb-10 flex flex-col md:flex-row gap-6 px-6 mt-4">
         <div className="md:flex-1">
-          {/* Tutor Header */}
           <div className="flex items-start gap-4 mb-10 pt-6">
             <div className="w-24 h-24 rounded overflow-hidden relative">
               <img
-                src="https://randomuser.me/api/portraits/women/57.jpg"
-                alt="Laura"
+                src="/api/placeholder/96/96"
+                alt="David"
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">Laura P.</h1>
+                <h1 className="text-2xl font-bold">David R.</h1>
                 <span className="text-2xl">🇪🇸</span>
               </div>
               <p className="text-gray-700 mb-4">
-                Experienced English teacher with 10 years of experience
+                Senior Software Engineer with 10 years of experience
               </p>
               <div className="flex items-start gap-2">
                 <div className="mt-1">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                  </svg>
+                  <Code size={18} />
                 </div>
                 <div>
                   <div className="font-medium">Teaches</div>
-                  <div className="text-gray-600">English lessons</div>
+                  <div className="text-gray-600">JavaScript, React, Node.js</div>
                 </div>
               </div>
             </div>
@@ -52,28 +42,30 @@ export default function TutorProfile() {
           <div className="mb-10">
             <h2 className="text-xl font-bold mb-2">About me</h2>
             <p className="text-gray-700 mb-1">
-              Hello, my name is Laura! I'm delighted to share a bit more about myself. As an
-              experienced English teacher with a decade-long journey spanning Spain, Ireland, and
-              now Sydney, Australia, teaching isn't just a job for me; it's my passion. Over the
-              years, I've had the privilege of guiding young learners, teens, and adults on their
-              English learning journey, tailoring my approach to suit their individual needs.
-              Whether it's General English, IELTS, or my beloved Cambridge courses, I bring
+              Hello, my name is David! I'm thrilled to share my journey with you. As a seasoned
+              software developer with a decade of experience across various tech stacks, I
+              specialize in modern JavaScript frameworks, particularly React and Node.js. My career
+              has taken me through startups in Barcelona, enterprise companies in Dublin, and now
+              tech giants in Sydney, Australia. I've guided junior developers, mentored bootcamp
+              graduates, and helped experienced developers level up their skills throughout my
+              career.
             </p>
             <button className="text-blue-600 font-medium">Show more</button>
           </div>
 
-          {/* I speak Section */}
+          {/* Tech Stack Section */}
           <div className="mb-10">
-            <h2 className="text-xl font-bold mb-4">I speak</h2>
-            <div className="flex gap-2">
-              <div className="flex items-center">
-                <span className="bg-gray-100 py-1 px-3 rounded-md text-sm">Spanish</span>
-                <span className="bg-blue-100 py-1 px-3 rounded-md text-sm ml-1">Native</span>
-              </div>
-              <div className="flex items-center">
-                <span className="bg-gray-100 py-1 px-3 rounded-md text-sm">English</span>
-                <span className="bg-blue-100 py-1 px-3 rounded-md text-sm ml-1">Proficient C2</span>
-              </div>
+            <h2 className="text-xl font-bold mb-4">Tech Stack</h2>
+            <div className="flex flex-wrap gap-2">
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">JavaScript</div>
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">TypeScript</div>
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">React</div>
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">Node.js</div>
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">Next.js</div>
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">Express</div>
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">MongoDB</div>
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">PostgreSQL</div>
+              <div className="bg-gray-100 py-1 px-3 rounded-md text-sm">AWS</div>
             </div>
           </div>
 
@@ -84,14 +76,14 @@ export default function TutorProfile() {
               <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
                 <div>
                   <div className="text-xl font-bold">5.0</div>
-                  <div className="text-gray-600 text-sm">Reassurance</div>
+                  <div className="text-gray-600 text-sm">Mentorship</div>
                 </div>
                 <Smile className="text-gray-600" size={24} />
               </div>
               <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
                 <div>
                   <div className="text-xl font-bold">5.0</div>
-                  <div className="text-gray-600 text-sm">Clarity</div>
+                  <div className="text-gray-600 text-sm">Code Quality</div>
                 </div>
                 <MessageSquare className="text-gray-600" size={24} />
               </div>
@@ -129,197 +121,324 @@ export default function TutorProfile() {
             </div>
           </div>
 
-          {/* Student Reviews Section */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center">
-                What my students say
-                <Info size={16} className="ml-1 text-gray-400" />
-              </h2>
-            </div>
-
-            <div className="flex items-center gap-2 mb-6">
-              <div className="text-4xl font-bold">5</div>
-              <div className="text-2xl">⭐</div>
-            </div>
-
-            <div className="text-sm text-gray-600 mb-6">Based on 3 student reviews</div>
-
-            {/* Review 1 */}
-            <div className="mb-8 border-b pb-6">
-              <div className="flex gap-4 mb-3">
-                <div className="w-10 h-10 rounded-md overflow-hidden">
-                  <img
-                    src="/api/placeholder/40/40"
-                    alt="Andrea"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <div className="font-medium">Andrea</div>
-                  <div className="text-gray-500 text-sm">April 22, 2025</div>
-                </div>
-              </div>
-              <div className="flex mb-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} size={16} className="text-black fill-black" />
-                ))}
-              </div>
-              <p className="text-gray-700 mb-3">
-                I have been working with Laura for a month now and she has adapted very well to my
-                needs. She explains clearly and her classes are very enjoyable!!
-              </p>
-              <button className="flex items-center gap-1 text-gray-600 text-sm">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
-                  <line x1="16" y1="8" x2="2" y2="22"></line>
-                  <line x1="17.5" y1="15" x2="9" y2="15"></line>
-                </svg>
-                Show original
+          {/* Tabs Navigation */}
+          <div className="mb-6 border-b">
+            <div className="flex">
+              <button
+                onClick={() => setActiveTab('reviews')}
+                className={`py-3 px-4 font-medium text-sm ${activeTab === 'reviews' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              >
+                Reviews
               </button>
-            </div>
-
-            {/* Review 2 */}
-            <div className="mb-8 border-b pb-6">
-              <div className="flex gap-4 mb-3">
-                <div className="w-10 h-10 rounded-md overflow-hidden">
-                  <img
-                    src="/api/placeholder/40/40"
-                    alt="Jordi"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <div className="font-medium">Jordi</div>
-                  <div className="text-gray-500 text-sm">March 18, 2025</div>
-                </div>
-              </div>
-              <div className="flex mb-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} size={16} className="text-black fill-black" />
-                ))}
-              </div>
-              <p className="text-gray-700 mb-3">
-                Super professional! He adapts to you and makes the classes completely personalized
-                to your needs.
-              </p>
-              <button className="flex items-center gap-1 text-gray-600 text-sm">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
-                  <line x1="16" y1="8" x2="2" y2="22"></line>
-                  <line x1="17.5" y1="15" x2="9" y2="15"></line>
-                </svg>
-                Show original
+              <button
+                onClick={() => setActiveTab('education')}
+                className={`py-3 px-4 font-medium text-sm ${activeTab === 'education' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              >
+                Education & Qualifications
               </button>
-            </div>
-
-            {/* Review 3 */}
-            <div className="mb-8">
-              <div className="flex gap-4 mb-3">
-                <div className="w-10 h-10 rounded-md overflow-hidden">
-                  <img
-                    src="/api/placeholder/40/40"
-                    alt="Sandra"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <div className="font-medium">Sandra</div>
-                  <div className="text-gray-500 text-sm">October 23, 2024</div>
-                </div>
-              </div>
-              <div className="flex mb-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} size={16} className="text-black fill-black" />
-                ))}
-              </div>
-              <p className="text-gray-700 mb-3">
-                Laura understands and analyzes the student's level of English, making learning
-                easier. She inspires confidence and shows interest in improving the language.
-                Without a doubt, a very good teacher for discussing everyday topics and
-                understanding English in depth.
-              </p>
-              <button className="flex items-center gap-1 text-gray-600 text-sm">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
-                  <line x1="16" y1="8" x2="2" y2="22"></line>
-                  <line x1="17.5" y1="15" x2="9" y2="15"></line>
-                </svg>
-                Show original
+              <button
+                onClick={() => setActiveTab('conversation')}
+                className={`py-3 px-4 font-medium text-sm ${activeTab === 'conversation' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              >
+                Conversation Topics
               </button>
             </div>
           </div>
 
-          {/* Video Section */}
-          <div className="relative rounded-lg overflow-hidden mb-4">
-            <img
-              src="/api/placeholder/400/200"
-              alt="Video thumbnail"
-              className="w-full h-36 object-cover"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-pink-500 rounded-full p-2">
-                <Play size={24} className="text-white" />
+          {/* Tab Content */}
+          {activeTab === 'reviews' && (
+            <div className="mb-10">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center">
+                  What my students say
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-2 mb-6">
+                <div className="text-4xl font-bold">5</div>
+                <div className="text-2xl">⭐</div>
+              </div>
+
+              <div className="text-sm text-gray-600 mb-6">Based on 3 student reviews</div>
+
+              {/* Review 1 */}
+              <div className="mb-8 border-b pb-6">
+                <div className="flex gap-4 mb-3">
+                  <div className="w-10 h-10 rounded-md overflow-hidden">
+                    <img
+                      src="/api/placeholder/40/40"
+                      alt="Marco"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <div className="font-medium">Marco</div>
+                    <div className="text-gray-500 text-sm">April 22, 2025</div>
+                  </div>
+                </div>
+                <div className="flex mb-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} size={16} className="text-black fill-black" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-3">
+                  David helped me solve a complex React state management issue. He explained
+                  everything clearly and showed me best practices that made my code much more
+                  maintainable.
+                </p>
+                <button className="flex items-center gap-1 text-gray-600 text-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+                    <line x1="16" y1="8" x2="2" y2="22"></line>
+                    <line x1="17.5" y1="15" x2="9" y2="15"></line>
+                  </svg>
+                  Show original
+                </button>
+              </div>
+
+              {/* Review 2 */}
+              <div className="mb-8 border-b pb-6">
+                <div className="flex gap-4 mb-3">
+                  <div className="w-10 h-10 rounded-md overflow-hidden">
+                    <img
+                      src="/api/placeholder/40/40"
+                      alt="Jordi"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <div className="font-medium">Jordi</div>
+                    <div className="text-gray-500 text-sm">March 18, 2025</div>
+                  </div>
+                </div>
+                <div className="flex mb-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} size={16} className="text-black fill-black" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-3">
+                  Super professional! David tailored the lessons to my specific Node.js backend
+                  needs. The custom project we built helped me understand microservices
+                  architecture.
+                </p>
+                <button className="flex items-center gap-1 text-gray-600 text-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+                    <line x1="16" y1="8" x2="2" y2="22"></line>
+                    <line x1="17.5" y1="15" x2="9" y2="15"></line>
+                  </svg>
+                  Show original
+                </button>
+              </div>
+
+              {/* Review 3 */}
+              <div className="mb-8">
+                <div className="flex gap-4 mb-3">
+                  <div className="w-10 h-10 rounded-md overflow-hidden">
+                    <img
+                      src="/api/placeholder/40/40"
+                      alt="Sandra"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <div className="font-medium">Sandra</div>
+                    <div className="text-gray-500 text-sm">October 23, 2024</div>
+                  </div>
+                </div>
+                <div className="flex mb-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} size={16} className="text-black fill-black" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-3">
+                  David helped me understand TypeScript fundamentals and how to integrate it into my
+                  React applications. He's very patient and adapts his teaching to your knowledge
+                  level. I was able to confidently refactor my entire project after our sessions.
+                </p>
+                <button className="flex items-center gap-1 text-gray-600 text-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+                    <line x1="16" y1="8" x2="2" y2="22"></line>
+                    <line x1="17.5" y1="15" x2="9" y2="15"></line>
+                  </svg>
+                  Show original
+                </button>
               </div>
             </div>
-          </div>
+          )}
+
+          {activeTab === 'education' && (
+            <div className="mb-10">
+              <h2 className="text-xl font-bold mb-6">Education & Qualifications</h2>
+
+              {/* Education */}
+              <div className="mb-6">
+                <h3 className="font-medium text-lg mb-2">Education</h3>
+                <div className="mb-4 border-l-2 border-gray-200 pl-4">
+                  <div className="font-medium">Master's in Computer Science</div>
+                  <div className="text-gray-600">Technical University of Madrid • 2012-2014</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Specialized in Software Engineering
+                  </div>
+                </div>
+                <div className="mb-4 border-l-2 border-gray-200 pl-4">
+                  <div className="font-medium">Bachelor's in Computer Engineering</div>
+                  <div className="text-gray-600">University of Barcelona • 2008-2012</div>
+                </div>
+              </div>
+
+              {/* Certifications */}
+              <div className="mb-6">
+                <h3 className="font-medium text-lg mb-2">Certifications</h3>
+                <div className="mb-4 border-l-2 border-gray-200 pl-4">
+                  <div className="font-medium">AWS Certified Solutions Architect</div>
+                  <div className="text-gray-600">Amazon Web Services • 2023</div>
+                </div>
+                <div className="mb-4 border-l-2 border-gray-200 pl-4">
+                  <div className="font-medium">MongoDB Certified Developer</div>
+                  <div className="text-gray-600">MongoDB Inc. • 2021</div>
+                </div>
+                <div className="mb-4 border-l-2 border-gray-200 pl-4">
+                  <div className="font-medium">React Advanced Certification</div>
+                  <div className="text-gray-600">Meta • 2022</div>
+                </div>
+              </div>
+
+              {/* Work Experience */}
+              <div>
+                <h3 className="font-medium text-lg mb-2">Work Experience</h3>
+                <div className="mb-4 border-l-2 border-gray-200 pl-4">
+                  <div className="font-medium">Senior Software Engineer</div>
+                  <div className="text-gray-600">Tech Sydney • 2021-Present</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Leading the frontend team building React applications
+                  </div>
+                </div>
+                <div className="mb-4 border-l-2 border-gray-200 pl-4">
+                  <div className="font-medium">Full Stack Developer</div>
+                  <div className="text-gray-600">Dublin Tech • 2017-2021</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Worked on Node.js and React applications
+                  </div>
+                </div>
+                <div className="mb-4 border-l-2 border-gray-200 pl-4">
+                  <div className="font-medium">Frontend Developer</div>
+                  <div className="text-gray-600">Barcelona Startup • 2014-2017</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'conversation' && (
+            <div className="mb-10">
+              <h2 className="text-xl font-bold mb-4">Topics I can help with</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-medium flex items-center gap-2">
+                    <Code size={18} className="text-blue-500" />
+                    JavaScript Fundamentals
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    ES6+, closures, prototypes, promises, async/await
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-medium flex items-center gap-2">
+                    <Code size={18} className="text-blue-500" />
+                    React Ecosystem
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    Hooks, context, Redux, React Query, Next.js
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-medium flex items-center gap-2">
+                    <Code size={18} className="text-blue-500" />
+                    Backend Development
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    Node.js, Express, RESTful APIs, GraphQL
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-medium flex items-center gap-2">
+                    <Code size={18} className="text-blue-500" />
+                    Database Design
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    MongoDB, PostgreSQL, data modeling, querying
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-medium flex items-center gap-2">
+                    <Code size={18} className="text-blue-500" />
+                    DevOps & Deployment
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-1">Docker, CI/CD, AWS, Netlify, Vercel</p>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-medium flex items-center gap-2">
+                    <Code size={18} className="text-blue-500" />
+                    Testing Strategies
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    Jest, React Testing Library, Cypress, TDD
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Side UI */}
         <div className="md:w-80">
-          <div className="bg-white rounded-lg shadow-md p-4 sticky top-4">
+          <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
             {/* Video Preview */}
-            <div className="relative rounded-lg overflow-hidden mb-6">
-              <img
-                src="/api/placeholder/400/300"
-                alt="Video thumbnail"
-                className="w-full object-cover"
-              />
+            <div className="relative rounded-lg overflow-hidden mb-6 h-48 bg-gray-100">
               <div className="absolute bottom-4 right-4">
                 <div className="bg-pink-300 rounded-full p-4">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                  >
-                    <polygon points="5 3 19 12 5 21 5 3" className="fill-black"></polygon>
-                  </svg>
+                  <Play size={24} className="text-black" />
                 </div>
               </div>
             </div>
 
             {/* Stats Section */}
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-start mb-6 px-2">
               <div className="text-center">
                 <div className="flex items-center text-2xl font-bold">
                   <span className="text-black">★</span>
@@ -332,7 +451,7 @@ export default function TutorProfile() {
                 <div className="text-gray-500">lessons</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">$20</div>
+                <div className="text-2xl font-bold">$45</div>
                 <div className="text-gray-500">50-min lesson</div>
               </div>
             </div>
@@ -368,99 +487,6 @@ export default function TutorProfile() {
                 </svg>
                 Send message
               </button>
-
-              <button className="w-full bg-white hover:bg-gray-50 text-black py-3 px-4 rounded-full font-medium border flex items-center justify-center">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  className="mr-2"
-                >
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                Save to my list
-              </button>
-
-              <button className="w-full bg-white hover:bg-gray-50 text-black py-3 px-4 rounded-full font-medium border flex items-center justify-center">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  className="mr-2"
-                >
-                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                  <polyline points="16 6 12 2 8 6"></polyline>
-                  <line x1="12" y1="2" x2="12" y2="15"></line>
-                </svg>
-                Share tutor
-              </button>
-            </div>
-
-            {/* Free Switch Banner */}
-            <div className="bg-green-50 rounded-lg p-4 mb-6 flex">
-              <div className="relative mr-4">
-                <img
-                  src="https://randomuser.me/api/portraits/women/57.jpg"
-                  alt="Laura"
-                  className="rounded-md"
-                />
-                <div className="absolute -bottom-2 left-0 right-0 bg-white text-center py-1 text-sm font-medium">
-                  Free switch
-                </div>
-              </div>
-              <div>
-                <p className="text-gray-800 text-lg">
-                  If Laura P. isn't a match, get 2 more free trials to find the right tutor.
-                </p>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  className="mr-2"
-                >
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <div>
-                  <div className="font-medium">Popular</div>
-                  <div className="text-gray-500 text-sm">
-                    4 lesson bookings in the last 48 hours
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  className="mr-2"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <div>
-                  <div className="font-medium">Usually responds in 2 hrs</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

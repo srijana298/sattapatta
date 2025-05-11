@@ -1,12 +1,6 @@
 import { Request } from 'express';
-
-export interface UserPayload {
-  sub: number;
-  email: string;
-}
-
-export type UserPayloadKeys = keyof UserPayload;
+import { User } from './users/entities/users.entity';
 
 export interface AuthRequest extends Request {
-  user: UserPayload;
+  user: User;
 }

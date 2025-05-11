@@ -180,8 +180,6 @@ const Messages = () => {
     e.preventDefault();
     if (!messageText.trim()) return;
 
-    // In a real app, you would send this to your backend
-    console.log('Sending message:', messageText);
     setMessageText('');
   };
 

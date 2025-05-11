@@ -6,38 +6,37 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  ManyToMany,
-  JoinTable,
   BaseEntity,
+  OneToOne,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { MentorEducation } from './education.entity';
 import { MentorCertificate } from './certificate.entity';
 import { MentorAvailability } from './availability.entity';
-import { ManyToOne } from 'typeorm/browser';
+import { Users } from '../../users/entities/users.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 @Entity()
 export class Mentor extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   countryOfBirth: string;
 
-  @ManyToMany(() => Skill, (skill) => skill.mentors)
-  @JoinTable({
-    name: 'mentor_skills',
-    joinColumn: { name: 'mentorId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'skillId', referencedColumnName: 'id' },
-  })
-  skills: Skill[];
+  @ManyToOne(() => Category, (c) => c.mentors)
+  skill_category: Category;
 
-  @Column()
+  @ManyToOne(() => Skill, (skill) => skill.mentors)
+  skills: Skill;
+
+  @Column({ nullable: true })
   subject: string;
 
   @Column({ nullable: true })
   profilePhotoUrl: string;
 
-  // Description - from DescriptionUploadForm
   @Column({ type: 'text', nullable: true })
   introduction: string;
 
@@ -50,11 +49,16 @@ export class Mentor extends BaseEntity {
   @Column({ nullable: true })
   headline: string;
 
-  // Relations
+  @Column({ default: false })
+  has_education: boolean;
+
   @OneToMany(() => MentorEducation, (education) => education.mentor, {
     cascade: true,
   })
-  education: MentorEducation[];
+  educations: MentorEducation[];
+
+  @Column({ default: false })
+  has_certificate: boolean;
 
   @OneToMany(() => MentorCertificate, (certificate) => certificate.mentor, {
     cascade: true,
@@ -66,14 +70,16 @@ export class Mentor extends BaseEntity {
   })
   availability: MentorAvailability[];
 
-  // Status
   @Column({ default: false })
   isVerified: boolean;
 
   @Column({ default: false })
   isActive: boolean;
 
-  // Timestamps
+  @OneToOne(() => Users, (user) => user.mentor_profile)
+  @JoinColumn({ name: 'users_id' })
+  user: Users;
+
   @CreateDateColumn()
   createdAt: Date;
 

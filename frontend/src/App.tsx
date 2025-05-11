@@ -14,6 +14,7 @@ import MyPosts from './pages/MyPosts';
 import Matches from './pages/Matches';
 import Profile from './pages/Profile';
 import TutorMultiStepForm from './pages/TutorSignupForm';
+import PrivateRoutes from './components/PrivateRoute';
 
 const client = new QueryClient();
 function App() {
@@ -23,17 +24,18 @@ function App() {
         <AuthProvider>
           <Toaster position="top-right" reverseOrder={false} />
           <Routes>
-            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/home" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/my-posts" element={<MyPosts />} />
-            <Route path="/signup/mentor" element={<TutorMultiStepForm />} />
-            <Route path="/matches" element={<Matches />} />
-            <Route path="/submit-request" element={<Listings />} />
-            <Route path="/admin/*" element={<Admin />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="my-posts" element={<MyPosts />} />
+            <Route path="signup/mentor" element={<TutorMultiStepForm />} />
+            <Route path="/" element={<PrivateRoutes />}>
+              <Route path="" element={<Home />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="matches" element={<Matches />} />
+              <Route path="submit-request" element={<Listings />} />
+              <Route path="admin/*" element={<Admin />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
           </Routes>
         </AuthProvider>
       </QueryClientProvider>

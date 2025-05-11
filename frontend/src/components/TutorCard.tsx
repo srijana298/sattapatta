@@ -1,17 +1,15 @@
-import { Heart, Star, Shield, DollarSign } from 'lucide-react';
-import { useState } from 'react';
+import { Star, Shield } from 'lucide-react';
 import { Button } from './ui/button/CustomButton';
+import { MentorProfile } from '../services/users';
 
-export default function TutorCard() {
-  const [isFavorite, setIsFavorite] = useState(false);
-
+export default function TutorCard({ profile }: { profile: MentorProfile }) {
   return (
     <div className="border border-gray-200 rounded-lg p-6 flex bg-white">
       {/* Left column - Tutor image */}
       <div className="w-64 mr-6">
         <div className="relative">
           <img
-            src="https://randomuser.me/api/portraits/men/50.jpg"
+            src={profile.profilePhotoUrl}
             alt="Mitchell T."
             className="rounded-md w-full h-full object-cover"
           />
@@ -23,12 +21,11 @@ export default function TutorCard() {
       <div className="flex-grow">
         {/* Tutor name and badges */}
         <div className="flex items-center mb-2">
-          <h2 className="text-3xl font-bold mr-2">Mitchell T.</h2>
+          <h2 className="text-3xl font-bold mr-2">{profile.user.fullname}</h2>
           <Shield size={20} className="text-gray-800 mr-2" />
           <span className="text-lg">🇿🇦</span>
         </div>
 
-        {/* Professional badge */}
         <div className="mb-4">
           <span className="bg-blue-100 text-blue-800 px-4 py-1 rounded-md text-sm font-medium">
             Professional
@@ -104,16 +101,12 @@ export default function TutorCard() {
                 />
               </svg>
             </div>
-            <span className="text-lg">Speaks English (Native), French (Pre-Intermediate)</span>
+            <span className="text-lg">{profile.introduction}</span>
           </div>
         </div>
 
         <div className="mt-4 text-md ">
-          <p>
-            Patient | Certified Tutor | Business English | General English | Kids English | IELTS
-            Coach | TOEIC Coach — Hello, I am Mitchell <span className="inline-block">👋</span>. and
-            thank you for visiting my
-          </p>
+          <p>{profile.experience}</p>
           <button className="text-gray-900 font-semibold underline mt-1">Read more</button>
         </div>
       </div>

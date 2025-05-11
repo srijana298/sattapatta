@@ -20,8 +20,12 @@ const Signup = () => {
   const { mutateAsync } = useMutation({
     mutationFn: (value: CreateUser) => createUser(value),
     mutationKey: ['createUser'],
-    onSuccess: () => {
-      navigate('/home');
+    onSuccess: (data: CreateUser) => {
+      if (data.role === 'mentor') {
+        navigate('/signup/mentor');
+      } else {
+        navigate('/');
+      }
     }
   });
 

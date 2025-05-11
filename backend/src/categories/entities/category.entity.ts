@@ -1,3 +1,4 @@
+import { Mentor } from '../../mentor/entities/mentor.entity';
 import { Skill } from '../../skills/entities/skill.entity';
 import {
   Entity,
@@ -22,6 +23,9 @@ export class Category extends BaseEntity {
 
   @OneToMany(() => Skill, (skill) => skill.category)
   skills: Skill[];
+
+  @OneToMany(() => Mentor, (m) => m.skill_category)
+  mentors: Mentor[];
 
   @CreateDateColumn()
   createdAt: Date;

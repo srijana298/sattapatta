@@ -1,47 +1,51 @@
-import { useState, useEffect } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod/src/zod.js';
+import { useForm } from 'react-hook-form';
+import { Description, descriptionSchema } from '../../lib/profile';
+import { useMutation, useQuery } from 'react-query';
+import { createDescription, getDescription } from '../../services/users';
+import { useEffect } from 'react';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 const DescriptionUploadForm = () => {
-  const [formData, setFormData] = useState({
-    introduction:
-      'My name is alexandar and I have experience of teaching english language for 2 years',
-    experience: 'I have 4 years of experience in teaching english',
-    motivation: 'Book a trial session with me',
-    headline: 'Certified tutor with 4 years of experience'
+  const {
+    reset,
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(descriptionSchema)
   });
 
-  const [currentCharCount, setCurrentCharCount] = useState(0);
-  const maxCharCount = 400;
+  const { data, isLoading, refetch } = useQuery({
+    queryFn: getDescription
+  });
 
-  useEffect(() => {
-    // Calculate combined character count from steps 1, 2, and 3
-    const combinedLength =
-      (formData.introduction?.length || 0) +
-      (formData.experience?.length || 0) +
-      (formData.motivation?.length || 0);
-
-    setCurrentCharCount(combinedLength);
-  }, [formData]);
-
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value
-    }));
+  const { mutateAsync } = useMutation({
+    mutationFn: (data: Partial<Description>) => createDescription(data),
+    onSuccess: () => {
+      refetch();
+    }
+  });
+  const onSubmit = async (values: Description) => {
+    await mutateAsync(values);
   };
 
+  useEffect(() => {
+    if (data) {
+      reset(data);
+    }
+  }, [reset, data]);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <div className="max-w-lg mx-auto px-4 py-8 font-sans">
+    <form className="max-w-lg mx-auto px-4 py-8 font-sans" onSubmit={handleSubmit(onSubmit)}>
       <h1 className="text-2xl font-bold text-center mb-4">Profile description</h1>
 
-      <p className="mb-2">
-        This info will go on your public profile. Write it in the language you'll be teaching and
-        make sure to follow our{' '}
-        <a href="#" className="underline font-medium">
-          guidelines to get approved
-        </a>
-      </p>
+      <p className="mb-2">This info will go on your public profile.</p>
 
-      {/* Section 1: Introduce yourself */}
       <div className="mt-8 mb-6">
         <h2 className="text-xl font-bold mb-4">1. Introduce yourself</h2>
 
@@ -52,8 +56,7 @@ const DescriptionUploadForm = () => {
 
         <textarea
           className="w-full border rounded p-3 min-h-[100px]"
-          value={formData.introduction}
-          onChange={(e) => handleInputChange('introduction', e.target.value)}
+          {...register('introduction')}
         />
 
         <div className="bg-blue-100 p-3 mt-3 flex items-start rounded">
@@ -75,13 +78,8 @@ const DescriptionUploadForm = () => {
             Don't include your last name or present your information in a CV format
           </p>
         </div>
-
-        <button className="mt-4 border border-gray-800 text-gray-800 font-medium py-2 px-5 rounded">
-          Continue
-        </button>
       </div>
 
-      {/* Section 2: Teaching experience */}
       <div className="mt-8 mb-6">
         <h2 className="text-xl font-bold mb-4">2. Teaching experience</h2>
 
@@ -90,18 +88,9 @@ const DescriptionUploadForm = () => {
           certifications, teaching methodology, education, and subject expertise.
         </p>
 
-        <textarea
-          className="w-full border rounded p-3 min-h-[100px]"
-          value={formData.experience}
-          onChange={(e) => handleInputChange('experience', e.target.value)}
-        />
-
-        <button className="mt-4 border border-gray-800 text-gray-800 font-medium py-2 px-5 rounded">
-          Continue
-        </button>
+        <textarea className="w-full border rounded p-3 min-h-[100px]" {...register('experience')} />
       </div>
 
-      {/* Section 3: Motivate potential students */}
       <div className="mt-8 mb-6">
         <h2 className="text-xl font-bold mb-4">3. Motivate potential students</h2>
 
@@ -110,11 +99,7 @@ const DescriptionUploadForm = () => {
           you!
         </p>
 
-        <textarea
-          className="w-full border rounded p-3 min-h-[100px]"
-          value={formData.motivation}
-          onChange={(e) => handleInputChange('motivation', e.target.value)}
-        />
+        <textarea className="w-full border rounded p-3 min-h-[100px]" {...register('motivation')} />
 
         <div className="bg-blue-100 p-3 mt-3 flex items-start rounded">
           <svg
@@ -136,13 +121,8 @@ const DescriptionUploadForm = () => {
             personal contact details
           </p>
         </div>
-
-        <button className="mt-4 border border-gray-800 text-gray-800 font-medium py-2 px-5 rounded">
-          Continue
-        </button>
       </div>
 
-      {/* Section 4: Write a catchy headline */}
       <div className="mt-8 mb-6">
         <h2 className="text-xl font-bold mb-4">4. Write a catchy headline</h2>
 
@@ -152,11 +132,7 @@ const DescriptionUploadForm = () => {
           description.
         </p>
 
-        <textarea
-          className="w-full border rounded p-3 min-h-[100px]"
-          value={formData.headline}
-          onChange={(e) => handleInputChange('headline', e.target.value)}
-        />
+        <textarea className="w-full border rounded p-3 min-h-[100px]" {...register('headline')} />
       </div>
 
       {/* Character count warning */}
@@ -185,24 +161,13 @@ const DescriptionUploadForm = () => {
 
       {/* Bottom action bar */}
       <div className="flex justify-between items-center border-t pt-4">
-        <div className="text-red-500 font-medium">
-          {currentCharCount} / {maxCharCount}
-        </div>
-
         <div className="flex gap-3">
-          <button className="border border-gray-800 text-gray-800 font-medium py-2 px-5 rounded">
-            Back
-          </button>
-
-          <button
-            className="bg-pink-500 text-white font-medium py-2 px-5 rounded"
-            disabled={currentCharCount < maxCharCount}
-          >
+          <button className="bg-orange-500 text-white font-medium py-2 px-5 rounded" type="submit">
             Save and continue
           </button>
         </div>
       </div>
-    </div>
+    </form>
   );
 };
 

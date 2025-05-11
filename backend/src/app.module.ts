@@ -11,6 +11,8 @@ import { Category } from './categories/entities/category.entity';
 import { Skill } from './skills/entities/skill.entity';
 import { MentorModule } from './mentor/mentor.module';
 import { Mentor } from './mentor/entities/mentor.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import path from 'path';
 
 const DEFAULT_ADMIN = {
   email: 'admin@example.com',
@@ -26,6 +28,10 @@ const authenticate = async (email: string, password: string) => {
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: path.join(__dirname, '..', '..', 'uploads'),
+      serveRoot: '/uploads/',
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

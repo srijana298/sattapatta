@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Video, User, MoreVertical, Paperclip, Image, Send, MessageSquare } from 'lucide-react';
+import { Video, User, MoreVertical, Send } from 'lucide-react';
 import { useParams, Link } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
 import { getConversation, sendMessage } from '../../services/conversation';
@@ -38,6 +38,34 @@ const Message = () => {
       }
     }
   });
+
+  // Function to generate Jitsi Meet room name
+  const generateJitsiRoomName = () => {
+    // Create a unique room name using conversation ID and timestamp
+    const timestamp = Date.now();
+    const roomName = `skillswap-${id}-${timestamp}`;
+    return roomName;
+  };
+
+  // Function to handle video call
+  const handleVideoCall = () => {
+    const roomName = generateJitsiRoomName();
+    const jitsiUrl = `https://meet.jit.si/${roomName}`;
+
+    // Open Jitsi Meet in a new tab/window
+    window.open(jitsiUrl, '_blank', 'noopener,noreferrer');
+
+    // Optionally, you can also send a message to the chat with the meeting link
+    if (id && sender?.id) {
+      const meetingMessage = `📹 Video call started: ${jitsiUrl}`;
+      // You might want to send this as a system message or special message type
+      sendMessage(id, {
+        participant: sender.id,
+        content: meetingMessage
+      });
+    }
+  };
+
   useEffect(() => {
     if (!id) return;
 
@@ -59,6 +87,7 @@ const Message = () => {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   }, [messages, messages.length]);
+
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -88,33 +117,6 @@ const Message = () => {
     setMessageText('');
   };
 
-  // if (!activeConversation) {
-  //   return (
-  //     <div className="max-w-6xl mx-auto">
-  //       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-  //         <div className="flex h-[600px] items-center justify-center">
-  //           <div className="text-center p-6">
-  //             <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
-  //               <MessageSquare size={24} className="text-gray-400" />
-  //             </div>
-  //             <h3 className="text-lg font-medium text-gray-900 mb-2">Conversation not found</h3>
-  //             <p className="text-gray-500 mb-4">
-  //               The conversation you're looking for does not exist or has been deleted.
-  //             </p>
-  //             <Link
-  //               to="/messages"
-  //               className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-  //             >
-  //               Back to Messages
-  //             </Link>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-  //
-
   if (isLoading || !data || !currentUser) {
     return <LoadingSpinner />;
   }
@@ -135,18 +137,16 @@ const Message = () => {
           {/* Conversation header */}
           <div className="p-4 border-b flex items-center justify-between bg-white">
             <div className="flex items-center">
-              {/* <img
-                src={otherParticipant.profile_pic}
-                className="w-10 h-10 rounded-full object-cover"
-                alt={activeConversation.username}
-              /> */}
               <div className="ml-3">
                 <h3 className="font-medium">{otherParticipant?.user.fullname}</h3>
-                {/* <p className="text-xs text-gray-500">Re: {activeConversation.about_skill_swap}</p> */}
               </div>
             </div>
             <div>
-              <button className="text-gray-500 hover:text-gray-700 p-2" title="Video call">
+              <button
+                className="text-gray-500 hover:text-gray-700 p-2"
+                title="Start video call"
+                onClick={handleVideoCall}
+              >
                 <Video size={18} />
               </button>
               <button className="text-gray-500 hover:text-gray-700 p-2" title="View profile">
@@ -177,7 +177,6 @@ const Message = () => {
                   )}
 
                   <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
-
                     <div className="max-w-[70%]">
                       <div
                         className={`px-4 py-3 rounded-lg ${

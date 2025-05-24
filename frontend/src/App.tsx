@@ -15,6 +15,7 @@ import TutorMultiStepForm from './pages/TutorSignupForm';
 import PrivateRoutes from './components/PrivateRoute';
 import MentorDashboard from './pages/Mentor/Dashboard';
 import MentorBookingUI from './pages/Booking';
+import BookingDetailsPage from './pages/BookingDetails';
 
 const client = new QueryClient();
 function App() {
@@ -30,6 +31,7 @@ function App() {
             <Route path="signup/mentor" element={<TutorMultiStepForm />} />
             <Route path="/" element={<PrivateRoutes />}>
               <Route path="" element={<Home />} />
+              <Route path="bookings/:id" element={<BookingDetailsPage />} />
               <Route path="messages/*" element={<Messages />} />
               <Route path="matches" element={<Matches />} />
               <Route path="send-booking-request" element={<MentorBookingUI />} />

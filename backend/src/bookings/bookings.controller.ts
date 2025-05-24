@@ -9,6 +9,7 @@ import {
   Delete,
   UseGuards,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
@@ -42,9 +43,10 @@ export class BookingsController {
     return this.bookingsService.create(studentId, createBookingDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.bookingsService.findAll();
+  findAll(@Req() request: AuthRequest) {
+    return this.bookingsService.findAll(request.user.id);
   }
 
   @Get(':id')

@@ -5,7 +5,7 @@ import DashboardHeader from '../components/dashboard/DashboardHeader';
 interface DashboardLayoutProps {
   children: ReactNode;
   activeTab: string;
-  setActiveTab: (tab: any) => void;
+  setActiveTab: (tab: string) => void;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, activeTab, setActiveTab }) => {

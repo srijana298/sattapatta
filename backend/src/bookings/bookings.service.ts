@@ -44,8 +44,22 @@ export class BookingsService {
     return savedBooking;
   }
 
-  findAll() {
-    return `This action returns all bookings`;
+  findAll(student_id: number) {
+    return this.bookingRepository.find({
+      relations: ['mentee', 'mentor', 'mentor.mentor_profile'],
+      where: {
+        mentee: { id: student_id },
+      },
+      select: {
+        mentor: {
+          id: true,
+          fullname: true,
+        },
+        mentee: {
+          id: true,
+        },
+      },
+    });
   }
 
   findOne(id: number) {

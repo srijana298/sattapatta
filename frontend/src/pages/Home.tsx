@@ -1,5 +1,4 @@
 import { Search } from 'lucide-react';
-import { Select } from '../components/ui/select/select';
 import { CustomDropdown } from '../components/ui/dropdown/CustomDropdown';
 import FirstHeroImage from '../assets/home-screen-1.jpg';
 import SecondHeroImage from '../assets/home-screen-bg.jpg';
@@ -315,48 +314,6 @@ const AuthenticatedPage = () => {
   }
   return (
     <div className="font-sans max-w-6xl mx-auto p-4 bg-white mt-2">
-      <div className="my-8 w-full flex justify-center gap-5">
-        <Select
-          options={[
-            {
-              label: 'Japanese',
-              value: 'japanese'
-            }
-          ]}
-          label="I want to learn"
-          defaultValue=""
-        />
-        <Select
-          options={[
-            {
-              label: '500-1000 NRS',
-              value: '0'
-            },
-            {
-              label: '1500-2000 NRS',
-              value: '1'
-            }
-          ]}
-          label="Price per lesson"
-          defaultValue=""
-        />
-
-        <Select
-          options={[
-            {
-              label: 'Nepal',
-              value: 'nep'
-            },
-            {
-              label: 'India',
-              value: 'ind'
-            }
-          ]}
-          label="Location"
-          defaultValue=""
-        />
-      </div>
-
       <div className="flex flex-wrap gap-3 mb-8 justify-end">
         <CustomDropdown
           options={[

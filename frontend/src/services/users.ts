@@ -10,6 +10,12 @@ export interface MentorProfile {
   introduction: string;
   experience: string;
   motivation: string;
+  skill_category: {
+    name: string;
+  };
+  skills: {
+    name: string;
+  };
   headline: string;
   has_education: boolean;
   user: CurrentUser;

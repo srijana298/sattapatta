@@ -16,7 +16,7 @@ export const registerUserSchema = zod
 export type CreateUser = zod.infer<typeof registerUserSchema>;
 
 export type CurrentUser = {
-  id: string;
+  id: number;
   email: string;
   fullname: string;
   mentor_profile: {

@@ -99,37 +99,23 @@ const Navbar = () => {
               Messages
             </Link>
             <Link to="/my-posts" className="text-gray-600 hover:text-orange-600 focus-outline">
-              My Posts
+              My Bookings
             </Link>
-            <button
-              className="text-white bg-red-600 hover:bg-red-700 transition-colors duration-200 focus-outline rounded-lg px-4 py-2"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
 
             {/* Profile Picture Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
-                className="flex items-center justify-center h-10 w-10 rounded-full bg-orange-100 border-2 border-orange-300 hover:border-orange-500 transition-colors duration-200 focus-outline"
+                className="flex items-center justify-center h-10 w-10 rounded-full bg-orange-100 border-2 border-orange-300 hover:border-orange-500 transition-colors duration-200 focus-outline cursor-pointer"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
-                {currentUser.profilePicture ? (
-                  <img
-                    src={currentUser.profilePicture}
-                    alt="Profile"
-                    className="h-full w-full rounded-full object-cover"
-                  />
-                ) : (
-                  <User className="h-6 w-6 text-orange-600" />
-                )}
+                <User className="h-6 w-6 text-orange-600" />
               </button>
 
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 border border-gray-200">
                   <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">
-                      {currentUser.name || 'User'}
+                    <p className="text-sm font-medium text-gray-900 capitalize">
+                      {currentUser.role}
                     </p>
                     <p className="text-xs text-gray-500 truncate">{currentUser.email || ''}</p>
                   </div>

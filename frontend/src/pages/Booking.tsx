@@ -1,262 +1,351 @@
-import { useState } from 'react';
-import { Clock, Calendar, Code, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, Clock, Calendar, CheckCircle } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { useMutation } from 'react-query';
+import { createBooking } from '../services/bookings';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
-interface;
+interface TimeSlot {
+  id: string;
+  time: string;
+  available: boolean;
+}
 
-export default function BookingModal({ isOpen, onClose, tutorId, tutorName }) {
-  const [step, setStep] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [focusArea, setFocusArea] = useState('');
-  const [notes, setNotes] = useState('');
+export default function MentorBookingUI() {
+  const [searchParams] = useSearchParams();
+  const mentorId = searchParams.get('mentorId');
+  const navigate = useNavigate();
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [step, setStep] = useState<number>(1);
+  const [isBooked, setIsBooked] = useState<boolean>(false);
 
-  // Mock available time slots - in a real app, fetch these from backend
-  const availableSlots = [
-    { id: 1, date: '2025-05-15', time: '09:00', available: true },
-    { id: 2, date: '2025-05-15', time: '10:00', available: true },
-    { id: 3, date: '2025-05-15', time: '14:00', available: true },
-    { id: 4, date: '2025-05-16', time: '11:00', available: true },
-    { id: 5, date: '2025-05-16', time: '15:00', available: true },
-    { id: 6, date: '2025-05-17', time: '13:00', available: true }
-  ];
-
-  // Tech focus areas
-  const focusAreas = [
-    'JavaScript Fundamentals',
-    'React & Hooks',
-    'Node.js & Express',
-    'TypeScript',
-    'Frontend Architecture',
-    'Backend Development'
-  ];
-
-  const handleBookSession = async () => {
-    try {
-      // In a real implementation, this would be an API call
-      const response = await bookTrialSession({
-        tutorId,
-        date: selectedDate,
-        time: selectedTime,
-        focusArea,
-        notes,
-        isTrialSession: true
-      });
-
-      // Move to confirmation step
-      setStep(3);
-
-      // You would typically update the session count here
-      // Either by refreshing data or optimistically updating the UI
-    } catch (error) {
-      console.error('Booking failed:', error);
-      // Show error message
+  const { mutateAsync, isLoading } = useMutation({
+    mutationFn: createBooking,
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message);
+      }
     }
+  });
+
+  useEffect(() => {
+    if (!mentorId) {
+      navigate('/');
+      return;
+    }
+  }, [mentorId, navigate]);
+  const timeSlots: TimeSlot[] = [
+    { id: '1', time: '09:00', available: true },
+    { id: '2', time: '10:00', available: true },
+    { id: '3', time: '11:00', available: true },
+    { id: '4', time: '14:00', available: true },
+    { id: '5', time: '15:00', available: true },
+    { id: '6', time: '16:00', available: true },
+    { id: '7', time: '17:00', available: true }
+  ];
+
+  // Get days in month
+  const getDaysInMonth = (date: Date): (Date | null)[] => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days: (Date | null)[] = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+
+    return days;
   };
 
-  // Mock function - would be replaced by actual API call
-  const bookTrialSession = async (sessionData) => {
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ success: true, sessionId: 'sess_' + Math.random().toString(36).substr(2, 9) });
-      }, 800);
+  const navigateMonth = (direction: number): void => {
+    setCurrentDate((prev) => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() + direction);
+      return newDate;
     });
   };
 
-  if (!isOpen) return null;
+  const isDateAvailable = (date: Date | null): boolean => {
+    if (!date) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date >= today;
+  };
+
+  const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const handleBooking = async (): Promise<void> => {
+    if (!selectedDate || !selectedTime) return;
+
+    await mutateAsync({
+      mentorId: Number(mentorId),
+      start_date: selectedDate.toISOString().split('T')[0],
+      end_time: selectedTime
+    });
+
+    setIsBooked(true);
+    setStep(3);
+  };
+
+  const resetBooking = (): void => {
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setStep(1);
+    setIsBooked(false);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-md mx-4 overflow-hidden">
-        {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-bold">
-            {step === 1 && 'Book Trial Session'}
-            {step === 2 && 'Session Details'}
-            {step === 3 && 'Booking Confirmed!'}
-          </h2>
-          <button onClick={onClose} className="p-1">
-            <X size={20} />
-          </button>
+    <>
+      <Navbar />
+      <div className="max-w-4xl mx-auto p-6 bg-white mt-10">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Book a Mentorship Session</h1>
+          <p className="text-gray-600">
+            Select your preferred date and time for your mentoring session
+          </p>
         </div>
 
-        {/* Step 1: Date & Time Selection */}
-        {step === 1 && (
-          <div className="p-4">
-            <p className="text-gray-600 mb-4">
-              Select a date and time for your 50-minute trial session with {tutorName}
-            </p>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Available dates</label>
-              <div className="grid grid-cols-3 gap-2">
-                {[...new Set(availableSlots.map((slot) => slot.date))].map((date) => (
-                  <button
-                    key={date}
-                    className={`p-2 border rounded-md text-sm ${
-                      selectedDate === date ? 'bg-blue-50 border-blue-500' : ''
-                    }`}
-                    onClick={() => setSelectedDate(date)}
-                  >
-                    {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </button>
-                ))}
+        {/* Progress Steps */}
+        <div className="flex items-center justify-center mb-8">
+          <div className="flex items-center space-x-8">
+            {[
+              { num: 1, label: 'Choose Date' },
+              { num: 2, label: 'Select Time' },
+              { num: 3, label: 'Confirmation' }
+            ].map((s, idx) => (
+              <div key={s.num} className="flex items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    step >= s.num ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  {step > s.num ? <CheckCircle size={16} /> : s.num}
+                </div>
+                <span
+                  className={`ml-2 text-sm ${step >= s.num ? 'text-orange-600' : 'text-gray-500'}`}
+                >
+                  {s.label}
+                </span>
+                {idx < 2 && <div className="w-8 h-px bg-gray-300 ml-4" />}
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            {selectedDate && (
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-2">Available times</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {availableSlots
-                    .filter((slot) => slot.date === selectedDate)
-                    .map((slot) => (
+        {!isBooked ? (
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left Panel - Selection */}
+            <div className="space-y-6">
+              {/* Step 1: Calendar */}
+              <div className="bg-gray-50 rounded-lg p-6">
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Calendar size={20} />
+                  Select Date
+                </h2>
+
+                <div className="bg-white rounded-lg p-4">
+                  {/* Calendar Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <button
+                      onClick={() => navigateMonth(-1)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      type="button"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <h3 className="text-lg font-semibold">
+                      {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    </h3>
+                    <button
+                      onClick={() => navigateMonth(1)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      type="button"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+
+                  {/* Days of Week */}
+                  <div className="grid grid-cols-7 gap-1 mb-2">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                      <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Calendar Days */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {getDaysInMonth(currentDate).map((date, index) => (
                       <button
-                        key={slot.id}
-                        className={`p-2 border rounded-md text-sm flex items-center justify-center gap-1 ${
-                          selectedTime === slot.time ? 'bg-blue-50 border-blue-500' : ''
+                        key={index}
+                        disabled={!isDateAvailable(date)}
+                        type="button"
+                        className={`p-2 text-sm rounded-lg transition-all ${
+                          date && isDateAvailable(date)
+                            ? selectedDate?.toDateString() === date.toDateString()
+                              ? 'bg-orange-600 text-white'
+                              : 'hover:bg-orange-100 text-gray-900'
+                            : 'text-gray-300 cursor-not-allowed'
                         }`}
-                        onClick={() => setSelectedTime(slot.time)}
+                        onClick={() => {
+                          if (isDateAvailable(date)) {
+                            setSelectedDate(date);
+                            if (step === 1) setStep(2);
+                          }
+                        }}
                       >
-                        <Clock size={14} />
-                        {slot.time}
+                        {date ? date.getDate() : ''}
                       </button>
                     ))}
+                  </div>
                 </div>
               </div>
-            )}
 
-            <button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md font-medium mt-4"
-              disabled={!selectedDate || !selectedTime}
-              onClick={() => setStep(2)}
-            >
-              Continue
-            </button>
+              {/* Step 2: Time Selection */}
+              {step >= 2 && selectedDate && (
+                <div className="bg-gray-50 rounded-lg p-6">
+                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <Clock size={20} />
+                    Choose Time
+                  </h2>
+                  <div className="grid grid-cols-3 gap-3">
+                    {timeSlots
+                      .filter((slot) => slot.available)
+                      .map((slot) => (
+                        <button
+                          key={slot.id}
+                          type="button"
+                          className={`p-3 rounded-lg border transition-all ${
+                            selectedTime === slot.time
+                              ? 'bg-orange-600 text-white border-orange-600'
+                              : 'bg-white border-gray-200 hover:border-orange-300'
+                          }`}
+                          onClick={() => setSelectedTime(slot.time)}
+                        >
+                          {slot.time}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Panel - Summary */}
+            <div className="space-y-6">
+              <div className="bg-white border rounded-lg p-6 sticky top-6">
+                <h2 className="text-xl font-semibold mb-4">Session Summary</h2>
+
+                <div className="space-y-4">
+                  {selectedDate && (
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Calendar size={16} />
+                        <span className="font-medium">{formatDate(selectedDate)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedTime && (
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Clock size={16} />
+                        <span className="font-medium">{selectedTime} (60 minutes)</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Session Fee:</span>
+                      <span className="text-xl font-bold text-green-600">$75</span>
+                    </div>
+                  </div>
+
+                  {selectedDate && selectedTime && (
+                    <button
+                      onClick={handleBooking}
+                      disabled={isLoading}
+                      type="button"
+                      className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 text-white py-3 px-4 rounded-lg font-medium transition-colors"
+                    >
+                      {isLoading ? 'Booking...' : 'Confirm Booking'}
+                    </button>
+                  )}
+
+                  {!selectedDate && (
+                    <p className="text-sm text-gray-500 text-center">
+                      Please select a date to continue
+                    </p>
+                  )}
+
+                  {selectedDate && !selectedTime && (
+                    <p className="text-sm text-gray-500 text-center">Please select a time slot</p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-
-        {/* Step 2: Session Details */}
-        {step === 2 && (
-          <div className="p-4">
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                What would you like to focus on?
-              </label>
-              <select
-                className="w-full p-2 border rounded-md"
-                value={focusArea}
-                onChange={(e) => setFocusArea(e.target.value)}
-              >
-                <option value="">Select a focus area</option>
-                {focusAreas.map((area) => (
-                  <option key={area} value={area}>
-                    {area}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Any specific topics or questions?
-              </label>
-              <textarea
-                className="w-full p-2 border rounded-md h-24"
-                placeholder="e.g., I need help with React Hooks and state management"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-md mb-4">
-              <h3 className="font-medium mb-2">Session Summary</h3>
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar size={16} className="text-gray-500" />
-                <span>
-                  {new Date(selectedDate).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
+        ) : (
+          /* Confirmation Page */
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-8">
+              <CheckCircle size={64} className="text-green-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-green-800 mb-4">Booking Confirmed!</h2>
+              <div className="space-y-3 mb-6">
+                <p className="text-green-700">
+                  Your mentorship session has been successfully booked.
+                </p>
+                {selectedDate && (
+                  <div className="flex items-center justify-center gap-2 text-green-700">
+                    <Calendar size={16} />
+                    <span className="font-medium">{formatDate(selectedDate)}</span>
+                  </div>
+                )}
+                {selectedTime && (
+                  <div className="flex items-center justify-center gap-2 text-green-700">
+                    <Clock size={16} />
+                    <span className="font-medium">{selectedTime} (60 minutes)</span>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-2 mb-2">
-                <Clock size={16} className="text-gray-500" />
-                <span>{selectedTime} - 50 minutes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Code size={16} className="text-gray-500" />
-                <span>{focusArea || 'General programming guidance'}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
+              <p className="text-green-600 mb-6">
+                You'll receive a confirmation email with the session details and meeting link
+                shortly.
+              </p>
               <button
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-md font-medium"
-                onClick={() => setStep(1)}
+                onClick={resetBooking}
+                type="button"
+                className="bg-orange-600 hover:bg-orange-700 text-white py-2 px-6 rounded-lg font-medium transition-colors"
               >
-                Back
-              </button>
-              <button
-                className="flex-1 bg-orange-400 hover:bg-orange-500 text-black py-3 px-4 rounded-md font-medium"
-                onClick={handleBookSession}
-              >
-                Book Trial Session
+                Book Another Session
               </button>
             </div>
-          </div>
-        )}
-
-        {/* Step 3: Confirmation */}
-        {step === 3 && (
-          <div className="p-4 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-green-600"
-              >
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            </div>
-            <h3 className="font-bold mb-2">Your trial session is booked!</h3>
-            <p className="text-gray-600 mb-4">
-              We've sent the details to your email. {tutorName} will contact you shortly to confirm.
-            </p>
-
-            <div className="bg-gray-50 p-4 rounded-md mb-4 text-left">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar size={16} className="text-gray-500" />
-                <span>
-                  {new Date(selectedDate).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock size={16} className="text-gray-500" />
-                <span>{selectedTime} - 50 minutes</span>
-              </div>
-            </div>
-
-            <button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md font-medium"
-              onClick={onClose}
-            >
-              Done
-            </button>
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

@@ -13,6 +13,12 @@ import { MentorModule } from './mentor/mentor.module';
 import { Mentor } from './mentor/entities/mentor.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import path from 'path';
+import { Conversation } from './conversations/entities/conversation.entity';
+import { Message } from './conversations/entities/message.entity';
+import { ConversationParticipant } from './conversations/entities/participant.entity';
+import { ChatModule } from './chat/chat.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { Booking } from './bookings/entities/booking.entity';
 
 const DEFAULT_ADMIN = {
   email: 'admin@example.com',
@@ -52,7 +58,16 @@ const authenticate = async (email: string, password: string) => {
         useFactory: () => ({
           adminJsOptions: {
             rootPath: '/admin',
-            resources: [Users, Category, Skill, Mentor],
+            resources: [
+              Users,
+              Category,
+              Skill,
+              Mentor,
+              Conversation,
+              Message,
+              ConversationParticipant,
+              Booking,
+            ],
           },
           // auth: {
           //   authenticate,
@@ -72,6 +87,8 @@ const authenticate = async (email: string, password: string) => {
     SkillsModule,
     ConversationsModule,
     MentorModule,
+    ChatModule,
+    BookingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

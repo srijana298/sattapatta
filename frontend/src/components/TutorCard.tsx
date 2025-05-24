@@ -1,8 +1,21 @@
-import { Star, Shield } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Button } from './ui/button/CustomButton';
 import { MentorProfile } from '../services/users';
+import { Link } from 'react-router-dom';
+import { useMutation } from 'react-query';
+import { createConversation } from '../services/conversation';
+import { useNavigate } from 'react-router-dom';
 
 export default function TutorCard({ profile }: { profile: MentorProfile }) {
+  const navigate = useNavigate();
+
+  const { mutateAsync: sendMessage } = useMutation({
+    mutationFn: ({ receiver_id }: { receiver_id: number }) => createConversation({ receiver_id }),
+    onSuccess: (data: string) => {
+      navigate('/messages/' + data);
+    }
+  });
+
   return (
     <div className="border border-gray-200 rounded-lg p-6 flex bg-white">
       {/* Left column - Tutor image */}
@@ -10,10 +23,9 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
         <div className="relative">
           <img
             src={profile.profilePhotoUrl}
-            alt="Mitchell T."
+            alt={profile.user.fullname}
             className="rounded-md w-full h-full object-cover"
           />
-          <div className="absolute bottom-2 left-2 bg-teal-500 w-6 h-6 rounded"></div>
         </div>
       </div>
 
@@ -22,17 +34,8 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
         {/* Tutor name and badges */}
         <div className="flex items-center mb-2">
           <h2 className="text-3xl font-bold mr-2">{profile.user.fullname}</h2>
-          <Shield size={20} className="text-gray-800 mr-2" />
-          <span className="text-lg">🇿🇦</span>
         </div>
 
-        <div className="mb-4">
-          <span className="bg-blue-100 text-blue-800 px-4 py-1 rounded-md text-sm font-medium">
-            Professional
-          </span>
-        </div>
-
-        {/* Tutor details */}
         <div className="space-y-3 text-gray-700">
           <div className="flex items-center">
             <div className="w-6 h-6 mr-2 flex items-center justify-center">
@@ -58,26 +61,7 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
                 />
               </svg>
             </div>
-            <span className="text-lg">English</span>
-          </div>
-
-          <div className="flex items-center">
-            <div className="w-6 h-6 mr-2 flex items-center justify-center">
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
-                <path
-                  d="M4 18C4 15.7909 5.79086 14 8 14H16C18.2091 14 20 15.7909 20 18V20H4V18Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
-            <span className="text-lg">48 active students • 7,022 lessons</span>
+            <span className="text-lg">{profile.skills.name}</span>
           </div>
 
           <div className="flex items-center">
@@ -105,33 +89,57 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
           </div>
         </div>
 
-        <div className="mt-4 text-md ">
+        <div className="mt-4 text-md">
           <p>{profile.experience}</p>
-          <button className="text-gray-900 font-semibold underline mt-1">Read more</button>
         </div>
       </div>
 
       {/* Right column - Price, rating, and buttons */}
-      <div className="flex flex-col items-end">
-        <div className="flex items-center gap-5 w-full mb-1">
-          <div className="flex-col">
-            <div className="flex items-center">
-              <Star className="w-5 h-5 text-black fill-current" />
-              <span className="text-3xl font-bold ml-1">5</span>
-            </div>
-            <span className="text-gray-500 text-sm">14 reviews</span>
+      <div className="flex flex-col items-end min-w-48">
+        {/* Rating and Price in separate rows with better spacing */}
+        <div className="flex flex-col w-full mb-6 space-y-4">
+          {/* Rating */}
+          <div className="flex items-center">
+            <Star className="w-6 h-6 text-yellow-500 fill-current" />
+            <span className="text-3xl font-bold ml-2">5</span>
+            <span className="text-gray-500 text-sm ml-2">(14 reviews)</span>
           </div>
-          <div className="flex-col">
-            <div className="flex items-center">
-              Rs.<span className="text-3xl font-bold ml-1">2000</span>
-            </div>
-            <span className="text-gray-500 text-sm">50min lessons</span>
+
+          {/* Price */}
+          <div className="flex items-center">
+            <span className="text-gray-800 font-medium">Rs.</span>
+            <span className="text-3xl font-bold ml-1">2000</span>
+            <span className="text-gray-500 text-sm ml-2">/ 50 min</span>
           </div>
         </div>
 
         {/* Action buttons */}
         <div className="w-full space-y-3 mt-auto">
-          <Button label="Send Message" color="orange" />
+          <Link
+            className="w-full bg-orange-400 hover:bg-orange-500 text-black py-2 px-4 rounded font-medium flex items-center justify-center border border-black cursor-pointer"
+            to={"/send-booking-request?mentorId=" + profile.user.id}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
+              className="mr-2"
+            >
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Book
+          </Link>
+
+          <Button
+            label="Send Message"
+            color="light"
+            onClick={() => {
+              sendMessage({ receiver_id: profile.user.id });
+            }}
+          />
         </div>
       </div>
     </div>

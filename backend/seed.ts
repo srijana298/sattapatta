@@ -8,13 +8,14 @@ import { Mentor } from './src/mentor/entities/mentor.entity';
 
 import { MentorEducation } from './src/mentor/entities/education.entity';
 import { MentorCertificate } from './src/mentor/entities/certificate.entity';
+import { faker } from '@faker-js/faker';
 
-// Category generators
-// Interface for createListing parameters
-// Helper function to generate a unique email
 async function seed(): Promise<void> {
   try {
     await AppDataSource.initialize();
+
+    console.log('Existing data cleared.');
+
     // Create categories
     const categories = [
       {
@@ -221,8 +222,8 @@ async function seed(): Promise<void> {
     for (let i = 1; i <= 5; i++) {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = AppDataSource.manager.create(Users, {
-        fullname: `Student User ${i}`,
-        email: `student${i}@example.com`,
+        fullname: faker.person.fullName(),
+        email: faker.internet.email(),
         role: 'student',
         password: hashedPassword,
       });
@@ -234,8 +235,8 @@ async function seed(): Promise<void> {
     for (let i = 1; i <= 20; i++) {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = Users.create({
-        fullname: `Mentor User ${i}`,
-        email: `mentor${i}@example.com`,
+        fullname: faker.person.fullName(),
+        email: faker.internet.email(),
         role: 'mentor',
         password: hashedPassword,
       });

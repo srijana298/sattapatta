@@ -1,7 +1,7 @@
 import {
+  BaseEntity,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -10,7 +10,7 @@ import { ConversationParticipant } from './participant.entity';
 import { Message } from './message.entity';
 
 @Entity()
-export class Conversation {
+export class Conversation extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,7 +20,9 @@ export class Conversation {
   )
   participants: ConversationParticipant[];
 
-  @OneToMany(() => Message, (message) => message.conversation)
+  @OneToMany(() => Message, (message) => message.conversation, {
+    cascade: true,
+  })
   messages: Message[];
 
   @CreateDateColumn({ type: 'timestamp' })

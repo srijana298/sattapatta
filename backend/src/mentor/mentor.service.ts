@@ -180,7 +180,13 @@ export class MentorService {
 
   findAll() {
     return this.mentorRepository.find({
-      relations: ['educations', 'certificates', 'user'],
+      relations: [
+        'educations',
+        'certificates',
+        'user',
+        'skill_category',
+        'skills',
+      ],
       select: {
         id: true,
         countryOfBirth: true,

@@ -1,3 +1,4 @@
+import { Booking } from '../../bookings/entities/booking.entity';
 import { ConversationParticipant } from '../../conversations/entities/participant.entity';
 import { Mentor } from '../../mentor/entities/mentor.entity';
 import {
@@ -31,6 +32,12 @@ export class Users extends BaseEntity {
 
   @OneToOne(() => Mentor, (mentor) => mentor.user, { nullable: true })
   mentor_profile: Mentor;
+
+  @OneToMany(() => Booking, (booking) => booking.mentor)
+  mentorBookings: Booking[];
+
+  @OneToMany(() => Booking, (booking) => booking.mentee)
+  menteeBookings: Booking[];
 }
 
 export type User = Omit<Users, 'password'>;

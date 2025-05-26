@@ -9,23 +9,20 @@ import { Mentor } from './mentor.entity';
 
 @Entity()
 export class MentorAvailability {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
-  dayOfWeek: string;
+  day_of_week: string;
 
   @Column()
-  startTime: string;
+  start_time: string;
 
   @Column()
-  endTime: string;
+  end_time: string;
 
   @Column()
-  isAvailable: boolean;
-
-  @Column({ nullable: true })
-  timezone: string;
+  is_available: boolean;
 
   @ManyToOne(() => Mentor, (mentor) => mentor.availability, {
     onDelete: 'CASCADE',

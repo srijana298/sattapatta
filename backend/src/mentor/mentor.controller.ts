@@ -29,9 +29,14 @@ import { diskStorage } from 'multer';
 export class MentorController {
   constructor(private readonly mentorService: MentorService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createMentorDto: CreateMentorDto) {
-    return this.mentorService.create(createMentorDto);
+  create(
+    @Body() createMentorDto: CreateMentorDto,
+    @Req() request: AuthRequest,
+  ) {
+    const userId = request.user.id;
+    return this.mentorService.create(userId, createMentorDto);
   }
 
   @Get()
@@ -134,7 +139,10 @@ export class MentorController {
       mentorProfile.id,
       body.certificates,
     );
-    return response;
+    return {
+      ...response,
+      has_certificate: mentorProfile.has_certificate,
+    };
   }
 
   @UseGuards(AuthGuard)

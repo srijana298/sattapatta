@@ -68,10 +68,10 @@ export const CustomDropdown = ({
   };
 
   return (
-    <div className={`relative ${className}`} ref={dropdownRef}>
+    <div className={`relative`} ref={dropdownRef}>
       {/* Dropdown Button */}
       <button
-        className={`w-full flex items-center justify-between px-6 py-2 text-gray-700 bg-white border gap-5 ${
+        className={`w-full flex items-center justify-between px-6 py-2 text-gray-700 bg-white border gap-5 ${className} ${
           isOpen ? 'border-gray-800' : 'border-gray-300'
         } rounded-lg hover:bg-gray-50 focus:outline-none transition-all duration-150`}
         onClick={() => setIsOpen(!isOpen)}

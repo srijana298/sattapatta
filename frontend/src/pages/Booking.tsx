@@ -1,11 +1,23 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock, Calendar, CheckCircle } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Calendar,
+  CheckCircle,
+  User,
+  Star,
+  MapPin,
+  Award
+} from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useMutation } from 'react-query';
 import { createBooking } from '../services/bookings';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useMentors } from '../lib/hooks';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 interface TimeSlot {
   id: string;
@@ -17,11 +29,15 @@ export default function MentorBookingUI() {
   const [searchParams] = useSearchParams();
   const mentorId = searchParams.get('mentorId');
   const navigate = useNavigate();
+
+  const { data: mentors, isLoading: isMentorsLoading } = useMentors();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [step, setStep] = useState<number>(1);
   const [isBooked, setIsBooked] = useState<boolean>(false);
+
+  const mentor = mentors?.find((m) => m.user.id === Number(mentorId));
 
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: createBooking,
@@ -38,6 +54,7 @@ export default function MentorBookingUI() {
       return;
     }
   }, [mentorId, navigate]);
+
   const timeSlots: TimeSlot[] = [
     { id: '1', time: '09:00', available: true },
     { id: '2', time: '10:00', available: true },
@@ -116,14 +133,94 @@ export default function MentorBookingUI() {
     setIsBooked(false);
   };
 
+  if (isMentorsLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <>
       <Navbar />
-      <div className="max-w-4xl mx-auto p-6 bg-white mt-10">
+      <div className="max-w-6xl mx-auto p-6 bg-white mt-10">
+        {/* Mentor Info Section */}
+        {mentor && (
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-6 mb-8">
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Avatar and Basic Info */}
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 bg-orange-200 rounded-full flex items-center justify-center">
+                  {mentor.profilePhotoUrl ? (
+                    <img
+                      src={mentor.profilePhotoUrl}
+                      alt={mentor.user.fullname}
+                      className="w-20 h-20 rounded-full object-cover"
+                    />
+                  ) : (
+                    <User size={32} className="text-orange-600" />
+                  )}
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">{mentor.user.fullname}</h2>
+                  <p className="text-orange-600 font-medium">{mentor.headline}</p>
+                </div>
+              </div>
+
+              {/* Stats and Rating */}
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white rounded-lg p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <Star size={16} className="text-yellow-500 fill-current" />
+                    <span className="font-bold text-lg">{mentor.rating || '4.9'}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Rating</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <Award size={16} className="text-blue-500" />
+                    <span className="font-bold text-lg">{mentor.experience_years || '5+'}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Years Experience</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <User size={16} className="text-green-500" />
+                    <span className="font-bold text-lg">{mentor.sessions_completed || '200+'}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Sessions</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bio/Description */}
+            {mentor.bio && (
+              <div className="mt-4 p-4 bg-white rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-2">About</h3>
+                <p className="text-gray-700 text-sm leading-relaxed">{mentor.bio}</p>
+              </div>
+            )}
+
+            {/* Skills/Expertise */}
+            {mentor.skills && mentor.skills.length > 0 && (
+              <div className="mt-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Expertise</h3>
+                <div className="flex flex-wrap gap-2">
+                  {mentor.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-orange-200 text-orange-800 text-sm rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Book a Mentorship Session</h1>
           <p className="text-gray-600">
-            Select your preferred date and time for your mentoring session
+            Select your preferred date and time for your mentoring session with {mentor?.user.name}
           </p>
         </div>
 
@@ -255,6 +352,34 @@ export default function MentorBookingUI() {
 
             {/* Right Panel - Summary */}
             <div className="space-y-6">
+              {/* Mentor Quick Info */}
+              {mentor && (
+                <div className="bg-white border rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-3">Your Mentor</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
+                      {mentor.user.profile_picture ? (
+                        <img
+                          src={mentor.user.profile_picture}
+                          alt={mentor.user.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <User size={20} className="text-orange-600" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{mentor.user.fullname}</p>
+                      <p className="text-sm text-orange-600">{mentor.specialization}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Star size={12} className="text-yellow-500 fill-current" />
+                        <span className="text-sm text-gray-600">{mentor.rating || '4.9'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white border rounded-lg p-6 sticky top-6">
                 <h2 className="text-xl font-semibold mb-4">Session Summary</h2>
 
@@ -280,7 +405,9 @@ export default function MentorBookingUI() {
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center">
                       <span className="font-medium">Session Fee:</span>
-                      <span className="text-xl font-bold text-green-600">$75</span>
+                      <span className="text-xl font-bold text-green-600">
+                        ${mentor?.hourly_rate || '75'}
+                      </span>
                     </div>
                   </div>
 
@@ -316,7 +443,7 @@ export default function MentorBookingUI() {
               <h2 className="text-2xl font-bold text-green-800 mb-4">Booking Confirmed!</h2>
               <div className="space-y-3 mb-6">
                 <p className="text-green-700">
-                  Your mentorship session has been successfully booked.
+                  Your mentorship session with {mentor?.user.name} has been successfully booked.
                 </p>
                 {selectedDate && (
                   <div className="flex items-center justify-center gap-2 text-green-700">

@@ -21,11 +21,7 @@ const Signup = () => {
     mutationFn: (value: CreateUser) => createUser(value),
     mutationKey: ['createUser'],
     onSuccess: (data: CreateUser) => {
-      if (data.role === 'mentor') {
-        navigate('/signup/mentor');
-      } else {
-        navigate('/');
-      }
+      navigate('/login');
     }
   });
 

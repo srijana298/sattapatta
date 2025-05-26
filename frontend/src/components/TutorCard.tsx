@@ -1,5 +1,4 @@
-import { Star } from 'lucide-react';
-import { Button } from './ui/button/CustomButton';
+import { Star, MessageCircle, Calendar, MapPin } from 'lucide-react';
 import { MentorProfile } from '../services/users';
 import { Link } from 'react-router-dom';
 import { useMutation } from 'react-query';
@@ -17,129 +16,103 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
   });
 
   return (
-    <div className="border border-gray-200 rounded-lg p-6 flex bg-white">
-      {/* Left column - Tutor image */}
-      <div className="w-64 mr-6">
-        <div className="relative">
-          <img
-            src={profile.profilePhotoUrl}
-            alt={profile.user.fullname}
-            className="rounded-md w-full h-full object-cover"
-          />
-        </div>
-      </div>
-
-      {/* Middle column - Tutor information */}
-      <div className="flex-grow">
-        {/* Tutor name and badges */}
-        <div className="flex items-center mb-2">
-          <h2 className="text-3xl font-bold mr-2">{profile.user.fullname}</h2>
-        </div>
-
-        <div className="space-y-3 text-gray-700">
-          <div className="flex items-center">
-            <div className="w-6 h-6 mr-2 flex items-center justify-center">
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M21 10L12 5L3 10L12 15L21 10ZM21 10V14"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M3 14V10M12 15V19M7 12.5V17.5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+    <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+      <div className="md:flex">
+        {/* Profile Image Section */}
+        <div className="md:w-72 flex-shrink-0">
+          <div className="relative h-64 md:h-full">
+            <img
+              src={profile.profilePhotoUrl}
+              alt={profile.user.fullname}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute bottom-4 left-4 right-4">
+              <div className="bg-black bg-opacity-60 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
+                {profile.skills.name}
+              </div>
             </div>
-            <span className="text-lg">{profile.skills.name}</span>
           </div>
+        </div>
 
-          <div className="flex items-center">
-            <div className="w-6 h-6 mr-2 flex items-center justify-center">
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M17 8C17 10.7614 14.7614 13 12 13C9.23858 13 7 10.7614 7 8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M3 21C3.95728 17.9237 6.41998 17 12 17C17.58 17 20.0427 17.9237 21 21"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
+        {/* Content Section */}
+        <div className="flex-1 p-6 md:p-8">
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex-1">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                    {profile.user.fullname}
+                  </h3>
+                  <div className="flex items-center space-x-4 text-gray-600 mb-3">
+                    <div className="flex items-center">
+                      <Star className="w-5 h-5 text-yellow-400 fill-current mr-1" />
+                      <span className="font-semibold text-gray-900">4.9</span>
+                      <span className="text-sm ml-1">(24 reviews)</span>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      <span className="text-sm">Kathmandu</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-orange-600">₹2,000</div>
+                  <div className="text-sm text-gray-500">per hour</div>
+                </div>
+              </div>
+
+              {/* Introduction */}
+              <div className="mb-4">
+                <p className="text-gray-700 text-lg leading-relaxed line-clamp-2">
+                  {profile.introduction}
+                </p>
+              </div>
+
+              {/* Experience */}
+              <div className="mb-6">
+                <h4 className="font-semibold text-gray-900 mb-2">Experience</h4>
+                <p className="text-gray-600 leading-relaxed line-clamp-3">{profile.experience}</p>
+              </div>
+
+              {/* Key Stats */}
+              {/* <div className="grid grid-cols-3 gap-4 mb-6 py-4 bg-gray-50 rounded-xl">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">50+</div>
+                  <div className="text-sm text-gray-600">Students</div>
+                </div>
+                <div className="text-center border-l border-gray-200">
+                  <div className="text-2xl font-bold text-orange-600">3</div>
+                  <div className="text-sm text-gray-600">Years Exp.</div>
+                </div>
+                <div className="text-center border-l border-gray-200">
+                  <div className="text-2xl font-bold text-orange-600">100%</div>
+                  <div className="text-sm text-gray-600">Response</div>
+                </div>
+              </div> */}
             </div>
-            <span className="text-lg">{profile.introduction}</span>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              <Link
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-4 px-6 rounded-xl font-semibold text-center transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center"
+                to={'/send-booking-request?mentorId=' + profile.user.id}
+              >
+                <Calendar className="w-5 h-5 mr-2" />
+                Book Session
+              </Link>
+
+              <button
+                onClick={() => sendMessage({ receiver_id: profile.user.id })}
+                className="flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 py-4 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center cursor-pointer"
+              >
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Send Message
+              </button>
+            </div>
+
+            {/* Trust Indicators */}
           </div>
-        </div>
-
-        <div className="mt-4 text-md">
-          <p>{profile.experience}</p>
-        </div>
-      </div>
-
-      {/* Right column - Price, rating, and buttons */}
-      <div className="flex flex-col items-end min-w-48">
-        {/* Rating and Price in separate rows with better spacing */}
-        <div className="flex flex-col w-full mb-6 space-y-4">
-          {/* Rating */}
-          <div className="flex items-center">
-            <Star className="w-6 h-6 text-yellow-500 fill-current" />
-            <span className="text-3xl font-bold ml-2">5</span>
-            <span className="text-gray-500 text-sm ml-2">(14 reviews)</span>
-          </div>
-
-          {/* Price */}
-          <div className="flex items-center">
-            <span className="text-gray-800 font-medium">Rs.</span>
-            <span className="text-3xl font-bold ml-1">2000</span>
-            <span className="text-gray-500 text-sm ml-2">/ 50 min</span>
-          </div>
-        </div>
-
-        {/* Action buttons */}
-        <div className="w-full space-y-3 mt-auto">
-          <Link
-            className="w-full bg-orange-400 hover:bg-orange-500 text-black py-2 px-4 rounded font-medium flex items-center justify-center border border-black cursor-pointer"
-            to={"/send-booking-request?mentorId=" + profile.user.id}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="none"
-              className="mr-2"
-            >
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-            </svg>
-            Book
-          </Link>
-
-          <Button
-            label="Send Message"
-            color="light"
-            onClick={() => {
-              sendMessage({ receiver_id: profile.user.id });
-            }}
-          />
         </div>
       </div>
     </div>

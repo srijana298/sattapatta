@@ -25,11 +25,11 @@ export class UsersService {
     user.password = await bcrypt.hash(payload.password, 10);
 
     const saved = await this.usersRepository.save(user);
-    if (user.role === 'mentor') {
-      const mentor = new Mentor();
-      mentor.user = saved;
-      await this.mentorRepository.save(mentor);
-    }
+    // if (user.role === 'mentor') {
+    //   const mentor = new Mentor();
+    //   mentor.user = saved;
+    //   await this.mentorRepository.save(mentor);
+    // }
     return saved;
   }
 

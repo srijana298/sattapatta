@@ -118,6 +118,7 @@ export class MentorService {
       relations: ['user', 'certificates'],
       select: {
         id: true,
+        has_certificate: true,
         user: {
           id: true,
         },
@@ -174,8 +175,76 @@ export class MentorService {
     );
   }
 
-  create(createMentorDto: CreateMentorDto) {
-    return 'This action adds a new mentor';
+  async create(userId: number, createMentorDto: CreateMentorDto) {
+    const {
+      fullname,
+      email,
+      countryOfBirth,
+      category,
+      skill,
+      profile_picture,
+      has_certificate,
+      educations,
+      has_education,
+      introduction,
+      experience,
+      motivation,
+      headline,
+      hourly_rate,
+      trial_rate,
+    } = createMentorDto;
+    const mentor = new Mentor();
+    Object.assign(mentor, {
+      fullname,
+      email,
+      countryOfBirth,
+      category,
+      skill,
+      profile_picture,
+      has_certificate,
+      has_education,
+      introduction,
+      user: userId,
+      experience,
+      motivation,
+      headline,
+      hourly_rate,
+      trial_rate,
+    });
+
+    const savedMentor = await this.mentorRepository.save(mentor);
+
+    if (has_certificate) {
+      const _certificates: MentorCertificate[] = [];
+      createMentorDto.certificates.forEach((cert) => {
+        const data = this.certificateRepository.create({
+          mentor: {
+            id: savedMentor.id,
+          },
+          ...cert,
+        });
+        _certificates.push(data);
+      });
+
+      await this.certificateRepository.save(_certificates);
+    }
+
+    if (has_education) {
+      const _educations: MentorEducation[] = [];
+      educations.forEach((ed) => {
+        const data = this.educationRepository.create({
+          mentor: {
+            id: savedMentor.id,
+          },
+          ...ed,
+        });
+        _educations.push(data);
+      });
+
+      await this.educationRepository.save(_educations);
+    }
+
+    return savedMentor;
   }
 
   findAll() {

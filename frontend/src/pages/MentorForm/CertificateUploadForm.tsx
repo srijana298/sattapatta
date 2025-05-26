@@ -2,35 +2,16 @@ import { ChevronDown, Trash2 } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod/src/zod.js';
 import { Certificate, certificateSchema } from '../../lib/profile';
-import { useMutation, useQuery } from 'react-query';
-import { getCertificates, updateCertificates } from '../../services/users';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { useEffect } from 'react';
+import { useMentorForm } from '../../components/MentorFormContext';
 
 export default function TeachingCertification() {
   const { register, handleSubmit, control, watch, reset } = useForm({
     resolver: zodResolver(certificateSchema),
     defaultValues: {
-      certificates: [
-        {
-          subject: '',
-          name: '',
-          description: '',
-          issuedBy: '',
-          start_year: '',
-          end_year: ''
-        }
-      ]
-    }
-  });
-
-  const { data, isLoading, refetch } = useQuery({
-    queryFn: getCertificates
-  });
-  const { mutateAsync } = useMutation({
-    mutationFn: (data: Partial<Certificate>) => updateCertificates(data),
-    onSuccess: () => {
-      refetch();
+      has_certificate: false,
+      certificates: []
     }
   });
 
@@ -39,7 +20,7 @@ export default function TeachingCertification() {
     name: 'certificates'
   });
 
-  const hasTeachingCertificate = watch('hasTeachingCertificate');
+  const hasTeachingCertificate = watch('has_certificate');
 
   const addCertificationSection = () => {
     append({
@@ -84,20 +65,12 @@ export default function TeachingCertification() {
     'Foreign Languages'
   ];
 
-  useEffect(() => {
-    if (data) {
-      reset(data);
-    }
-  }, [reset, data]);
+  const { setCurrentStep, currentStep } = useMentorForm();
 
   const onSubmit = async (values: Certificate) => {
-    await mutateAsync(values);
+    console.log({ values });
+    setCurrentStep(currentStep + 1);
   };
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
   return (
     <form className="max-w-3xl mx-auto p-6" onSubmit={handleSubmit(onSubmit)}>
       <h1 className="text-2xl font-bold mb-6 text-center">Teaching certification</h1>
@@ -111,7 +84,7 @@ export default function TeachingCertification() {
         <label className="flex items-center">
           <Controller
             control={control}
-            name="hasTeachingCertificate"
+            name="has_certificate"
             render={({ field }) => (
               <input
                 type="checkbox"

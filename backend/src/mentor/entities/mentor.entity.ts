@@ -70,6 +70,12 @@ export class Mentor extends BaseEntity {
   })
   availability: MentorAvailability[];
 
+  @Column({ type: 'decimal', default: 1000.0 })
+  hourly_rate: number;
+
+  @Column({ type: 'decimal', default: 1000.0 })
+  trial_rate: number;
+
   @Column({ default: false })
   isVerified: boolean;
 

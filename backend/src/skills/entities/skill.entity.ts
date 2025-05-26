@@ -22,7 +22,9 @@ export class Skill extends BaseEntity {
   @Column({ nullable: true })
   description: string;
 
-  @ManyToOne(() => Category, (category) => category.skills)
+  @ManyToOne(() => Category, (category) => category.skills, {
+    onDelete: 'CASCADE',
+  })
   category: Category;
 
   @ManyToMany(() => Mentor, (mentor) => mentor.skills)

@@ -9,7 +9,7 @@ import {
   User,
   Menu as MenuIcon
 } from 'lucide-react';
-import { mentorData } from '../../../../project/src/data/mentorData';
+import { mentorData } from '../../data/mentorData';
 
 interface DashboardHeaderProps {
   activeTab: string;

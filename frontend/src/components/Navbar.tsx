@@ -121,10 +121,8 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <>
-                {/* Authenticated Navigation */}
                 <div className="hidden md:flex items-center space-x-6">
 
-                  {/* Navigation Links */}
                   <Link
                     to="/messages"
                     className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 font-medium transition-colors duration-200 relative group"
@@ -142,7 +140,6 @@ const Navbar: React.FC = () => {
                   </Link>
 
 
-                  {/* Profile Dropdown */}
                   <div className="relative" ref={dropdownRef}>
                     <button
                       className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
@@ -170,14 +167,6 @@ const Navbar: React.FC = () => {
                           </p>
                         </div>
 
-                        <Link
-                          to="/profile"
-                          className="flex items-center px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
-                          onClick={() => setDropdownOpen(false)}
-                        >
-                          <User className="w-4 h-4 mr-3" />
-                          My Profile
-                        </Link>
 
                         <Link
                           to="/account-settings"

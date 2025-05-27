@@ -7,6 +7,7 @@ import TutorCard from '../components/TutorCard';
 import { useAuth } from '../components/AuthContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { useMentors } from '../lib/hooks';
+import { Navigate } from 'react-router-dom';
 
 const LandingPage = () => {
   return (
@@ -315,18 +316,22 @@ const MentorPendingStatus = () => {
 const AuthenticatedPage = () => {
   const { data, isLoading } = useMentors()
   const { currentUser } = useAuth();
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  console.log(currentUser)
   if (currentUser?.role === 'mentor' && currentUser.mentor_profile.status === 'pending') {
     return <MentorPendingStatus />;
   }
 
+  if (currentUser?.role === 'mentor' && currentUser.mentor_profile.status === "approved") {
+    return <Navigate to="/mentor-dashboard" />;
+    
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Search Header */}
       <div className="bg-white shadow-sm py-8">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-8">

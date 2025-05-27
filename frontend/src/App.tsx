@@ -20,7 +20,12 @@ import Dashboard from './pages/admin/pages/Dashboard';
 import Layout from './pages/admin/components/Layout';
 import Mentors from './pages/admin/pages/Mentors';
 import MentorDetail from './pages/admin/pages/MentorDetail';
-import { ThemeProvider } from './pages/admin/context/ThemeContext';
+import DashboardLayout from './layout/DashboardLayout';
+import DashboardOverview from './components/dashboard/DashboardOverview';
+import BookingsSection from './components/dashboard/BookingsSection';
+import MessagesSection from './components/dashboard/MessagesSection';
+import ReviewsSection from './components/dashboard/ReviewsSection';
+import ProfileSection from './components/dashboard/ProfileSection';
 
 const client = new QueryClient();
 function App() {
@@ -45,8 +50,16 @@ function App() {
               <Route path="my-bookings" element={<MyPosts />} />
               <Route path="messages/*" element={<Messages />} />
               <Route path="booking" element={<BookingDetailsPage />} />
+              <Route path="dashboard" element={<DashboardLayout/>}>
+                <Route path="" element={<DashboardOverview/>} />
+                <Route path="overview" element={<DashboardOverview/>} />
+                <Route path="bookings" element={<BookingsSection/>} />
+                <Route path="messages/*" element={<MessagesSection/>} />
+                <Route path="reviews" element={<ReviewsSection/>} />
+                <Route path="profile" element={<ProfileSection/>} />
+              </Route>
               <Route path="matches" element={<Matches />} />
-              <Route path="/mentors/:id" element={<Profile/>} />
+              <Route path="mentors/:id" element={<Profile/>} />
               <Route path="send-booking-request" element={<MentorBookingUI />} />
               <Route path="mentor-dashboard" element={<MentorDashboard />} />
               <Route path="submit-request" element={<Listings />} />

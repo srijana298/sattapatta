@@ -29,7 +29,7 @@ const MentorDashboard: React.FC = () => {
   };
 
   return (
-    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <DashboardLayout>
       {renderTabContent()}
     </DashboardLayout>
   );

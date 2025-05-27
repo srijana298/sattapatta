@@ -20,7 +20,9 @@ export type CurrentUser = {
   email: string;
   fullname: string;
   mentor_profile: {
+    id: number;
     isActive: boolean;
+    profilePhotoUrl: string;
     status: string;
   };
   role: 'mentor' | 'student';

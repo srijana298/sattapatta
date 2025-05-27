@@ -1,5 +1,5 @@
 import api from '../api';
-import { ConversationMessageResponse } from '../lib/messages';
+import { ConversationDetails, ConversationMessageResponse } from '../lib/messages';
 
 export const createConversation = async ({ receiver_id }: { receiver_id: number }) => {
   const response = await api.post('/conversations', {
@@ -8,7 +8,7 @@ export const createConversation = async ({ receiver_id }: { receiver_id: number 
   return response.data;
 };
 
-export const getAllConversations = async () => {
+export const getAllConversations = async (): Promise<ConversationDetails[]> => {
   const response = await api.get('/conversations');
   return response.data;
 };

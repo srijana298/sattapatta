@@ -340,9 +340,7 @@ export default function MentorBookingUI() {
               )}
             </div>
 
-            {/* Right Panel - Summary */}
             <div className="space-y-6">
-              {/* Mentor Quick Info */}
               {mentor && (
                 <div className="bg-white border rounded-lg p-4">
                   <h3 className="font-semibold text-gray-900 mb-3">Your Mentor</h3>
@@ -430,14 +428,13 @@ export default function MentorBookingUI() {
             </div>
           </div>
         ) : (
-          /* Confirmation Page */
           <div className="max-w-2xl mx-auto text-center">
             <div className="bg-green-50 border border-green-200 rounded-lg p-8">
               <CheckCircle size={64} className="text-green-600 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-green-800 mb-4">Booking Confirmed!</h2>
               <div className="space-y-3 mb-6">
                 <p className="text-green-700">
-                  Your mentorship session with {mentor?.user.name} has been successfully booked.
+                  Your mentorship session with {mentor?.user.fullname} has been successfully booked.
                 </p>
                 {selectedDate && (
                   <div className="flex items-center justify-center gap-2 text-green-700">

@@ -1,15 +1,10 @@
 import { Search, UserRoundIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getAllConversations } from '../../services/conversation';
-import { useQuery } from 'react-query';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { useConversations } from '../../lib/hooks';
 
 const MessagesList = () => {
-  // Format time
-  const { data: conversations, isLoading } = useQuery({
-    queryFn: getAllConversations,
-    queryKey: 'getAllConversations'
-  });
+  const { data: conversations, isLoading } = useConversations()
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -35,25 +30,20 @@ const MessagesList = () => {
             </div>
 
             <div className="overflow-y-auto h-[calc(600px-65px)]">
-              {conversations.length === 0 ? (
+              {conversations && conversations.length === 0 ? (
                 <div className="p-4 text-center text-gray-500">
                   No conversations yet. Start swapping skills to begin messaging!
                 </div>
               ) : (
-                conversations.map((conversation) => (
-                  <Link
+                conversations?.map((conversation) => (
+                    <Link
                     key={conversation.id}
-                    to={`/messages/${conversation.id}`}
+                    to={`${location.pathname}/${conversation.id}`}
                     className="block w-full text-left border-b border-gray-100 hover:bg-gray-50 transition"
-                  >
+                    >
                     <div className="p-4 flex items-start">
                       <div className="relative">
                         <UserRoundIcon />
-                        {/* {conversation.> 0 && (
-                          <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                            {conversation.unread}
-                          </span>
-                        )} */}
                       </div>
                       <div className="ml-3 flex-1">
                         <div className="flex justify-between items-baseline">

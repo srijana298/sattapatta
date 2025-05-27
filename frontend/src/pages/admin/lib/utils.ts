@@ -13,6 +13,13 @@ export function formatDate(date: string | Date) {
   });
 }
 
+export function getImageUrl(url?: string | null) {
+  if (url?.startsWith('http://') || url?.startsWith('https://')) {
+    return url;
+  }
+  return "http://localhost:3000/" + url;
+}
+
 export function formatTime(time: string) {
   // Parse HH:MM format to display in 12-hour format
   const [hours, minutes] = time.split(':').map(Number);

@@ -44,6 +44,27 @@ export class BookingsService {
     return savedBooking;
   }
 
+  findByMentors(mentor_id: number) {
+    return this.bookingRepository.find({
+      relations: ['mentee', 'mentor', 'mentor.mentor_profile'],
+      where: {
+        mentor: { id: mentor_id },
+      },
+      select: {
+        mentor: {
+          id: true,
+          fullname: true,
+          email: true,
+        },
+        mentee: {
+          id: true,
+          fullname: true,
+          email: true,
+        },
+      },
+    });
+  }
+
   findAll(student_id: number) {
     return this.bookingRepository.find({
       relations: ['mentee', 'mentor', 'mentor.mentor_profile'],
@@ -57,6 +78,7 @@ export class BookingsService {
         },
         mentee: {
           id: true,
+          fullname: true,
         },
       },
     });

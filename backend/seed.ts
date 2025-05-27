@@ -381,13 +381,6 @@ async function seed(): Promise<void> {
             start_year: startYear,
             end_year: endYear,
             mentor,
-            // subject: randomSkill.name,
-            // name: `${getRandomItem(certificateNames)} in ${randomSkill.name}`,
-            // description: `Professional certification demonstrating expertise in ${randomSkill.name} principles and applications.`,
-            // issuedBy: getRandomItem(certificateIssuers),
-            // start_year: startYear,
-            // end_year: endYear,
-            // mentor: mentor,
           });
 
           await certificate.save();

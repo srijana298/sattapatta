@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Video, User, MoreVertical, Send } from 'lucide-react';
+import { Video,  Send } from 'lucide-react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
 import { getConversation, sendMessage } from '../../services/conversation';
@@ -8,7 +8,7 @@ import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { socket } from '../../lib/socket';
 import type { Message } from '../../lib/messages';
 
-const Message = () => {
+const DashboardMessage = () => {
   const { id } = useParams<{ id: string }>();
   const { currentUser } = useAuth();
 
@@ -192,7 +192,6 @@ const Message = () => {
             })}
           </div>
 
-          {/* Message input */}
           <div className="p-4 border-t bg-white">
             <form onSubmit={handleSendMessage} className="flex items-end">
               <div className="flex-1 mr-2">
@@ -221,4 +220,4 @@ const Message = () => {
   );
 };
 
-export default Message;
+export default DashboardMessage;

@@ -1,27 +1,22 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import DashboardSidebar from '../components/dashboard/DashboardSidebar';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
+import { Outlet } from 'react-router-dom';
 
-interface DashboardLayoutProps {
-  children: ReactNode;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, activeTab, setActiveTab }) => {
+const DashboardLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar - hidden on mobile */}
       <div className="hidden md:flex">
-        <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <DashboardSidebar />
       </div>
 
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <DashboardHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+        <DashboardHeader />
 
         <main className="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
-          <div className="mx-auto max-w-7xl">{children}</div>
+          <div className="mx-auto max-w-7xl"><Outlet /></div>
         </main>
       </div>
     </div>

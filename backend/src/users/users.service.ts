@@ -47,7 +47,8 @@ export class UsersService {
         mentor_profile: {
           id: true,
           isVerified: true,
-          status: true
+          status: true,
+          profilePhotoUrl: true,
         },
       },
     });

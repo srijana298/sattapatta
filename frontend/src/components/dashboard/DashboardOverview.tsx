@@ -3,9 +3,13 @@ import { Calendar, MessageSquare, Star, Users, DollarSign, Clock } from 'lucide-
 import { bookings } from '../../data/bookingsData';
 import { messages } from '../../data/messagesData';
 import { reviews } from '../../data/reviewsData';
+import { useAuth } from '../AuthContext';
+import { useMentor } from '../../lib/hooks';
 
 const DashboardOverview: React.FC = () => {
-  // Calculate upcoming appointments (next 48 hours)
+  const { currentUser } = useAuth();
+
+  const { data: mentor} = useMentor(currentUser?.mentor_profile?.id);
   const now = new Date();
   const in48Hours = new Date(now.getTime() + 48 * 60 * 60 * 1000);
   const upcomingAppointments = bookings.filter(
@@ -89,14 +93,6 @@ const DashboardOverview: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
-        <div>
-          <button
-            className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg
-                           transition-colors duration-150 ease-in-out shadow-sm"
-          >
-            + Create Availability
-          </button>
-        </div>
       </div>
 
       {/* Stats Grid */}

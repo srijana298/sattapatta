@@ -10,6 +10,7 @@ import {
   UseGuards,
   BadRequestException,
   Req,
+  Query,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
@@ -45,7 +46,13 @@ export class BookingsController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll(@Req() request: AuthRequest) {
+  findAll(
+    @Req() request: AuthRequest,
+    @Query('hasMentors') hasMentors: boolean = false,
+  ) {
+    if (hasMentors) {
+      return this.bookingsService.findByMentors(request.user.id);
+    }
     return this.bookingsService.findAll(request.user.id);
   }
 

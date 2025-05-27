@@ -28,7 +28,7 @@ export type CurrentUser = {
 
 export const loginUserSchema = zod.object({
   email: zod.string().email().min(5).max(100),
-  password: zod.string().min(8).max(100)
+  password: zod.string()
 });
 
 export type LoginUser = zod.infer<typeof loginUserSchema>;

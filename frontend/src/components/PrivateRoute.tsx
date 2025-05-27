@@ -10,7 +10,7 @@ const PrivateRoutes = () => {
   }
 
   console.log({ currentUser });
-  if (currentUser?.role === 'mentor' && !currentUser.mentor_profile.isActive) {
+  if (currentUser?.role === 'mentor' && !currentUser.mentor_profile) {
     return <Navigate to="/signup/mentor" />;
   }
   return currentUser ? <Outlet /> : <Navigate to="/login" />;

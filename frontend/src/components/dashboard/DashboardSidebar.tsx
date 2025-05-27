@@ -20,7 +20,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ activeTab, setActiv
     <div className="flex flex-col h-full w-64 bg-white border-r border-gray-200 overflow-y-auto">
       {/* Logo and title */}
       <div className="flex items-center px-6 py-5 border-b border-gray-200">
-        <div className="flex items-center justify-center bg-orange-500 rounded-md h-10 w-10 flex-shrink-0">
+        <div className="flex items-center justify-center bg-orange-500 rounded-md h-10 w-10 shrink-0">
           <User className="h-6 w-6 text-white" />
         </div>
         <span className="ml-3 text-lg font-bold text-gray-800">MentorConnect</span>
@@ -65,7 +65,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ activeTab, setActiv
             } group flex items-center px-3 py-2 text-sm font-medium rounded-md w-full transition-colors duration-150 ease-in-out`}
             onClick={() => setActiveTab(item.id)}
           >
-            <div className={`mr-3 flex-shrink-0 ${
+            <div className={`mr-3 shrink-0 ${
               activeTab === item.id ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-500'
             }`}>
               {item.icon}

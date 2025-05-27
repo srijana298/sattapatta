@@ -46,7 +46,8 @@ export class UsersService {
         role: true,
         mentor_profile: {
           id: true,
-          isVerified: true
+          isVerified: true,
+          status: true
         },
       },
     });

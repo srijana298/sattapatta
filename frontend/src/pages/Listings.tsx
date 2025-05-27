@@ -104,7 +104,7 @@ export default function Listings() {
           {success && (
             <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
               <div className="flex">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <Check className="h-5 w-5 text-green-500" />
                 </div>
                 <div className="ml-3">
@@ -122,7 +122,7 @@ export default function Listings() {
           {errors.length > 0 && (
             <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
               <div className="flex">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <AlertCircle className="h-5 w-5 text-red-500" />
                 </div>
                 <div className="ml-3">

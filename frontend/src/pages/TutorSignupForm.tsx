@@ -23,6 +23,7 @@ import { useMutation } from 'react-query';
 import { uploadPicture } from '../services/users';
 import toast from 'react-hot-toast';
 import { createMentor } from '../services/mentor';
+import { useNavigate } from 'react-router-dom';
 
 const yearOptions = Array.from({ length: 16 }, (_, i) => (2025 - i).toString());
 const degreeTypes = ["Bachelor's", "Master's", 'PhD', "Associate's", 'Diploma', 'Certificate'];
@@ -74,6 +75,7 @@ export default function TutorSignupForm() {
   const [isSubmitting] = useState(false);
   const [activeSection, setActiveSection] = useState('personal');
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   const { mutateAsync: _upload_picture } = useMutation({
     mutationFn: (formData: FormData) => {
@@ -97,6 +99,7 @@ export default function TutorSignupForm() {
     },
     onSuccess: () => {
       toast.success('Mentor Profile created successfully');
+      navigate('/');
     },
     onError: () => {
       toast.error('Error creating mentor profile');
@@ -129,10 +132,17 @@ export default function TutorSignupForm() {
 
   useEffect(() => {
     if (currentUser) {
-      setValue('fullname', currentUser.fullname || '');
-      setValue('email', currentUser.email || '');
+      if (currentUser.role !== 'mentor') {
+        toast.error('You must be a mentor to access this form');
+        navigate('/');
+      } else if (currentUser.mentor_profile?.status === 'pending') {
+        navigate('/');
+      } else {
+        setValue('fullname', currentUser.fullname || '');
+        setValue('email', currentUser.email || '');
+      }
     }
-  }, [currentUser, setValue]);
+  }, [currentUser, setValue , navigate]);
   const certificatesArray = useFieldArray({ control, name: 'certificates' });
   const educationsArray = useFieldArray({ control, name: 'educations' });
 
@@ -219,7 +229,7 @@ export default function TutorSignupForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
+    <div className="min-h-screen bg-linear-to-br from-orange-50 via-white to-orange-50">
       {/* Header */}
 
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -387,7 +397,7 @@ export default function TutorSignupForm() {
                   </div>
 
                   <div className="flex flex-col md:flex-row items-center gap-8">
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       {profilePhoto ? (
                         <img
                           src={URL.createObjectURL(profilePhoto)}
@@ -395,7 +405,7 @@ export default function TutorSignupForm() {
                           className="w-32 h-32 rounded-2xl object-cover border-4 border-orange-200"
                         />
                       ) : (
-                        <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center border-4 border-orange-200">
+                        <div className="w-32 h-32 rounded-2xl bg-linear-to-br from-orange-100 to-orange-200 flex items-center justify-center border-4 border-orange-200">
                           <User className="w-12 h-12 text-orange-600" />
                         </div>
                       )}
@@ -416,7 +426,7 @@ export default function TutorSignupForm() {
                       <button
                         type="button"
                         onClick={() => document.getElementById('photoUpload')?.click()}
-                        className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105 shadow-lg"
+                        className="flex items-center justify-center px-6 py-3 bg-linear-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105 shadow-lg"
                       >
                         <Upload className="w-5 h-5 mr-2" />
                         Upload Photo
@@ -555,7 +565,7 @@ export default function TutorSignupForm() {
                       {certificatesArray.fields.map((section, index) => (
                         <div
                           key={section.id}
-                          className="p-6 bg-gradient-to-r from-orange-50 to-orange-25 rounded-xl border border-orange-200"
+                          className="p-6 bg-linear-to-r from-orange-50 to-orange-25 rounded-xl border border-orange-200"
                         >
                           <div className="flex items-center justify-between mb-4">
                             <h3 className="font-semibold text-orange-800">
@@ -719,7 +729,7 @@ export default function TutorSignupForm() {
                       {educationsArray.fields.map((section, index) => (
                         <div
                           key={section.id}
-                          className="p-6 bg-gradient-to-r from-orange-50 to-orange-25 rounded-xl border border-orange-200"
+                          className="p-6 bg-linear-to-r from-orange-50 to-orange-25 rounded-xl border border-orange-200"
                         >
                           <div className="flex items-center justify-between mb-4">
                             <h3 className="font-semibold text-orange-800">
@@ -896,7 +906,7 @@ export default function TutorSignupForm() {
                       </h3>
                       <div className="bg-white rounded-lg p-5 shadow-sm">
                         <div className="flex items-center space-x-3 mb-5 pb-4 border-b">
-                          <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
+                          <div className="w-12 h-12 bg-linear-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">
                               {currentUser?.fullname?.[0] || 'T'}
                             </span>
@@ -1009,7 +1019,7 @@ export default function TutorSignupForm() {
 
                   <div className="mt-6 bg-blue-50 rounded-lg p-4">
                     <div className="flex">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <div className="p-1 bg-blue-100 rounded-full">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1043,7 +1053,7 @@ export default function TutorSignupForm() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium text-lg rounded-xl shadow-lg hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105 ${
+                    className={`px-8 py-4 bg-linear-to-r from-orange-500 to-orange-600 text-white font-medium text-lg rounded-xl shadow-lg hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105 ${
                       isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                   >

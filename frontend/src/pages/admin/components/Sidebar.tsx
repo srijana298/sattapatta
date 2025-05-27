@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { BarChart3, BookOpen, GraduationCap, LayoutDashboard, Menu, Users, X } from 'lucide-react';
+import {  GraduationCap, LayoutDashboard, Menu, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../lib/utils';
 
@@ -80,26 +80,6 @@ const Sidebar = () => {
             </NavLink>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-border">
-            <h3
-              className={cn(
-                'text-xs uppercase font-medium text-muted-foreground mb-2',
-                !expanded && 'sr-only'
-              )}
-            >
-              Resources
-            </h3>
-            <div className="space-y-1">
-              <a href="#" className="sidebar-item">
-                <BookOpen className="h-5 w-5" />
-                {expanded && <span>Guides</span>}
-              </a>
-              <a href="#" className="sidebar-item">
-                <BarChart3 className="h-5 w-5" />
-                {expanded && <span>Analytics</span>}
-              </a>
-            </div>
-          </div>
         </nav>
       </aside>
     </>

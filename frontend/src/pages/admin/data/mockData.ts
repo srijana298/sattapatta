@@ -382,7 +382,7 @@ export const getMentorById = (id: string) => {
 };
 
 // Update mentor status
-export const updateMentorStatus = (id: string, status: 'pending' | 'approved' | 'rejected') => {
+export const updateMentorStatus = (id: number | string, status: 'pending' | 'approved' | 'rejected') => {
   const mentorIndex = mockMentors.findIndex(mentor => mentor.id === id);
   
   if (mentorIndex !== -1) {

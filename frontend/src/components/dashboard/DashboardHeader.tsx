@@ -109,7 +109,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, setActiveT
                           className="block px-4 py-3 hover:bg-gray-50 transition duration-150 ease-in-out"
                         >
                           <div className="flex items-start">
-                            <div className="flex-shrink-0">
+                            <div className="shrink-0">
                               {notification.type === 'message' && (
                                 <MessageSquare className="h-5 w-5 text-blue-500" />
                               )}
@@ -203,7 +203,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, setActiveT
                   setIsMobileMenuOpen(false);
                 }}
               >
-                <div className="mr-4 flex-shrink-0">{item.icon}</div>
+                <div className="mr-4 shrink-0">{item.icon}</div>
                 {item.label}
               </button>
             ))}

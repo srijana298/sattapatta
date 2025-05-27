@@ -45,7 +45,9 @@ function App() {
               <Route path="bookings/:id" element={<BookingDetailsPage />} />
               <Route path="my-bookings" element={<MyPosts />} />
               <Route path="messages/*" element={<Messages />} />
+              <Route path="booking" element={<BookingDetailsPage />} />
               <Route path="matches" element={<Matches />} />
+              <Route path="/mentors/:id" element={<Profile/>} />
               <Route path="send-booking-request" element={<MentorBookingUI />} />
               <Route path="mentor-dashboard" element={<MentorDashboard />} />
               <Route path="submit-request" element={<Listings />} />

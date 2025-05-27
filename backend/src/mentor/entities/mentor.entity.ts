@@ -16,6 +16,7 @@ import { MentorCertificate } from './certificate.entity';
 import { MentorAvailability } from './availability.entity';
 import { Users } from '../../users/entities/users.entity';
 import { Category } from '../../categories/entities/category.entity';
+import { MentorReview } from './rating.entity';
 
 @Entity()
 export class Mentor extends BaseEntity {
@@ -30,7 +31,6 @@ export class Mentor extends BaseEntity {
 
   @ManyToOne(() => Skill, (skill) => skill.mentors)
   skills: Skill;
-
 
   @Column({ nullable: true })
   profilePhotoUrl: string;
@@ -79,6 +79,14 @@ export class Mentor extends BaseEntity {
 
   @Column({ default: false })
   isActive: boolean;
+
+  @Column({ default: 'pending' })
+  status: string;
+
+  @OneToMany(() => MentorReview, (review) => review.mentor, {
+    cascade: true,
+  })
+  reviews: MentorReview[];
 
   @OneToOne(() => Users, (user) => user.mentor_profile)
   @JoinColumn({ name: 'users_id' })

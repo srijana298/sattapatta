@@ -143,14 +143,18 @@ export default function MentorBookingUI() {
       <div className="max-w-6xl mx-auto p-6 bg-white mt-10">
         {/* Mentor Info Section */}
         {mentor && (
-          <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-6 mb-8">
+          <div className="bg-linear-to-r from-orange-50 to-orange-100 rounded-lg p-6 mb-8">
             <div className="flex flex-col md:flex-row gap-6">
               {/* Avatar and Basic Info */}
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 bg-orange-200 rounded-full flex items-center justify-center">
                   {mentor.profilePhotoUrl ? (
                     <img
-                      src={mentor.profilePhotoUrl}
+                      src={
+                        mentor.profilePhotoUrl.startsWith('http')
+                          ? mentor.profilePhotoUrl
+                          : 'http://localhost:3000/' + mentor.profilePhotoUrl
+                      }
                       alt={mentor.user.fullname}
                       className="w-20 h-20 rounded-full object-cover"
                     />
@@ -165,7 +169,7 @@ export default function MentorBookingUI() {
               </div>
 
               {/* Stats and Rating */}
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white rounded-lg p-4 text-center">
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <Star size={16} className="text-yellow-500 fill-current" />
@@ -187,33 +191,28 @@ export default function MentorBookingUI() {
                   </div>
                   <p className="text-sm text-gray-600">Sessions</p>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Bio/Description */}
-            {mentor.bio && (
+            {mentor.introduction&& (
               <div className="mt-4 p-4 bg-white rounded-lg">
                 <h3 className="font-semibold text-gray-900 mb-2">About</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">{mentor.bio}</p>
+                <p className="text-gray-700 text-sm leading-relaxed">{mentor.introduction}</p>
               </div>
             )}
 
             {/* Skills/Expertise */}
-            {mentor.skills && mentor.skills.length > 0 && (
               <div className="mt-4">
                 <h3 className="font-semibold text-gray-900 mb-2">Expertise</h3>
                 <div className="flex flex-wrap gap-2">
-                  {mentor.skills.map((skill, index) => (
                     <span
-                      key={index}
                       className="px-3 py-1 bg-orange-200 text-orange-800 text-sm rounded-full"
                     >
-                      {skill}
+                      {mentor.skills.name}
                     </span>
-                  ))}
                 </div>
               </div>
-            )}
           </div>
         )}
 
@@ -224,7 +223,6 @@ export default function MentorBookingUI() {
           </p>
         </div>
 
-        {/* Progress Steps */}
         <div className="flex items-center justify-center mb-8">
           <div className="flex items-center space-x-8">
             {[
@@ -253,9 +251,7 @@ export default function MentorBookingUI() {
 
         {!isBooked ? (
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Left Panel - Selection */}
             <div className="space-y-6">
-              {/* Step 1: Calendar */}
               <div className="bg-gray-50 rounded-lg p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Calendar size={20} />
@@ -263,7 +259,6 @@ export default function MentorBookingUI() {
                 </h2>
 
                 <div className="bg-white rounded-lg p-4">
-                  {/* Calendar Header */}
                   <div className="flex items-center justify-between mb-4">
                     <button
                       onClick={() => navigateMonth(-1)}
@@ -284,7 +279,6 @@ export default function MentorBookingUI() {
                     </button>
                   </div>
 
-                  {/* Days of Week */}
                   <div className="grid grid-cols-7 gap-1 mb-2">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                       <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
@@ -293,7 +287,6 @@ export default function MentorBookingUI() {
                     ))}
                   </div>
 
-                  {/* Calendar Days */}
                   <div className="grid grid-cols-7 gap-1">
                     {getDaysInMonth(currentDate).map((date, index) => (
                       <button
@@ -321,7 +314,6 @@ export default function MentorBookingUI() {
                 </div>
               </div>
 
-              {/* Step 2: Time Selection */}
               {step >= 2 && selectedDate && (
                 <div className="bg-gray-50 rounded-lg p-6">
                   <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -358,10 +350,10 @@ export default function MentorBookingUI() {
                   <h3 className="font-semibold text-gray-900 mb-3">Your Mentor</h3>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
-                      {mentor.user.profile_picture ? (
+                      {mentor.profilePhotoUrl ? (
                         <img
-                          src={mentor.user.profile_picture}
-                          alt={mentor.user.name}
+                          src={mentor.profilePhotoUrl}
+                          alt={mentor.user.fullname}
                           className="w-12 h-12 rounded-full object-cover"
                         />
                       ) : (
@@ -370,7 +362,7 @@ export default function MentorBookingUI() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{mentor.user.fullname}</p>
-                      <p className="text-sm text-orange-600">{mentor.specialization}</p>
+                      <p className="text-sm text-orange-600">{mentor.headline}</p>
                       <div className="flex items-center gap-1 mt-1">
                         <Star size={12} className="text-yellow-500 fill-current" />
                         <span className="text-sm text-gray-600">{mentor.rating || '4.9'}</span>
@@ -406,7 +398,7 @@ export default function MentorBookingUI() {
                     <div className="flex justify-between items-center">
                       <span className="font-medium">Session Fee:</span>
                       <span className="text-xl font-bold text-green-600">
-                        ${mentor?.hourly_rate || '75'}
+                        ₹{mentor?.hourly_rate || '75'}
                       </span>
                     </div>
                   </div>

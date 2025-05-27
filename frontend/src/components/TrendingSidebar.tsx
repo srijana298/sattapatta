@@ -16,7 +16,7 @@ const TrendingSidebar = ({ popularData, isLoading }) => {
                 alt="People exchanging skills"
                 className="rounded-full"
               />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-200 to-transparent opacity-60"></div>
+              <div className="absolute inset-0 rounded-full bg-linear-to-tr from-orange-200 to-transparent opacity-60"></div>
             </div>
           </div>
 
@@ -39,7 +39,7 @@ const TrendingSidebar = ({ popularData, isLoading }) => {
             <div className="flex justify-center mb-5">
               <div className="relative w-16 h-16 rounded bg-gray-100 flex items-center justify-center">
                 <img src="/api/placeholder/100/100" alt="Categories" className="rounded" />
-                <div className="absolute inset-0 rounded bg-gradient-to-br from-gray-200 to-transparent opacity-60"></div>
+                <div className="absolute inset-0 rounded bg-linear-to-br from-gray-200 to-transparent opacity-60"></div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">

@@ -1,11 +1,12 @@
-import  { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, ChevronDown, Search, SlidersHorizontal } from 'lucide-react';
-import { mockMentors } from '../data/mockData';
 import StatusBadge from '../components/StatusBadge';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { cn, formatDate } from '../lib/utils';
+import { useMentors } from '../../../lib/hooks';
+import { LoadingSpinner } from '../../../components/LoadingSpinner';
 
 type FilterType = 'all' | 'pending' | 'approved' | 'rejected';
 
@@ -14,29 +15,32 @@ const Mentors = () => {
   const [statusFilter, setStatusFilter] = useState<FilterType>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
-  
-  // Filter mentors based on search query and status filter
-  const filteredMentors = mockMentors.filter(mentor => {
-    const matchesSearch = 
-      mentor.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mentor.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mentor.headline.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = 
-      statusFilter === 'all' || mentor.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
 
+  const { data: mentors, isLoading } = useMentors();
+
+  const filteredMentors = useMemo(() => {
+    return mentors?.filter((mentor) => {
+      
+      const matchesSearch =
+        mentor.user?.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        mentor.user?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        mentor.headline?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesStatus = statusFilter === 'all' || mentor.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [mentors, searchQuery, statusFilter]);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
   return (
     <div className="space-y-8 animate-in">
       <div>
         <h1 className="text-3xl font-bold">Mentors</h1>
-        <p className="text-muted-foreground mt-1">
-          Review and manage mentor applications
-        </p>
+        <p className="text-muted-foreground mt-1">Review and manage mentor applications</p>
       </div>
-      
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -51,7 +55,7 @@ const Mentors = () => {
             className="bg-muted/50 w-full pl-10 pr-4 py-2 text-sm rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
         </div>
-        
+
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -62,7 +66,7 @@ const Mentors = () => {
             <SlidersHorizontal className="h-4 w-4" />
             <span>Filter</span>
           </Button>
-          
+
           <div className="relative">
             <Button
               variant="outline"
@@ -73,30 +77,32 @@ const Mentors = () => {
               <span>Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}</span>
               <ChevronDown className="h-4 w-4" />
             </Button>
-            
-            <div className={cn(
-              "absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-card border border-border z-10 transition-all origin-top-right",
-              statusFilter === 'all' ? "" : ""
-            )}>
-              <div className="py-1">
-                {(['all', 'pending', 'approved', 'rejected'] as FilterType[]).map((status) => (
-                  <button
-                    key={status}
-                    className={cn(
-                      "w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors",
-                      statusFilter === status ? "bg-primary/10 text-primary font-medium" : ""
-                    )}
-                    onClick={() => setStatusFilter(status)}
-                  >
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </button>
-                ))}
+
+            {isStatusOpen && (
+              <div className="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-card border border-border z-10">
+                <div className="py-1">
+                  {(['all', 'pending', 'approved', 'rejected'] as FilterType[]).map((status) => (
+                    <button
+                      key={status}
+                      className={cn(
+                        'w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors',
+                        statusFilter === status ? 'bg-primary/10 text-primary font-medium' : ''
+                      )}
+                      onClick={() => {
+                        setStatusFilter(status);
+                        setIsStatusOpen(false);
+                      }}
+                    >
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
-      
+
       {/* Advanced Filters - Hidden by default */}
       {isFilterOpen && (
         <Card className="p-4 animate-in">
@@ -112,7 +118,7 @@ const Mentors = () => {
                 <option value="5">Personal Development</option>
               </select>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium mb-1 block">Skill</label>
               <select className="w-full bg-muted/50 rounded-md border border-border p-2 text-sm">
@@ -124,7 +130,7 @@ const Mentors = () => {
                 <option value="5">Marketing</option>
               </select>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium mb-1 block">Country</label>
               <select className="w-full bg-muted/50 rounded-md border border-border p-2 text-sm">
@@ -135,7 +141,7 @@ const Mentors = () => {
                 <option value="AU">Australia</option>
               </select>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium mb-1 block">Sort By</label>
               <select className="w-full bg-muted/50 rounded-md border border-border p-2 text-sm">
@@ -146,25 +152,18 @@ const Mentors = () => {
               </select>
             </div>
           </div>
-          
+
           <div className="flex justify-end mt-4 gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsFilterOpen(false)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(false)}>
               Cancel
             </Button>
-            <Button
-              variant="default"
-              size="sm"
-            >
+            <Button variant="default" size="sm">
               Apply Filters
             </Button>
           </div>
         </Card>
       )}
-      
+
       {/* Mentors List */}
       <div className="border rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
@@ -180,73 +179,40 @@ const Mentors = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {filteredMentors.map(mentor => (
+              {filteredMentors?.map((mentor) => (
                 <tr key={mentor.id} className="hover:bg-muted/30 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                        <img 
-                          src={mentor.profile_picture} 
-                          alt={mentor.fullname}
+                      <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
+                        <img
+                          src={mentor.profilePhotoUrl}
+                          alt={mentor.user.fullname}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div>
-                        <div className="font-medium">{mentor.fullname}</div>
-                        <div className="text-sm text-muted-foreground">{mentor.email}</div>
+                        <div className="font-medium">{mentor.user.fullname}</div>
+                        <div className="text-sm text-muted-foreground">{mentor.user.email}</div>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
                     <div className="space-y-1">
-                      <div className="text-sm font-medium">
-                        {
-                          (() => {
-                            switch(mentor.category) {
-                              case 1: return 'Academic';
-                              case 2: return 'Professional';
-                              case 3: return 'Creative';
-                              case 4: return 'Technical';
-                              case 5: return 'Personal Development';
-                              default: return `Category ${mentor.category}`;
-                            }
-                          })()
-                        }
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {
-                          (() => {
-                            switch(mentor.skill) {
-                              case 1: return 'Mathematics';
-                              case 2: return 'Physics';
-                              case 3: return 'Programming';
-                              case 4: return 'Design';
-                              case 5: return 'Marketing';
-                              case 6: return 'Language';
-                              case 7: return 'Business';
-                              case 8: return 'Music';
-                              case 9: return 'Art';
-                              case 10: return 'Personal Finance';
-                              default: return `Skill ${mentor.skill}`;
-                            }
-                          })()
-                        }
-                      </div>
+                      <div className="text-sm font-medium">{mentor.skill_category.name}</div>
+                      <div className="text-xs text-muted-foreground">{mentor.skills.name}</div>
                     </div>
                   </td>
                   <td className="p-4">
                     <div className="space-y-1">
                       <div className="text-sm">
-                        <span className="font-medium">${mentor.hourly_rate}</span> /hour
+                        <span className="font-medium">₹ {mentor.hourly_rate}</span> /hour
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        <span>${mentor.trial_rate}</span> trial
+                        <span>₹ {mentor.trial_rate}</span> trial
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 text-sm">
-                    {formatDate(mentor.created_at)}
-                  </td>
+                  <td className="p-4 text-sm">{formatDate(mentor.createdAt)}</td>
                   <td className="p-4">
                     <StatusBadge status={mentor.status} />
                   </td>
@@ -263,22 +229,21 @@ const Mentors = () => {
             </tbody>
           </table>
         </div>
-        
-        {/* Empty state */}
-        {filteredMentors.length === 0 && (
+
+        {filteredMentors?.length === 0 && (
           <div className="py-12 text-center">
             <p className="text-muted-foreground">No mentors found matching your criteria.</p>
           </div>
         )}
       </div>
-      
+
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing <span className="font-medium">{filteredMentors.length}</span> of{' '}
-          <span className="font-medium">{mockMentors.length}</span> mentors
+          Showing <span className="font-medium">{filteredMentors?.length}</span> of{' '}
+          <span className="font-medium">{mentors?.length}</span> mentors
         </div>
-        
+
         <div className="flex gap-1">
           <Button variant="outline" size="sm" disabled>
             Previous

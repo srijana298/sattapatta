@@ -1,27 +1,39 @@
 import api from '../api';
-import { AboutProfileResponse, Certificate, Description, Education } from '../lib/profile';
+import { AboutProfileResponse, Certificate, Description, Education, Profile } from '../lib/profile';
 import { CreateUser, CurrentUser } from '../lib/users';
 
 export interface MentorProfile {
   id: number;
   countryOfBirth: string;
   subject: string;
+  hourly_rate: number;
+  trial_rate: number;
   profilePhotoUrl: string;
   introduction: string;
   experience: string;
   motivation: string;
+  status: string;
   skill_category: {
+    id: number;
     name: string;
   };
   skills: {
+    id: number;
     name: string;
   };
   headline: string;
   has_education: boolean;
   user: CurrentUser;
-  educations: Education[];
+  availabilities: {
+    id: number;
+    day_of_week: string;
+    start_time: string;
+    end_time: string;
+    is_available: boolean;
+  }[];
+  educations: Profile["educations"];
   has_certificate: boolean;
-  certificates: Certificate[];
+  certificates: Profile["certificates"];
   isVerified: boolean;
   isActive: boolean;
   createdAt: string;
@@ -96,5 +108,10 @@ export const getMentorProfile = async (): Promise<MentorProfile> => {
 
 export const getAllMentors = async (): Promise<MentorProfile[]> => {
   const response = await api.get('/mentor');
+  return response.data;
+};
+
+export const getMentor = async (id?: string): Promise<MentorProfile> => {
+  const response = await api.get('/mentor/'+ id);
   return response.data;
 };

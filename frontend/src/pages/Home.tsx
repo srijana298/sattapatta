@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { CheckCircle, Clock, Mail, Search } from 'lucide-react';
 import { CustomDropdown } from '../components/ui/dropdown/CustomDropdown';
 import FirstHeroImage from '../assets/home-screen-1.jpg';
 import SecondHeroImage from '../assets/home-screen-bg.jpg';
@@ -12,7 +12,7 @@ const LandingPage = () => {
   return (
     <>
       {/* Main Hero Section */}
-      <section className="bg-gradient-to-br from-orange-100 via-orange-50 to-white min-h-screen flex items-center">
+      <section className="bg-linear-to-br from-orange-100 via-orange-50 to-white min-h-screen flex items-center">
         <div className="container mx-auto px-6 md:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
@@ -59,7 +59,7 @@ const LandingPage = () => {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-200">
+              <div className="w-20 h-20 bg-linear-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-200">
                 <span className="text-3xl font-bold text-white">1</span>
               </div>
               <h3 className="text-2xl font-bold text-orange-800 mb-4">Choose Your Skill</h3>
@@ -69,7 +69,7 @@ const LandingPage = () => {
             </div>
 
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-200">
+              <div className="w-20 h-20 bg-linear-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-200">
                 <span className="text-3xl font-bold text-white">2</span>
               </div>
               <h3 className="text-2xl font-bold text-orange-800 mb-4">Find Your Mentor</h3>
@@ -79,7 +79,7 @@ const LandingPage = () => {
             </div>
 
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-200">
+              <div className="w-20 h-20 bg-linear-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-200">
                 <span className="text-3xl font-bold text-white">3</span>
               </div>
               <h3 className="text-2xl font-bold text-orange-800 mb-4">Start Learning</h3>
@@ -92,7 +92,7 @@ const LandingPage = () => {
       </section>
 
       {/* Community Section - More Visual */}
-      <section className="py-20 bg-gradient-to-r from-orange-50 to-orange-100">
+      <section className="py-20 bg-linear-to-r from-orange-50 to-orange-100">
         <div className="container mx-auto px-6 md:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
@@ -110,7 +110,7 @@ const LandingPage = () => {
               </h2>
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-white text-xl">👥</span>
                   </div>
                   <div>
@@ -123,7 +123,7 @@ const LandingPage = () => {
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-white text-xl">🎯</span>
                   </div>
                   <div>
@@ -134,7 +134,7 @@ const LandingPage = () => {
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-white text-xl">⭐</span>
                   </div>
                   <div>
@@ -149,7 +149,7 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section - Bold and Clear */}
-      <section className="py-20 bg-gradient-to-r from-orange-600 to-orange-700">
+      <section className="py-20 bg-linear-to-r from-orange-600 to-orange-700">
         <div className="container mx-auto px-6 md:px-8 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Ready to Start Your Journey?
@@ -253,11 +253,75 @@ const LandingPage = () => {
   );
 };
 
-const AuthenticatedPage = () => {
-const { data, isLoading } = useMentors()
+const MentorPendingStatus = () => {
+  return (
+    <div className="max-w-md mx-auto mt-8 p-6 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm">
+      <div className="flex items-center justify-center mb-4">
+        <div className="p-3 bg-amber-100 rounded-full">
+          <Clock className="h-8 w-8 text-amber-600" />
+        </div>
+      </div>
+      
+      <h2 className="text-xl font-semibold text-gray-800 text-center mb-3">
+        Application Under Review
+      </h2>
+      
+      <p className="text-gray-600 text-center mb-6 leading-relaxed">
+        Your mentor application is currently being reviewed by our admin team. 
+        You'll receive a notification within <span className="font-semibold text-amber-700">24 hours</span> 
+        of your submission.
+      </p>
+      
+      <div className="space-y-3 mb-6">
+        <div className="flex items-center">
+          <div className="flex-shrink-0">
+            <CheckCircle className="h-5 w-5 text-green-500" />
+          </div>
+          <div className="ml-3">
+            <p className="text-sm font-medium text-gray-700">Application submitted</p>
+            <p className="text-xs text-gray-500">We've received your mentor application</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center">
+          <div className="flex-shrink-0">
+            <div className="h-5 w-5 bg-amber-500 rounded-full flex items-center justify-center">
+              <div className="h-2 w-2 bg-white rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm font-medium text-gray-700">Under review</p>
+            <p className="text-xs text-gray-500">Admin team is reviewing your profile</p>
+          </div>
+        </div>
+        
+      </div>
+      
+      <div className="bg-white rounded-lg p-4 border border-amber-100">
+        <p className="text-sm text-gray-600 text-center">
+          <span className="font-medium">What happens next?</span><br />
+          Our team will review your qualifications and experience. 
+          Wait to receive our call for updates on your application status.
+        </p>
+      </div>
+      
+      <p className="text-xs text-gray-500 text-center mt-4">
+        Questions? Contact our support team for assistance.
+      </p>
+    </div>
+  );
+};
 
+const AuthenticatedPage = () => {
+  const { data, isLoading } = useMentors()
+  const { currentUser } = useAuth();
   if (isLoading) {
     return <LoadingSpinner />;
+  }
+
+  console.log(currentUser)
+  if (currentUser?.role === 'mentor' && currentUser.mentor_profile.status === 'pending') {
+    return <MentorPendingStatus />;
   }
 
   return (

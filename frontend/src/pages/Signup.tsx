@@ -31,7 +31,7 @@ const Signup = () => {
   return (
     <>
       <Navbar />
-      <div className="flex-grow flex items-center justify-center px-4 py-12">
+      <div className="grow flex items-center justify-center px-4 py-12">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Create your account</h2>

@@ -21,6 +21,7 @@ export type CurrentUser = {
   fullname: string;
   mentor_profile: {
     isActive: boolean;
+    status: string;
   };
   role: 'mentor' | 'student';
 };

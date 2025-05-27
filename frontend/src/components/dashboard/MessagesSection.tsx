@@ -140,7 +140,7 @@ const MessagesSection: React.FC = () => {
                                }`}
                       onClick={() => setActiveConversation(conversation)}
                     >
-                      <div className="relative flex-shrink-0">
+                      <div className="relative shrink-0">
                         <img
                           src={conversation.avatar}
                           alt={conversation.name}

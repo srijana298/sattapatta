@@ -234,7 +234,7 @@ const DashboardOverview: React.FC = () => {
                   <p className="text-sm text-gray-600 truncate">{message.content}</p>
                 </div>
                 {!message.read && (
-                  <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-blue-500"></span>
+                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-blue-500"></span>
                 )}
               </div>
             </div>

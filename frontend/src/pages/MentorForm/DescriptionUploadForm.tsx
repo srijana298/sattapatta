@@ -61,7 +61,7 @@ const DescriptionUploadForm = () => {
 
         <div className="bg-blue-100 p-3 mt-3 flex items-start rounded">
           <svg
-            className="w-5 h-5 text-blue-800 mt-0.5 mr-2 flex-shrink-0"
+            className="w-5 h-5 text-blue-800 mt-0.5 mr-2 shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -103,7 +103,7 @@ const DescriptionUploadForm = () => {
 
         <div className="bg-blue-100 p-3 mt-3 flex items-start rounded">
           <svg
-            className="w-5 h-5 text-blue-800 mt-0.5 mr-2 flex-shrink-0"
+            className="w-5 h-5 text-blue-800 mt-0.5 mr-2 shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -139,7 +139,7 @@ const DescriptionUploadForm = () => {
       <div className="bg-red-100 p-4 my-6 rounded">
         <div className="flex items-start">
           <svg
-            className="w-5 h-5 text-red-800 mt-0.5 mr-2 flex-shrink-0"
+            className="w-5 h-5 text-red-800 mt-0.5 mr-2 shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

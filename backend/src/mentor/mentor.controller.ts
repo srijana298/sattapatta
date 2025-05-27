@@ -50,6 +50,18 @@ export class MentorController {
   }
 
   @UseGuards(AuthGuard)
+  @Put('/:id/update-status')
+  async updateStatus(@Body('status') status: string, @Param('id') id: string) {
+    const mentor = await this.mentorService.findOne(+id);
+    if (!mentor) {
+      throw new NotFoundException("Mentor doesn't exist");
+    }
+    mentor.status = status;
+    await mentor.save();
+    return mentor.id;
+  }
+
+  @UseGuards(AuthGuard)
   @Get('/picture')
   async getProfilePicture(@Req() request: AuthRequest) {
     const mentorProfile = await this.mentorService.findProfile(request.user.id);

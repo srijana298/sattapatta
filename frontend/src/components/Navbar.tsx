@@ -66,10 +66,10 @@ const Navbar: React.FC = () => {
             {/* Logo Section */}
             <div className="flex items-center space-x-3">
               <Link to="/" className="flex items-center space-x-3 group">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
+                <div className="h-10 w-10 rounded-xl bg-linear-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
                   <span className="text-white font-bold text-lg">SP</span>
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
+                <span className="text-2xl font-bold bg-linear-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
                   SattaPatta
                 </span>
               </Link>
@@ -131,9 +131,6 @@ const Navbar: React.FC = () => {
                   >
                     <MessageCircle className="w-5 h-5" />
                     <span className='pr-3'>Messages</span>
-                    <span className="absolute -top-1 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      3
-                    </span>
                   </Link>
 
                   <Link
@@ -144,13 +141,6 @@ const Navbar: React.FC = () => {
                     <span>My Sessions</span>
                   </Link>
 
-                  {/* Notifications */}
-                  <button className="relative p-2 text-gray-700 hover:text-orange-600 transition-colors duration-200">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                      2
-                    </span>
-                  </button>
 
                   {/* Profile Dropdown */}
                   <div className="relative" ref={dropdownRef}>
@@ -158,7 +148,7 @@ const Navbar: React.FC = () => {
                       className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                       onClick={() => setDropdownOpen(!dropdownOpen)}
                     >
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                      <div className="h-8 w-8 rounded-full bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                         <User className="h-4 w-4 text-white" />
                       </div>
                       <span className="text-gray-700 font-medium">
@@ -321,7 +311,7 @@ const Navbar: React.FC = () => {
               ) : (
                 <>
                   <div className="flex items-center space-x-3 pb-4 border-b border-gray-100">
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-full bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                       <User className="h-5 w-5 text-white" />
                     </div>
                     <div>

@@ -93,7 +93,7 @@ const ProfileSection: React.FC = () => {
         {/* Profile Card */}
         <div className="md:col-span-1">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="relative h-32 bg-gradient-to-r from-orange-500 to-orange-600">
+            <div className="relative h-32 bg-linear-to-r from-orange-500 to-orange-600">
               {isEditing && (
                 <button className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-sm 
                                 text-gray-700 hover:text-gray-900 focus:outline-none">
@@ -428,7 +428,7 @@ const ProfileSection: React.FC = () => {
                               'isActive', 
                               !slot.isActive
                             )}
-                            className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent 
+                            className={`relative inline-flex shrink-0 h-6 w-11 border-2 border-transparent 
                                      rounded-full cursor-pointer transition-colors ease-in-out duration-200 
                                      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500
                                      ${slot.isActive ? 'bg-orange-500' : 'bg-gray-200'}`}

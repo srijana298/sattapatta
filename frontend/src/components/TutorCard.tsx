@@ -19,10 +19,14 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
       <div className="md:flex">
         {/* Profile Image Section */}
-        <div className="md:w-72 flex-shrink-0">
+        <div className="md:w-72 shrink-0">
           <div className="relative h-64 md:h-full">
             <img
-              src={profile.profilePhotoUrl}
+              src={
+                profile.profilePhotoUrl.startsWith('http')
+                  ? profile.profilePhotoUrl
+                  : 'http://localhost:3000/' + profile.profilePhotoUrl
+              }
               alt={profile.user.fullname}
               className="w-full h-full object-cover"
             />
@@ -42,7 +46,9 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                    {profile.user.fullname}
+                    <Link to={'/mentors/' + profile.id} className="hover:underline">
+                      {profile.user.fullname}
+                    </Link>
                   </h3>
                   <div className="flex items-center space-x-4 text-gray-600 mb-3">
                     <div className="flex items-center">
@@ -52,12 +58,12 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
                     </div>
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Kathmandu</span>
+                      <span className="text-sm">{profile.countryOfBirth} </span>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-orange-600">₹2,000</div>
+                  <div className="text-3xl font-bold text-orange-600">₹{profile.hourly_rate}</div>
                   <div className="text-sm text-gray-500">per hour</div>
                 </div>
               </div>

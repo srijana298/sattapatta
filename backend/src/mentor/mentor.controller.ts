@@ -39,6 +39,11 @@ export class MentorController {
     return this.mentorService.create(userId, createMentorDto);
   }
 
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.mentorService.findOne(+id);
+  }
+
   @Get()
   findAll() {
     return this.mentorService.findAll();
@@ -65,17 +70,17 @@ export class MentorController {
       }),
     }),
   )
-  async createPicture(
+  createPicture(
     @Req() request: AuthRequest,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const mentorProfile = await this.mentorService.findProfile(request.user.id);
+    // const mentorProfile = await this.mentorService.findProfile(request.user.id);
 
-    if (!mentorProfile) {
-      throw new NotFoundException("Mentor profile doesn't exist");
-    }
+    // if (!mentorProfile) {
+    //   throw new NotFoundException("Mentor profile doesn't exist");
+    // }
 
-    await this.mentorService.addProfilePicture(mentorProfile.id, file.path);
+    // await this.mentorService.addProfilePicture(mentorProfile.id, file.path);
     return file.path;
   }
 

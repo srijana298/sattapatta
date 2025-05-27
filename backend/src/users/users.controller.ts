@@ -5,6 +5,7 @@ import {
   UseGuards,
   Post,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, LoginUserDto } from './dto/create-user.dto';
@@ -38,7 +39,11 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Get('/me')
-  getProfile(@Request() req: AuthRequest) {
-    return req.user;
+  async getProfile(@Request() req: AuthRequest) {
+    const user = await this.usersService.findOne(req.user.id);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return user;
   }
 }

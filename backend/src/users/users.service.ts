@@ -33,6 +33,26 @@ export class UsersService {
     return saved;
   }
 
+  async findOne(id: number): Promise<User | null> {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id,
+      },
+      relations: ['mentor_profile'],
+      select: {
+        id: true,
+        fullname: true,
+        email: true,
+        role: true,
+        mentor_profile: {
+          id: true,
+          isVerified: true
+        },
+      },
+    });
+    return user;
+  }
+
   async findAll(): Promise<User[]> {
     const users = await this.usersRepository.find({
       select: {

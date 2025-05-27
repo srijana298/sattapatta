@@ -7,6 +7,7 @@ import { Message } from './entities/message.entity';
 import { ConversationParticipant } from './entities/participant.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ChatModule } from 'src/chat/chat.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ChatModule } from 'src/chat/chat.module';
         expiresIn: '24h',
       },
     }),
+    UsersModule,
 
     TypeOrmModule.forFeature([Conversation, ConversationParticipant, Message]),
   ],

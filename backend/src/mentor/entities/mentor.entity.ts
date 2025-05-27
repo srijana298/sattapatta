@@ -31,8 +31,6 @@ export class Mentor extends BaseEntity {
   @ManyToOne(() => Skill, (skill) => skill.mentors)
   skills: Skill;
 
-  @Column({ nullable: true })
-  subject: string;
 
   @Column({ nullable: true })
   profilePhotoUrl: string;
@@ -68,7 +66,7 @@ export class Mentor extends BaseEntity {
   @OneToMany(() => MentorAvailability, (availability) => availability.mentor, {
     cascade: true,
   })
-  availability: MentorAvailability[];
+  availabilities: MentorAvailability[];
 
   @Column({ type: 'decimal', default: 1000.0 })
   hourly_rate: number;

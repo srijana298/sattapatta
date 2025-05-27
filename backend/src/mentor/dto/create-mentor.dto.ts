@@ -1,6 +1,5 @@
 import {
   IsString,
-  IsEmail,
   IsBoolean,
   IsNumber,
   IsArray,
@@ -60,12 +59,6 @@ class AvailabilityDto {
 }
 
 export class CreateMentorDto {
-  @IsString()
-  fullname: string;
-
-  @IsEmail()
-  email: string;
-
   @IsString()
   countryOfBirth: string;
 

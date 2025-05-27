@@ -7,9 +7,13 @@ import { Users } from 'src/users/entities/users.entity';
 import { Mentor } from './entities/mentor.entity';
 import { MentorCertificate } from './entities/certificate.entity';
 import { MentorEducation } from './entities/education.entity';
+import { MentorAvailability } from './entities/availability.entity';
+import { UsersModule } from 'src/users/users.module';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   imports: [
+    UsersModule,
     JwtModule.register({
       secret: 'your_secret_key',
       signOptions: {
@@ -21,9 +25,10 @@ import { MentorEducation } from './entities/education.entity';
       Mentor,
       MentorCertificate,
       MentorEducation,
+      MentorAvailability,
     ]),
   ],
   controllers: [MentorController],
-  providers: [MentorService],
+  providers: [MentorService, UsersService],
 })
 export class MentorModule {}

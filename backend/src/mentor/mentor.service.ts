@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateMentorDto } from './dto/create-mentor.dto';
 import {
   AboutMentorDto,
@@ -13,6 +13,7 @@ import { Repository } from 'typeorm';
 import { Users } from 'src/users/entities/users.entity';
 import { MentorCertificate } from './entities/certificate.entity';
 import { MentorEducation } from './entities/education.entity';
+import { MentorAvailability } from './entities/availability.entity';
 
 @Injectable()
 export class MentorService {
@@ -25,6 +26,9 @@ export class MentorService {
 
     @InjectRepository(Users)
     private readonly userRepository: Repository<Users>,
+
+    @InjectRepository(MentorAvailability)
+    private readonly availabilityRepository: Repository<MentorAvailability>,
 
     @InjectRepository(MentorCertificate)
     private readonly certificateRepository: Repository<MentorCertificate>,
@@ -176,9 +180,27 @@ export class MentorService {
   }
 
   async create(userId: number, createMentorDto: CreateMentorDto) {
+    const foundMentor = await this.mentorRepository.findOne({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+      select: {
+        id: true,
+        user: {
+          id: true,
+        },
+      },
+    });
+
+    if (foundMentor) {
+      throw new BadRequestException(
+        'Mentor profile already exists for this user',
+      );
+    }
+
     const {
-      fullname,
-      email,
       countryOfBirth,
       category,
       skill,
@@ -191,16 +213,15 @@ export class MentorService {
       motivation,
       headline,
       hourly_rate,
+      availability,
       trial_rate,
     } = createMentorDto;
     const mentor = new Mentor();
     Object.assign(mentor, {
-      fullname,
-      email,
       countryOfBirth,
-      category,
-      skill,
-      profile_picture,
+      skill_category: category,
+      skills: skill,
+      profilePhotoUrl: profile_picture,
       has_certificate,
       has_education,
       introduction,
@@ -241,9 +262,22 @@ export class MentorService {
         _educations.push(data);
       });
 
-      await this.educationRepository.save(_educations);
+      const saved = await this.educationRepository.save(_educations);
+      console.log('Saved educations:', saved);
     }
 
+    const _availabilities: MentorAvailability[] = [];
+
+    availability.forEach((avail) => {
+      const data = this.availabilityRepository.create({
+        mentor: {
+          id: savedMentor.id,
+        },
+        ...avail,
+      });
+      _availabilities.push(data);
+    });
+    await this.availabilityRepository.save(_availabilities);
     return savedMentor;
   }
 
@@ -252,6 +286,7 @@ export class MentorService {
       relations: [
         'educations',
         'certificates',
+        'availabilities',
         'user',
         'skill_category',
         'skills',
@@ -260,10 +295,11 @@ export class MentorService {
         id: true,
         countryOfBirth: true,
         introduction: true,
-        subject: true,
         profilePhotoUrl: true,
         experience: true,
         motivation: true,
+        hourly_rate: true,
+        trial_rate: true,
         user: {
           id: true,
           email: true,
@@ -277,6 +313,29 @@ export class MentorService {
     return this.mentorRepository.findOne({
       where: {
         id,
+      },
+      relations: [
+        'educations',
+        'certificates',
+        'availabilities',
+        'user',
+        'skill_category',
+        'skills',
+      ],
+      select: {
+        id: true,
+        countryOfBirth: true,
+        introduction: true,
+        profilePhotoUrl: true,
+        hourly_rate: true,
+        trial_rate: true,
+        experience: true,
+        motivation: true,
+        user: {
+          id: true,
+          email: true,
+          fullname: true,
+        },
       },
     });
   }

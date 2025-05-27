@@ -16,6 +16,11 @@ import PrivateRoutes from './components/PrivateRoute';
 import MentorDashboard from './pages/Mentor/Dashboard';
 import MentorBookingUI from './pages/Booking';
 import BookingDetailsPage from './pages/BookingDetails';
+import Dashboard from './pages/admin/pages/Dashboard';
+import Layout from './pages/admin/components/Layout';
+import Mentors from './pages/admin/pages/Mentors';
+import MentorDetail from './pages/admin/pages/MentorDetail';
+import { ThemeProvider } from './pages/admin/context/ThemeContext';
 
 const client = new QueryClient();
 function App() {
@@ -24,10 +29,17 @@ function App() {
       <QueryClientProvider client={client}>
         <AuthProvider>
           <Toaster position="top-right" reverseOrder={false} />
+          <ThemeProvider>
+
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="signup/mentor" element={<TutorMultiStepForm />} />
+            <Route path="/admin" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="mentors" element={<Mentors />} />
+              <Route path="mentors/:id" element={<MentorDetail />} />
+            </Route>
             <Route path="/" element={<PrivateRoutes />}>
               <Route path="" element={<Home />} />
               <Route path="bookings/:id" element={<BookingDetailsPage />} />
@@ -40,6 +52,7 @@ function App() {
               <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>
+          </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>

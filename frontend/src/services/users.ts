@@ -84,7 +84,7 @@ export const getPicture = async (): Promise<{ profilePhotoUrl: string }> => {
   return response.data;
 };
 
-export const uploadPicture = async (data: FormData) => {
+export const uploadPicture = async (data: FormData): Promise<string> => {
   const response = await api.post('/mentor/picture', data);
   return response.data;
 };

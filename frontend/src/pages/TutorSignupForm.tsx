@@ -19,6 +19,10 @@ import { useAuth } from '../components/AuthContext';
 import { countries } from '../data/countries';
 import { useCategories } from '../lib/hooks';
 import { Profile, profileSchema } from '../lib/profile';
+import { useMutation } from 'react-query';
+import { uploadPicture } from '../services/users';
+import toast from 'react-hot-toast';
+import { createMentor } from '../services/mentor';
 
 const yearOptions = Array.from({ length: 16 }, (_, i) => (2025 - i).toString());
 const degreeTypes = ["Bachelor's", "Master's", 'PhD', "Associate's", 'Diploma', 'Certificate'];
@@ -67,10 +71,37 @@ const Rupees = ({ className }: { className?: string }) => {
 };
 
 export default function TutorSignupForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting] = useState(false);
   const [activeSection, setActiveSection] = useState('personal');
   const { currentUser } = useAuth();
 
+  const { mutateAsync: _upload_picture } = useMutation({
+    mutationFn: (formData: FormData) => {
+      return uploadPicture(formData);
+    },
+    onError: (error) => {
+      toast.error('Error uploading picture');
+    }
+  });
+
+  const { mutateAsync } = useMutation({
+    mutationFn: async (values: Profile) => {
+      const formData = new FormData();
+      formData.append('file', values.profile_picture);
+      const filePath = await _upload_picture(formData);
+      const profileData = {
+        ...values,
+        profile_picture: filePath
+      };
+      return createMentor(profileData);
+    },
+    onSuccess: () => {
+      toast.success('Mentor Profile created successfully');
+    },
+    onError: () => {
+      toast.error('Error creating mentor profile');
+    }
+  });
   const { data: categories, isLoading } = useCategories();
   const methods = useForm({
     resolver: zodResolver(profileSchema),
@@ -136,26 +167,23 @@ export default function TutorSignupForm() {
   };
   const availabilityArray = useFieldArray({
     control,
-    name: "availability"
+    name: 'availability'
   });
 
   const isTimeSlotSelected = (day: string, time: string) => {
     return availabilityArray.fields.some(
-      field => field.day_of_week === day && field.start_time === time
+      (field) => field.day_of_week === day && field.start_time === time
     );
   };
 
- const toggleAvailability = (day: string, time: string) => {
+  const toggleAvailability = (day: string, time: string) => {
     const existingIndex = availabilityArray.fields.findIndex(
-      field => field.day_of_week === day && field.start_time === time
+      (field) => field.day_of_week === day && field.start_time === time
     );
-    
+
     if (existingIndex >= 0) {
-      // Remove if already exists
       availabilityArray.remove(existingIndex);
     } else {
-      // Add new availability slot
-      // For simplicity, we'll set end_time to be 1 hour after start_time
       const timeComponents = time.split(':');
       const hour = parseInt(timeComponents[0], 10);
       const ampm = time.includes('AM') ? 'AM' : 'PM';
@@ -170,68 +198,10 @@ export default function TutorSignupForm() {
       });
     }
   };
-  const obj = {
-  "fullname": "Dibash Mentor",
-  "email": "dibashthapa56@gmail.com",
-  "countryOfBirth": "NP",
-  "category": "13",
-  "skill": "23",
-  "profile_picture": {},
-  "has_certificate": false,
-  "certificates": [
-    {
-      "subject": "English",
-      "name": "hi",
-      "description": "k chha",
-      "issuedBy": "TU",
-      "start_year": "2014",
-      "end_year": "2013"
-    }
-  ],
-  "has_education": false,
-  "educations": [
-    {
-      "university": "TU",
-      "degree": "BCA",
-      "degree_type": "Bachelor's",
-      "start_year": "2016",
-      "end_year": "2013"
-    }
-  ],
-  "introduction": "Hi, I am Dibash",
-  "experience": "5 years of experience",
-  "motivation": "I am good at what i am",
-  "headline": "Fix everything",
-  "hourly_rate": 250,
-  "trial_rate": 150,
-  "availability": [
-    {
-      "day_of_week": "Tuesday",
-      "start_time": "10:00 AM",
-      "end_time": "11:00 AM",
-      "is_available": true
-    },
-    {
-      "day_of_week": "Wednesday",
-      "start_time": "10:00 AM",
-      "end_time": "11:00 AM",
-      "is_available": true
-    }
-  ]
-}
 
   const onSubmit = async (formData: Profile) => {
     console.log('Form Data:', formData);
-    // setIsSubmitting(true);
-    // try {
-    //   console.log('Form submitted:', formData);
-    //   // Simulate API call
-    //   await new Promise((resolve) => setTimeout(resolve, 2000));
-    // } catch (error) {
-    //   console.error('Error submitting form:', error);
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
+    await mutateAsync(formData);
   };
 
   const sections = [
@@ -360,7 +330,7 @@ export default function TutorSignupForm() {
                       <label className="block text-sm font-semibold text-gray-700">Category</label>
                       <div className="relative">
                         <select
-                          {...register('category')}
+                          {...register('category', { valueAsNumber: true })}
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 appearance-none bg-white"
                         >
                           <option value="">Select Category</option>
@@ -381,7 +351,7 @@ export default function TutorSignupForm() {
                       <label className="block text-sm font-semibold text-gray-700">Skill</label>
                       <div className="relative">
                         <select
-                          {...register('skill')}
+                          {...register('skill', { valueAsNumber: true })}
                           disabled={!selectedCategory}
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 appearance-none bg-white disabled:bg-gray-50"
                         >

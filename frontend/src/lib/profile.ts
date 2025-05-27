@@ -4,9 +4,9 @@ export const profileSchema = zod
     fullname: zod.string().min(1, 'Full name is required'),
     email: zod.string().email('Invalid email format').min(1, 'Email is required'),
     countryOfBirth: zod.string().min(1, 'Country of birth is required'),
-    category: zod.string().min(1, 'Category is required'),
-    skill: zod.string().min(1, 'Skill is required'),
-    profile_picture: zod.instanceof(File),
+    category: zod.number().int().min(1, 'Category is required'),
+    skill: zod.number().int().min(1, 'Skill is required'),
+    profile_picture: zod.union([zod.instanceof(File), zod.string().url('Invalid URL format')]),
     has_certificate: zod.boolean().default(false),
     certificates: zod
       .array(
@@ -36,20 +36,18 @@ export const profileSchema = zod
     experience: zod.string().min(1, 'Experience is required'),
     motivation: zod.string().min(1, 'Motivation is required'),
     headline: zod.string().min(1, 'Headline is required'),
-    hourly_rate: zod
-      .number()
-      .default(1000),
-    trial_rate: zod
-      .number()
-      .default(50),
-    availability: zod.array(
-      zod.object({
-        day_of_week: zod.string().min(1, 'Day of week is required'),
-        start_time: zod.string().min(1, 'Start time is required'),
-        end_time: zod.string().min(1, 'End time is required'),
-        is_available: zod.boolean().default(true) 
-      })
-    ).min(1, 'At least one availability is required'),
+    hourly_rate: zod.number().default(1000),
+    trial_rate: zod.number().default(50),
+    availability: zod
+      .array(
+        zod.object({
+          day_of_week: zod.string().min(1, 'Day of week is required'),
+          start_time: zod.string().min(1, 'Start time is required'),
+          end_time: zod.string().min(1, 'End time is required'),
+          is_available: zod.boolean().default(true)
+        })
+      )
+      .min(1, 'At least one availability is required')
   })
   .superRefine((data, ctx) => {
     if (!data.has_education) {
@@ -73,5 +71,4 @@ export const profileSchema = zod
     }
   });
 
-
-  export type Profile = zod.infer<typeof profileSchema>;
+export type Profile = zod.infer<typeof profileSchema>;

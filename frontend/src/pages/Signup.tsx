@@ -20,7 +20,7 @@ const Signup = () => {
   const { mutateAsync } = useMutation({
     mutationFn: (value: CreateUser) => createUser(value),
     mutationKey: ['createUser'],
-    onSuccess: (data: CreateUser) => {
+    onSuccess: () => {
       navigate('/login');
     }
   });

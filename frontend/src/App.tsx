@@ -29,7 +29,6 @@ function App() {
       <QueryClientProvider client={client}>
         <AuthProvider>
           <Toaster position="top-right" reverseOrder={false} />
-          <ThemeProvider>
 
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -54,7 +53,6 @@ function App() {
               <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>
-          </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>

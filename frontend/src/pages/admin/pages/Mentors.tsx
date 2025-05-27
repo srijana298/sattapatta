@@ -20,7 +20,6 @@ const Mentors = () => {
 
   const filteredMentors = useMemo(() => {
     return mentors?.filter((mentor) => {
-      
       const matchesSearch =
         mentor.user?.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
         mentor.user?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -185,7 +184,11 @@ const Mentors = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
                         <img
-                          src={mentor.profilePhotoUrl}
+                          src={
+                            mentor.profilePhotoUrl.startsWith('http')
+                              ? mentor.profilePhotoUrl
+                              : 'http://localhost:3000/' + mentor.profilePhotoUrl
+                          }
                           alt={mentor.user.fullname}
                           className="w-full h-full object-cover"
                         />

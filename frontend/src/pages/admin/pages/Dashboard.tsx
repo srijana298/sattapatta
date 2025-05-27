@@ -135,7 +135,7 @@ const Dashboard = () => {
                 >
                   <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
                     <img
-                      src={mentor.profilePhotoUrl}
+                      src={mentor.profilePhotoUrl.includes('http') ? mentor.profilePhotoUrl : `http://localhost:3000/${mentor.profilePhotoUrl}`}
                       alt={mentor.user.fullname}
                       className="w-full h-full object-cover"
                     />

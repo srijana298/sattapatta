@@ -195,7 +195,7 @@ export default function MentorBookingUI() {
             </div>
 
             {/* Bio/Description */}
-            {mentor.introduction&& (
+            {mentor.introduction && (
               <div className="mt-4 p-4 bg-white rounded-lg">
                 <h3 className="font-semibold text-gray-900 mb-2">About</h3>
                 <p className="text-gray-700 text-sm leading-relaxed">{mentor.introduction}</p>
@@ -203,16 +203,14 @@ export default function MentorBookingUI() {
             )}
 
             {/* Skills/Expertise */}
-              <div className="mt-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Expertise</h3>
-                <div className="flex flex-wrap gap-2">
-                    <span
-                      className="px-3 py-1 bg-orange-200 text-orange-800 text-sm rounded-full"
-                    >
-                      {mentor.skills.name}
-                    </span>
-                </div>
+            <div className="mt-4">
+              <h3 className="font-semibold text-gray-900 mb-2">Expertise</h3>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1 bg-orange-200 text-orange-800 text-sm rounded-full">
+                  {mentor.skills.name}
+                </span>
               </div>
+            </div>
           </div>
         )}
 
@@ -352,7 +350,11 @@ export default function MentorBookingUI() {
                     <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
                       {mentor.profilePhotoUrl ? (
                         <img
-                          src={mentor.profilePhotoUrl}
+                          src={
+                            mentor.profilePhotoUrl.startsWith('http')
+                              ? mentor.profilePhotoUrl
+                              : 'http://localhost:3000/' + mentor.profilePhotoUrl
+                          }
                           alt={mentor.user.fullname}
                           className="w-12 h-12 rounded-full object-cover"
                         />

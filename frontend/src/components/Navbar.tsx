@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { User, MessageCircle, Calendar, Menu, X, Bell, Search, ChevronDown } from 'lucide-react';
+import { User, MessageCircle, Calendar, Menu, X,  ChevronDown } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
@@ -197,7 +197,7 @@ const Navbar: React.FC = () => {
 
                         {currentUser?.role === 'mentor' && (
                           <Link
-                            to="/mentor-dashboard"
+                            to="/dashboard"
                             className="flex items-center px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
                             onClick={() => setDropdownOpen(false)}
                           >

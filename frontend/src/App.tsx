@@ -13,7 +13,6 @@ import Matches from './pages/Matches';
 import Profile from './pages/Profile';
 import TutorMultiStepForm from './pages/TutorSignupForm';
 import PrivateRoutes from './components/PrivateRoute';
-import MentorDashboard from './pages/Mentor/Dashboard';
 import MentorBookingUI from './pages/Booking';
 import BookingDetailsPage from './pages/BookingDetails';
 import Dashboard from './pages/admin/pages/Dashboard';
@@ -61,7 +60,6 @@ function App() {
               <Route path="matches" element={<Matches />} />
               <Route path="mentors/:id" element={<Profile/>} />
               <Route path="send-booking-request" element={<MentorBookingUI />} />
-              <Route path="mentor-dashboard" element={<MentorDashboard />} />
               <Route path="submit-request" element={<Listings />} />
               <Route path="profile" element={<Profile />} />
             </Route>

@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, Mail, Search } from 'lucide-react';
+import { CheckCircle, Clock, Search } from 'lucide-react';
 import { CustomDropdown } from '../components/ui/dropdown/CustomDropdown';
 import FirstHeroImage from '../assets/home-screen-1.jpg';
 import SecondHeroImage from '../assets/home-screen-bg.jpg';
@@ -262,17 +262,17 @@ const MentorPendingStatus = () => {
           <Clock className="h-8 w-8 text-amber-600" />
         </div>
       </div>
-      
+
       <h2 className="text-xl font-semibold text-gray-800 text-center mb-3">
         Application Under Review
       </h2>
-      
+
       <p className="text-gray-600 text-center mb-6 leading-relaxed">
-        Your mentor application is currently being reviewed by our admin team. 
-        You'll receive a notification within <span className="font-semibold text-amber-700">24 hours</span> 
+        Your mentor application is currently being reviewed by our admin team. You'll receive a
+        notification within <span className="font-semibold text-amber-700">24 hours</span>
         of your submission.
       </p>
-      
+
       <div className="space-y-3 mb-6">
         <div className="flex items-center">
           <div className="flex-shrink-0">
@@ -283,7 +283,7 @@ const MentorPendingStatus = () => {
             <p className="text-xs text-gray-500">We've received your mentor application</p>
           </div>
         </div>
-        
+
         <div className="flex items-center">
           <div className="flex-shrink-0">
             <div className="h-5 w-5 bg-amber-500 rounded-full flex items-center justify-center">
@@ -295,17 +295,17 @@ const MentorPendingStatus = () => {
             <p className="text-xs text-gray-500">Admin team is reviewing your profile</p>
           </div>
         </div>
-        
       </div>
-      
+
       <div className="bg-white rounded-lg p-4 border border-amber-100">
         <p className="text-sm text-gray-600 text-center">
-          <span className="font-medium">What happens next?</span><br />
-          Our team will review your qualifications and experience. 
-          Wait to receive our call for updates on your application status.
+          <span className="font-medium">What happens next?</span>
+          <br />
+          Our team will review your qualifications and experience. Wait to receive our call for
+          updates on your application status.
         </p>
       </div>
-      
+
       <p className="text-xs text-gray-500 text-center mt-4">
         Questions? Contact our support team for assistance.
       </p>
@@ -314,7 +314,7 @@ const MentorPendingStatus = () => {
 };
 
 const AuthenticatedPage = () => {
-  const { data, isLoading } = useMentors()
+  const { data, isLoading } = useMentors();
   const { currentUser } = useAuth();
 
   if (isLoading) {
@@ -325,9 +325,8 @@ const AuthenticatedPage = () => {
     return <MentorPendingStatus />;
   }
 
-  if (currentUser?.role === 'mentor' && currentUser.mentor_profile.status === "approved") {
-    return <Navigate to="/mentor-dashboard" />;
-    
+  if (currentUser?.role === 'mentor' && currentUser.mentor_profile.status === 'approved') {
+    return <Navigate to="/dashboard" />;
   }
 
   return (
@@ -375,7 +374,9 @@ const AuthenticatedPage = () => {
       {/* Mentors Grid */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid gap-6">
-          {data?.map((mentor) => <TutorCard profile={mentor} key={mentor.id} />)}
+          {data?.map((mentor) => (
+            <TutorCard profile={mentor} key={mentor.id} />
+          ))}
         </div>
       </div>
     </div>

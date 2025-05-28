@@ -18,6 +18,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useMentors } from '../lib/hooks';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { getImageUrl } from './admin/lib/utils';
 
 interface TimeSlot {
   id: string;
@@ -150,11 +151,7 @@ export default function MentorBookingUI() {
                 <div className="w-20 h-20 bg-orange-200 rounded-full flex items-center justify-center">
                   {mentor.profilePhotoUrl ? (
                     <img
-                      src={
-                        mentor.profilePhotoUrl.startsWith('http')
-                          ? mentor.profilePhotoUrl
-                          : 'http://localhost:3000/' + mentor.profilePhotoUrl
-                      }
+                      src={getImageUrl(mentor.profilePhotoUrl)}
                       alt={mentor.user.fullname}
                       className="w-20 h-20 rounded-full object-cover"
                     />

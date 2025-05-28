@@ -45,10 +45,9 @@ function App() {
             </Route>
             <Route path="/" element={<PrivateRoutes />}>
               <Route path="" element={<Home />} />
-              <Route path="bookings/:id" element={<BookingDetailsPage />} />
               <Route path="my-bookings" element={<MyPosts />} />
               <Route path="messages/*" element={<Messages />} />
-              <Route path="booking" element={<BookingDetailsPage />} />
+              <Route path="my-bookings/:id" element={<BookingDetailsPage />} />
               <Route path="dashboard" element={<DashboardLayout/>}>
                 <Route path="" element={<DashboardOverview/>} />
                 <Route path="overview" element={<DashboardOverview/>} />

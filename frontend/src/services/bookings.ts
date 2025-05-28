@@ -28,6 +28,10 @@ export const getMentorBookings= async (): Promise<Booking[]> => {
   const response = await api.get('/bookings?hasMentors');
   return response.data;
 };
+export const getBooking= async (id?: string | number): Promise<Booking> => {
+  const response = await api.get('/bookings/'+ id);
+  return response.data;
+};
 
 export const getBookings = async (): Promise<Booking[]> => {
   const response = await api.get('/bookings');

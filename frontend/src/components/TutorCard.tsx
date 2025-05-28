@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { createConversation } from '../services/conversation';
 import { useNavigate } from 'react-router-dom';
+import { getImageUrl } from '../pages/admin/lib/utils';
 
 export default function TutorCard({ profile }: { profile: MentorProfile }) {
   const navigate = useNavigate();
@@ -22,11 +23,7 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
         <div className="md:w-72 shrink-0">
           <div className="relative h-64 md:h-full">
             <img
-              src={
-                profile.profilePhotoUrl.startsWith('http')
-                  ? profile.profilePhotoUrl
-                  : 'http://localhost:3000/' + profile.profilePhotoUrl
-              }
+              src={getImageUrl(profile.profilePhotoUrl)}
               alt={profile.user.fullname}
               className="w-full h-full object-cover"
             />

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Menu as MenuIcon } from 'lucide-react';
-import { mentorData } from '../../data/mentorData';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { getImageUrl } from '../../pages/admin/lib/utils';
@@ -16,6 +15,11 @@ const DashboardHeader: React.FC = () => {
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
     if (isNotificationsOpen) setIsNotificationsOpen(false);
+  };
+
+  const handleLogout = (): void => {
+    localStorage.removeItem('access_token');
+    window.location.reload();
   };
 
   return (
@@ -37,7 +41,6 @@ const DashboardHeader: React.FC = () => {
           <div className="flex items-center space-x-4">
             <div className="relative"></div>
 
-            {/* Profile dropdown */}
             <div className="relative">
               <button
                 onClick={toggleProfileMenu}
@@ -54,7 +57,6 @@ const DashboardHeader: React.FC = () => {
                 </span>
               </button>
 
-              {/* Profile menu dropdown */}
               {isProfileMenuOpen && (
                 <div
                   className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white
@@ -70,9 +72,9 @@ const DashboardHeader: React.FC = () => {
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       Settings
                     </a>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={handleLogout}>
                       Sign out
-                    </a>
+                    </button>
                   </div>
                 </div>
               )}

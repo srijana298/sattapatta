@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Calendar, Clock, Video, MessageCircle, Star, Search, ChevronDown } from 'lucide-react';
+import { Calendar, Clock, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useQuery } from 'react-query';
 import { getBookings } from '../services/bookings';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { Link } from 'react-router-dom';
 
 const MyBookingsPage = () => {
   const { data: bookings, isLoading } = useQuery({
@@ -60,14 +61,14 @@ const MyBookingsPage = () => {
     }
   ];
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`w-4 h-4 ${i < rating ? 'fill-orange-400 text-orange-400' : 'text-gray-300'}`}
-      />
-    ));
-  };
+  // const renderStars = (rating: number) => {
+  //   return Array.from({ length: 5 }, (_, i) => (
+  //     <Star
+  //       key={i}
+  //       className={`w-4 h-4 ${i < rating ? 'fill-orange-400 text-orange-400' : 'text-gray-300'}`}
+  //     />
+  //   ));
+  // };
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -140,7 +141,9 @@ const MyBookingsPage = () => {
                               </p>
                             </div>
                             <span
-                              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadge(booking.status)}`}
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadge(
+                                booking.status
+                              )}`}
                             >
                               {getStatusText(booking.status)}
                             </span>
@@ -183,9 +186,11 @@ const MyBookingsPage = () => {
                           </button>
                         )}
                       </div>
-                      <button className="text-gray-500 hover:text-gray-700 text-sm font-medium">
+                      <Link className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+                      to={`/my-bookings/${booking.id}`}
+                      >
                         View Details
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -193,7 +198,6 @@ const MyBookingsPage = () => {
             )}
           </div>
 
-          {/* Summary Stats */}
           {filteredBookings?.length > 0 && (
             <div className="mt-8 bg-white rounded-lg shadow-sm border border-orange-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking Summary</h3>

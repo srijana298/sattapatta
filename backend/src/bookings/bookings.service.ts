@@ -85,7 +85,45 @@ export class BookingsService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} booking`;
+    return this.bookingRepository.findOne({
+      relations: [
+        'mentee',
+        'mentor',
+        'mentor.mentor_profile',
+        'mentor.mentor_profile.user',
+        'mentor.mentor_profile.skills',
+      ],
+      where: {
+        id,
+      },
+      select: {
+        mentor: {
+          id: true,
+          fullname: true,
+          mentor_profile: {
+            id: true,
+            profilePhotoUrl: true,
+            hourly_rate: true,
+            experience: true,
+            introduction: true,
+            countryOfBirth: true,
+            user: {
+              id: true,
+              email: true,
+              fullname: true,
+            },
+            skills: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        mentee: {
+          id: true,
+          fullname: true,
+        },
+      },
+    });
   }
 
   update(id: number, updateBookingDto: UpdateBookingDto) {

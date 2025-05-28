@@ -18,7 +18,7 @@ import {
 import Button from '../components/Button';
 import Card, { CardContent, CardHeader, CardTitle } from '../components/Card';
 import StatusBadge from '../components/StatusBadge';
-import { cn, formatDate } from '../lib/utils';
+import { cn, formatDate, getImageUrl } from '../lib/utils';
 import Dialog from '../components/Dialog';
 import { useMentor } from '../../../lib/hooks';
 import { LoadingSpinner } from '../../../components/LoadingSpinner';
@@ -133,7 +133,7 @@ const MentorDetail = () => {
             <div className="flex flex-col items-center text-center">
               <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
                 <img
-                  src={data.profilePhotoUrl}
+                  src={getImageUrl(data.profilePhotoUrl)}
                   alt={data.user.fullname}
                   className="w-full h-full object-cover"
                 />

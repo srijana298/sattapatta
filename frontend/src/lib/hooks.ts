@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query';
 import { getAllCategories } from '../services/categories';
 import { getAllMentors, getMentor } from '../services/users';
-import { getBookings } from '../services/bookings';
+import { getBooking, getBookings } from '../services/bookings';
 import { getAllConversations } from '../services/conversation';
 
 export const useCategories = () => {
@@ -30,6 +30,14 @@ export const useMentorBookings= () => {
   return useQuery({
     queryKey: 'get_bookings',
     queryFn: () => getBookings()
+  });
+}
+
+export const useBooking = (id?: string | number) => {
+  return useQuery({
+    queryKey: ['get_booking', id],
+    queryFn: () => getBooking(id),
+    enabled: !!id,
   });
 }
 

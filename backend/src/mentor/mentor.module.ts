@@ -10,6 +10,7 @@ import { MentorEducation } from './entities/education.entity';
 import { MentorAvailability } from './entities/availability.entity';
 import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
+import { MentorReview } from './entities/rating.entity';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UsersService } from 'src/users/users.service';
       Mentor,
       MentorCertificate,
       MentorEducation,
+      MentorReview,
       MentorAvailability,
     ]),
   ],

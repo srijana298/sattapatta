@@ -11,9 +11,10 @@ import {
   NotFoundException,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { MentorService } from './mentor.service';
-import { CreateMentorDto } from './dto/create-mentor.dto';
+import { CreateMentorDto, CreateRatingDto } from './dto/create-mentor.dto';
 import {
   AboutMentorDto,
   CreateCertificateInputDto,
@@ -40,13 +41,19 @@ export class MentorController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mentorService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const mentor = await this.mentorService.findOne(+id);
+
+    if (!mentor) {
+      throw new NotFoundException("Mentor doesn't exist");
+    }
+
+    return mentor;
   }
 
   @Get()
-  findAll() {
-    return this.mentorService.findAll();
+  findAll(@Query('status') status?: string) {
+    return this.mentorService.findAll(status);
   }
 
   @UseGuards(AuthGuard)
@@ -56,8 +63,7 @@ export class MentorController {
     if (!mentor) {
       throw new NotFoundException("Mentor doesn't exist");
     }
-    mentor.status = status;
-    await mentor.save();
+    await this.mentorService.updateStatus(+id, status);
     return mentor.id;
   }
 
@@ -86,13 +92,6 @@ export class MentorController {
     @Req() request: AuthRequest,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    // const mentorProfile = await this.mentorService.findProfile(request.user.id);
-
-    // if (!mentorProfile) {
-    //   throw new NotFoundException("Mentor profile doesn't exist");
-    // }
-
-    // await this.mentorService.addProfilePicture(mentorProfile.id, file.path);
     return file.path;
   }
 
@@ -206,5 +205,18 @@ export class MentorController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.mentorService.remove(+id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/ratings')
+  async createRating(@Body() dto: CreateRatingDto, @Req() req: AuthRequest) {
+    const userId = req.user.id;
+    const mentorProfile = await this.mentorService.findOne(dto.mentorId);
+
+    if (!mentorProfile) {
+      throw new NotFoundException("Mentor profile doesn't exist");
+    }
+
+    return this.mentorService.createRating(userId, dto);
   }
 }

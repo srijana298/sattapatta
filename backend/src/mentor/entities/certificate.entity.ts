@@ -40,6 +40,5 @@ export class MentorCertificate extends BaseEntity {
   @ManyToOne(() => Mentor, (mentor) => mentor.certificates, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn()
   mentor: Mentor;
 }

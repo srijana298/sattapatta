@@ -83,9 +83,7 @@ export class Mentor extends BaseEntity {
   @Column({ default: 'pending' })
   status: string;
 
-  @OneToMany(() => MentorReview, (review) => review.mentor, {
-    cascade: true,
-  })
+  @OneToMany(() => MentorReview, (review) => review.mentor)
   reviews: MentorReview[];
 
   @OneToOne(() => Users, (user) => user.mentor_profile)

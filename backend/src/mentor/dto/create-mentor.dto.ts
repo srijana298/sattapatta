@@ -7,6 +7,17 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
+export class CreateRatingDto {
+  @IsString()
+  comment: string;
+
+  @IsNumber()
+  mentorId: number;
+
+  @IsNumber()
+  rating: number;
+}
+
 class CertificateDto {
   @IsString()
   subject: string;

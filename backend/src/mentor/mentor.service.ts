@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateMentorDto } from './dto/create-mentor.dto';
+import { CreateMentorDto, CreateRatingDto } from './dto/create-mentor.dto';
 import {
   AboutMentorDto,
   CertificateDto,
@@ -14,6 +14,7 @@ import { Users } from 'src/users/entities/users.entity';
 import { MentorCertificate } from './entities/certificate.entity';
 import { MentorEducation } from './entities/education.entity';
 import { MentorAvailability } from './entities/availability.entity';
+import { MentorReview } from './entities/rating.entity';
 
 @Injectable()
 export class MentorService {
@@ -32,7 +33,21 @@ export class MentorService {
 
     @InjectRepository(MentorCertificate)
     private readonly certificateRepository: Repository<MentorCertificate>,
+
+    @InjectRepository(MentorReview)
+    private readonly mentorReviewRepository: Repository<MentorReview>,
   ) {}
+
+  async updateStatus(id: number, status: string) {
+    await this.mentorRepository.update(
+      {
+        id,
+      },
+      {
+        status,
+      },
+    );
+  }
 
   async getEducations(userId: number) {
     return this.mentorRepository.findOne({
@@ -58,6 +73,20 @@ export class MentorService {
         },
       },
     });
+  }
+
+  async createRating(userId: number, dto: CreateRatingDto) {
+    const review = new MentorReview();
+    Object.assign(review, {
+      mentor: {
+        id: dto.mentorId,
+      },
+      reviewer: userId,
+      rating: dto.rating,
+      comment: dto.comment,
+    });
+    const saved = await this.mentorReviewRepository.save(review);
+    return saved.id;
   }
 
   async createEducation(id: number, education: EducationDto[]) {
@@ -281,7 +310,7 @@ export class MentorService {
     return savedMentor;
   }
 
-  findAll() {
+  findAll(status: string = 'pending') {
     return this.mentorRepository.find({
       relations: [
         'educations',
@@ -308,11 +337,74 @@ export class MentorService {
           fullname: true,
         },
       },
+      where: {
+        status,
+      },
     });
   }
 
-  findOne(id: number) {
-    return this.mentorRepository.findOne({
+  async calculateBayesianRating(mentorId: number) {
+    const mentorWithReviews = await this.mentorRepository.findOne({
+      where: { id: mentorId },
+      relations: ['reviews'],
+    });
+
+    if (!mentorWithReviews || !mentorWithReviews.reviews?.length) {
+      return { bayesianRating: 0, totalReviews: 0, rawAverage: 0 };
+    }
+
+    // Calculate the raw average for this mentor
+    const mentorRatings = mentorWithReviews.reviews.map(
+      (review) => review.rating,
+    );
+    const rawAverage =
+      mentorRatings.reduce((a, b) => a + b, 0) / mentorRatings.length;
+    const totalReviews = mentorRatings.length;
+
+    // Get global stats (all ratings across the platform)
+    const allReviews = await this.mentorReviewRepository.find();
+    const allRatings = allReviews.map((review) => review.rating);
+    const globalAverage =
+      allRatings.reduce((a, b) => a + b, 0) / allRatings.length;
+
+    // Constants for the Bayesian average
+    // C is the mean number of ratings per item
+    const C = await this.calculateMeanNumberOfReviews();
+
+    // Calculate Bayesian average: (C × m + R × v) / (C + R)
+    // Where:
+    // C = weight given to the global average (typically mean number of ratings)
+    // m = global average rating
+    // R = number of ratings for this item
+    // v = raw average rating for this item
+    const bayesianRating =
+      (C * globalAverage + totalReviews * rawAverage) / (C + totalReviews);
+
+    return {
+      bayesianRating: parseFloat(bayesianRating.toFixed(2)),
+      totalReviews,
+      rawAverage: parseFloat(rawAverage.toFixed(2)),
+    };
+  }
+
+  // Helper method to calculate the mean number of reviews per mentor
+  async calculateMeanNumberOfReviews() {
+    // Get count of reviews for each mentor
+    const mentors = await this.mentorRepository.find({
+      relations: ['reviews'],
+    });
+
+    const reviewCounts = mentors.map((mentor) => mentor.reviews?.length || 0);
+    const totalMentors = mentors.length || 1; // Avoid division by zero
+
+    // Default to 5 if there are no mentors yet
+    return reviewCounts.length
+      ? reviewCounts.reduce((a, b) => a + b, 0) / totalMentors
+      : 5; // Use 5 as a reasonable starting value
+  }
+
+  async findOne(id: number) {
+    const mentor = await this.mentorRepository.findOne({
       where: {
         id,
       },
@@ -321,6 +413,7 @@ export class MentorService {
         'certificates',
         'availabilities',
         'user',
+        'reviews',
         'skill_category',
         'skills',
       ],
@@ -342,6 +435,15 @@ export class MentorService {
         },
       },
     });
+    if (!mentor) {
+      return null;
+    }
+
+    const ratingStats = await this.calculateBayesianRating(id);
+    return {
+      ...mentor,
+      ratingStats,
+    };
   }
 
   async getPicture(id: number) {

@@ -26,8 +26,8 @@ export class Booking extends BaseEntity {
   @Column({ type: 'tinytext' })
   end_time: string;
 
-  @Column({ default: 'pending' })
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  @Column({ default: 'confirmed' })
+  status: 'confirmed' | 'cancelled' | 'completed';
 
   @CreateDateColumn()
   createdAt: Date;

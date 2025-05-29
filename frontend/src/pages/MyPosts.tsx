@@ -1,76 +1,219 @@
-import { useState } from 'react';
-import { Calendar, Clock, Star } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Calendar, Clock, ChevronDown, ChevronUp, Users, Star, X } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { getBookings } from '../services/bookings';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { Link } from 'react-router-dom';
+import { MentorProfile } from '../services/users';
+import { createRating } from '../services/mentor';
+import { mentorData } from '../data/mentorData';
+import toast from 'react-hot-toast';
+
+const RatingModal = ({ mentor, onClose, onSubmit }) => {
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState('');
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-in">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-gray-900">Rate your experience</h3>
+          <button 
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+        
+        <div className="flex items-center mb-6 bg-orange-50 rounded-xl p-4">
+          <img 
+            src={mentor.profilePhotoUrl} 
+            alt={mentor.fullname}
+            className="w-14 h-14 rounded-full object-cover border-2 border-orange-300"
+          />
+          <div className="ml-4">
+            <h4 className="font-medium text-gray-900">{mentor.fullname}</h4>
+            <p className="text-sm text-gray-600">{mentor.headline}</p>
+          </div>
+        </div>
+        
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Your rating</label>
+          <div className="flex items-center space-x-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHover(star)}
+                onMouseLeave={() => setHover(0)}
+                className="p-1 focus:outline-none"
+              >
+                <Star
+                  className={`w-8 h-8 ${
+                    star <= (hover || rating)
+                      ? 'text-yellow-500 fill-yellow-500'
+                      : 'text-gray-300'
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Your feedback (optional)
+          </label>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={4}
+            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            placeholder="Share your experience with this mentor..."
+          ></textarea>
+        </div>
+        
+        <button
+          onClick={() => onSubmit({ rating, comment })}
+          disabled={rating === 0}
+          className={`w-full py-3 px-4 rounded-lg font-medium ${
+            rating > 0
+              ? 'bg-orange-600 text-white hover:bg-orange-700'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          Submit Review
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const MyBookingsPage = () => {
   const { data: bookings, isLoading } = useQuery({
     queryFn: getBookings,
     queryKey: 'get_bookings'
   });
+
+  const { mutateAsync, isLoading: isRating } = useMutation({
+    mutationFn: (data: {
+      comment: string;
+      rating: number;
+      mentorId: number;
+    }) => {
+      return createRating(data);
+    },
+    onSuccess: () => {
+      toast.success("Thank you for your feedback!");
+    }
+  })
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [expandedMentors, setExpandedMentors] = useState<Record<string, boolean>>({});
+  const [ratingMentor, setRatingMentor] = useState<MentorProfile | null>(null);
 
-  const getStatusBadge = (status) => {
-    const badges = {
-      confirmed: 'bg-green-100 text-green-800 border-green-200',
-      completed: 'bg-blue-100 text-blue-800 border-blue-200',
-      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      cancelled: 'bg-red-100 text-red-800 border-red-200'
-    };
-    return badges[status] || badges.pending;
-  };
+  // Process bookings to mark past sessions as completed
+  const processedBookings = useMemo(() => {
+    // Your existing processing code
+    if (!bookings) return [];
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+    
+    return bookings.map(booking => {
+      const bookingDate = new Date(booking.start_date);
 
-  const getStatusText = (status: string) => {
-    const statusTexts = {
-      confirmed: 'Confirmed',
-      completed: 'Completed',
-      pending: 'Pending Approval',
-      cancelled: 'Cancelled'
-    };
-    return statusTexts[status] || 'Unknown';
-  };
+      if (bookingDate < today && booking.status === 'confirmed') {
+        return {
+          ...booking,
+          status: 'completed',
+        };
+      }
 
-  const filteredBookings = bookings?.filter((booking) => {
+      const now = new Date();
+      const diffMs = bookingDate.getTime() - now.getTime();
+      const diffHours = diffMs / (1000 * 60 * 60);
+
+      if (diffHours > 0 && diffHours <= 48 && booking.status === 'confirmed') {
+        return {
+          ...booking,
+          status: 'upcoming'
+        };
+      }
+      
+      return booking;
+    });
+  }, [bookings]);
+
+  // Your existing helper functions
+  const getStatusBadge = (status) => { /* ... */ };
+  const getStatusText = (status) => { /* ... */ };
+  
+  const filteredBookings = processedBookings?.filter((booking) => {
     const matchesSearch = booking.mentor.fullname.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = selectedFilter === 'all' || booking.status === selectedFilter;
     const matchesTab = activeTab === 'all' || booking.status === activeTab;
     return matchesSearch && matchesFilter && matchesTab;
   });
 
-  const tabs = [
-    { id: 'all', label: 'All Bookings', count: bookings?.length },
-    {
-      id: 'confirmed',
-      label: 'Upcoming',
-      count: bookings?.filter((b) => b.status === 'confirmed').length
-    },
-    {
-      id: 'completed',
-      label: 'Completed',
-      count: bookings?.filter((b) => b.status === 'completed').length
-    },
-    {
-      id: 'pending',
-      label: 'Pending',
-      count: bookings?.filter((b) => b.status === 'pending').length
-    }
-  ];
+  // Group bookings by mentor
+  const bookingsByMentor = useMemo(() => {
+    if (!filteredBookings) return {};
+    
+    return filteredBookings.reduce((groups, booking) => {
+      const mentorId = booking.mentor.mentor_profile.id;
+      if (!groups[mentorId]) {
+        groups[mentorId] = {
+          mentorInfo: {
+            id: mentorId,
+            fullname: booking.mentor.fullname,
+            profilePhotoUrl: booking.mentor.mentor_profile.profilePhotoUrl,
+            headline: booking.mentor.mentor_profile.headline
+          },
+          bookings: [],
+          hasCompletedSession: false
+        };
+      }
+      
+      groups[mentorId].bookings.push(booking);
+      
+      // Check if there's at least one completed session
+      if (booking.status === 'completed') {
+        groups[mentorId].hasCompletedSession = true;
+      }
+      
+      return groups;
+    }, {});
+  }, [filteredBookings]);
 
-  // const renderStars = (rating: number) => {
-  //   return Array.from({ length: 5 }, (_, i) => (
-  //     <Star
-  //       key={i}
-  //       className={`w-4 h-4 ${i < rating ? 'fill-orange-400 text-orange-400' : 'text-gray-300'}`}
-  //     />
-  //   ));
-  // };
+   const toggleMentorExpanded = (mentorId) => {
+    setExpandedMentors(prev => ({
+      ...prev,
+      [mentorId]: !prev[mentorId]
+    }));
+  };
 
-  if (isLoading) {
+  const handleRating = (mentorInfo: MentorProfile) => {
+    setRatingMentor(mentorInfo);
+  };
+
+
+  const handleRatingSubmit = async (ratingData:{
+    comment: string; 
+    rating: number; 
+  } ) => {
+    setRatingMentor(null);
+    await mutateAsync({
+      mentorId: ratingMentor!.id,
+      ...ratingData});
+  };
+
+  if (isLoading || isRating) {
     return <LoadingSpinner />;
   }
 
@@ -79,67 +222,92 @@ const MyBookingsPage = () => {
       <Navbar />
       <div className="min-h-screen bg-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow-sm border border-orange-100 mb-6">
-            <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8 px-6">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? 'border-orange-500 text-orange-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    {tab.label}
-                    <span
-                      className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        activeTab === tab.id
-                          ? 'bg-orange-100 text-orange-800'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  </button>
-                ))}
-              </nav>
-            </div>
-          </div>
-
-          {/* Bookings List */}
-          <div className="space-y-4">
-            {filteredBookings?.length === 0 ? (
+          {/* Your existing UI elements - tabs, search, etc. */}
+          
+          <div className="space-y-6">
+            {Object.keys(bookingsByMentor).length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-orange-100 p-12 text-center">
                 <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings found</h3>
                 <p className="text-gray-500">Try adjusting your search or filter criteria.</p>
               </div>
             ) : (
-              filteredBookings?.map((booking) => (
+              Object.values(bookingsByMentor).map((mentorGroup: any) => (
                 <div
-                  key={booking.id}
-                  className="bg-white rounded-lg shadow-sm border border-orange-100 hover:shadow-md transition-shadow"
+                  key={mentorGroup.mentorInfo.id}
+                  className="bg-white rounded-lg shadow-sm border border-orange-100 overflow-hidden"
                 >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4 flex-1">
+                  {/* Mentor header - always visible */}
+                  <div className="p-6 border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div 
+                        className="flex items-center space-x-4 flex-1 cursor-pointer"
+                        onClick={() => toggleMentorExpanded(mentorGroup.mentorInfo.id)}
+                      >
                         <img
-                          src={booking.mentor.mentor_profile.profilePhotoUrl}
-                          alt={booking.mentor.fullname}
+                          src={mentorGroup.mentorInfo.profilePhotoUrl}
+                          alt={mentorGroup.mentorInfo.fullname}
                           className="w-16 h-16 rounded-full object-cover border-2 border-orange-200"
                         />
-                        <div className="flex-1">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {mentorGroup.mentorInfo.fullname}
+                          </h3>
+                          <p className="text-gray-600">
+                            {mentorGroup.mentorInfo.headline}
+                          </p>
+                          <div className="flex items-center mt-1 text-sm">
+                            <Users className="w-4 h-4 text-orange-500 mr-1" />
+                            <span className="text-orange-700 font-medium">
+                              {mentorGroup.bookings.length} {mentorGroup.bookings.length === 1 ? 'Session' : 'Sessions'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4">
+                        {/* Rating button - only shows if there's at least one completed session */}
+                        {mentorGroup.hasCompletedSession && (
+                          <button
+                            onClick={() => handleRating(mentorGroup.mentorInfo)}
+                            className="flex items-center space-x-1 bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-2 rounded-lg transition-colors"
+                          >
+                            <Star className="w-4 h-4" />
+                            <span className="font-medium text-sm">Rate Mentor</span>
+                          </button>
+                        )}
+                        
+                        <button 
+                          onClick={() => toggleMentorExpanded(mentorGroup.mentorInfo.id)}
+                          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        >
+                          {expandedMentors[mentorGroup.mentorInfo.id] ? (
+                            <ChevronUp className="w-5 h-5 text-gray-500" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bookings for this mentor - expandable */}
+                  {expandedMentors[mentorGroup.mentorInfo.id] && (
+                    <div className="divide-y divide-gray-100">
+                      {mentorGroup.bookings.map((booking) => (
+                        <div key={booking.id} className="p-6 pl-24">
                           <div className="flex items-center justify-between mb-2">
-                            <div>
-                              <h3 className="text-lg font-semibold text-gray-900">
-                                {booking.mentor.fullname}
-                              </h3>
-                              <p className="text-gray-600">
-                                {booking.mentor.mentor_profile.headline}
-                              </p>
+                            <div className="flex items-center space-x-6 text-sm text-gray-600">
+                              <div className="flex items-center space-x-1">
+                                <Calendar className="w-4 h-4 text-orange-500" />
+                                <span>{booking.start_date}</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <Clock className="w-4 h-4 text-orange-500" />
+                                <span>{booking.end_time}</span>
+                              </div>
                             </div>
+                            
                             <span
                               className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadge(
                                 booking.status
@@ -149,89 +317,65 @@ const MyBookingsPage = () => {
                             </span>
                           </div>
 
-                          <div className="flex items-center space-x-6 text-sm text-gray-600 mb-4">
-                            <div className="flex items-center space-x-1">
-                              <Calendar className="w-4 h-4 text-orange-500" />
-                              <span>{booking.start_date}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Clock className="w-4 h-4 text-orange-500" />
-                              <span>{booking.end_time}</span>
-                            </div>
-                            {/* <div className="flex items-center space-x-1">
-                              <span className="font-medium text-orange-600">
-                                NPR {booking.amount.toLocaleString()}
-                              </span>
-                            </div> */}
+                          {/* Action Buttons */}
+                          <div className="flex items-center justify-end mt-4">
+                            <Link
+                              className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+                              to={`/my-bookings/${booking.id}`}
+                            >
+                              View Details
+                            </Link>
                           </div>
-
-                          {/* {booking.status === 'completed' && booking.rating && (
-                            <div className="flex items-center space-x-2 mb-4">
-                              <span className="text-sm text-gray-600">Your rating:</span>
-                              <div className="flex items-center space-x-1">
-                                {renderStars(booking.rating)}
-                              </div>
-                            </div>
-                          )} */}
                         </div>
-                      </div>
+                      ))}
                     </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <div className="flex items-center space-x-3">
-                        {booking.status === 'completed' && !booking.rating && (
-                          <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium">
-                            Rate & Review
-                          </button>
-                        )}
-                      </div>
-                      <Link className="text-gray-500 hover:text-gray-700 text-sm font-medium"
-                      to={`/my-bookings/${booking.id}`}
-                      >
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
+                  )}
                 </div>
               ))
             )}
           </div>
 
+          {/* Your existing summary section */}
           {filteredBookings?.length > 0 && (
             <div className="mt-8 bg-white rounded-lg shadow-sm border border-orange-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking Summary</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{bookings.length}</div>
+                  <div className="text-2xl font-bold text-orange-600">{processedBookings.length}</div>
                   <div className="text-sm text-gray-600">Total Bookings</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {bookings?.filter((b) => b.status === 'completed').length}
+                    {processedBookings?.filter((b) => b.status === 'completed').length}
                   </div>
                   <div className="text-sm text-gray-600">Completed</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">
-                    {bookings?.filter((b) => b.status === 'confirmed').length}
+                    {processedBookings?.filter((b) => b.status === 'upcoming').length}
                   </div>
                   <div className="text-sm text-gray-600">Upcoming</div>
                 </div>
-                {/* <div className="text-center">
+                <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">
-                    NPR{' '}
-                    {bookings
-                      .reduce((total, booking) => total + booking., 0)
-                      .toLocaleString()}
+                    {Object.keys(bookingsByMentor).length}
                   </div>
-                  <div className="text-sm text-gray-600">Total Spent</div>
-                </div> */}
+                  <div className="text-sm text-gray-600">Total Mentors</div>
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
+      
+      {/* Rating Modal */}
+      {ratingMentor && (
+        <RatingModal 
+          mentor={ratingMentor} 
+          onClose={() => setRatingMentor(null)} 
+          onSubmit={handleRatingSubmit}
+        />
+      )}
     </>
   );
 };

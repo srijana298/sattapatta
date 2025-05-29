@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 import { getAllCategories } from '../services/categories';
-import { getAllMentors, getMentor } from '../services/users';
+import { getAllMentors, getApprovedMentors, getMentor } from '../services/users';
 import { getBooking, getBookings } from '../services/bookings';
 import { getAllConversations } from '../services/conversation';
 
@@ -17,6 +17,13 @@ export const useMentors = () => {
     queryKey: 'get_mentors',
   });
 }
+
+export const useApprovedMentors = () => {
+  return useQuery({
+    queryFn: () => getApprovedMentors(),
+    queryKey: 'get_approved_mentors',   
+  });
+};
 
 export const useMentor = (id?: string | number) => {
   return useQuery({

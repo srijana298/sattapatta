@@ -6,7 +6,7 @@ import Navbar from '../components/Navbar';
 import TutorCard from '../components/TutorCard';
 import { useAuth } from '../components/AuthContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
-import { useMentors } from '../lib/hooks';
+import { useApprovedMentors, useMentors } from '../lib/hooks';
 import { Navigate } from 'react-router-dom';
 
 const LandingPage = () => {
@@ -314,7 +314,7 @@ const MentorPendingStatus = () => {
 };
 
 const AuthenticatedPage = () => {
-  const { data, isLoading } = useMentors();
+  const { data, isLoading } = useApprovedMentors();
   const { currentUser } = useAuth();
 
   if (isLoading) {

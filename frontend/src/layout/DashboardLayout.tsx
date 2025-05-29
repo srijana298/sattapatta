@@ -13,6 +13,11 @@ const DashboardLayout: React.FC = () => {
     return <Navigate to="/" />;
   }
 
+  if (currentUser.role === "mentor" && currentUser.mentor_profile?.status !== "approved") {
+    toast.error('Your mentor profile is not approved yet. Please wait for approval.');
+    return <Navigate to="/" />;
+  }
+
   return (
     <div className="flex h-screen bg-gray-50">
       <div className="hidden md:flex">

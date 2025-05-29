@@ -99,7 +99,7 @@ export default function TutorSignupForm() {
     },
     onSuccess: () => {
       toast.success('Mentor Profile created successfully');
-      navigate('/');
+      navigate('/dashboard');
     },
     onError: () => {
       toast.error('Error creating mentor profile');
@@ -843,10 +843,10 @@ export default function TutorSignupForm() {
                       <button
                         type="button"
                         onClick={addEducationSection}
-                        className="flex items-center justify-center px-5 py-3 w-full border-2 border-dashed border-orange-300 text-orange-600 font-medium rounded-xl hover:bg-orange-50 transition-colors"
+                        className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center"
                       >
-                        <Plus className="w-5 h-5 mr-2" />
-                        Add Another Education
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Education 
                       </button>
                     </div>
                   )}

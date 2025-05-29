@@ -111,6 +111,11 @@ export const getAllMentors = async (): Promise<MentorProfile[]> => {
   return response.data;
 };
 
+export const getApprovedMentors= async (): Promise<MentorProfile[]> => {
+  const response = await api.get('/mentor?status=approved');
+  return response.data;
+};
+
 export const getMentor = async (id?: string | number): Promise<MentorProfile> => {
   const response = await api.get('/mentor/'+ id);
   return response.data;

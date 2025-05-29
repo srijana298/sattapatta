@@ -199,7 +199,6 @@ const MentorProfile = () => {
 
             {activeTab === 'reviews' && (
               <div className="space-y-6">
-                {/* Reviews Summary */}
                 <div className="bg-white rounded-lg p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-semibold text-gray-900">Reviews & Ratings</h3>

@@ -16,15 +16,12 @@ const DashboardOverview: React.FC = () => {
     (booking) => new Date(booking.startTime) >= now && new Date(booking.startTime) <= in48Hours
   );
 
-  // Get unread messages
   const unreadMessages = messages.filter((message) => !message.read);
 
-  // Calculate earnings
   const totalEarnings = bookings
     .filter((booking) => booking.status === 'completed')
     .reduce((sum, booking) => sum + booking.price, 0);
 
-  // Calculate average rating
   const averageRating =
     reviews.length > 0
       ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
@@ -113,138 +110,6 @@ const DashboardOverview: React.FC = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Upcoming appointments */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h2 className="text-lg font-medium text-gray-800">Upcoming Appointments</h2>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {upcomingAppointments.length > 0 ? (
-            upcomingAppointments.map((appointment) => {
-              const startTime = new Date(appointment.startTime);
-              const endTime = new Date(appointment.endTime);
-
-              return (
-                <div key={appointment.id} className="p-6 hover:bg-gray-50">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4">
-                      <img
-                        src={appointment.studentAvatar}
-                        alt={appointment.studentName}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-800">
-                          {appointment.studentName}
-                        </h3>
-                        <p className="text-sm text-gray-600">{appointment.topic}</p>
-                        <div className="mt-1 flex items-center text-xs text-gray-500">
-                          <Calendar className="h-3.5 w-3.5 mr-1" />
-                          {startTime.toLocaleDateString(undefined, {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric'
-                          })}{' '}
-                          <span className="mx-1">•</span>
-                          <Clock className="h-3.5 w-3.5 mr-1" />
-                          {startTime.toLocaleTimeString(undefined, {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}{' '}
-                          -
-                          {endTime.toLocaleTimeString(undefined, {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button
-                        className="bg-orange-100 text-orange-600 hover:bg-orange-200 px-3 py-1.5
-                                       rounded-md text-xs font-medium transition-colors duration-150 ease-in-out"
-                      >
-                        Join Call
-                      </button>
-                      <button
-                        className="bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5
-                                       rounded-md text-xs font-medium transition-colors duration-150 ease-in-out"
-                      >
-                        Reschedule
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="p-8 text-center">
-              <Calendar className="mx-auto h-10 w-10 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No upcoming appointments</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                You don't have any appointments scheduled in the next 48 hours.
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-          <a
-            href="#"
-            className="text-sm font-medium text-orange-600 hover:text-orange-500"
-            onClick={() => document.querySelector('button[data-tab="bookings"]')?.click()}
-          >
-            View all appointments →
-          </a>
-        </div>
-      </div>
-
-      {/* Recent messages preview */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h2 className="text-lg font-medium text-gray-800">Recent Messages</h2>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {messages.slice(0, 3).map((message) => (
-            <div
-              key={message.id}
-              className={`p-4 hover:bg-gray-50 ${!message.read ? 'bg-blue-50' : ''}`}
-            >
-              <div className="flex items-start space-x-3">
-                <img
-                  src={message.senderAvatar}
-                  alt={message.senderName}
-                  className="h-10 w-10 rounded-full object-cover"
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="flex justify-between">
-                    <p className="text-sm font-medium text-gray-900">{message.senderName}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(message.timestamp).toLocaleTimeString(undefined, {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  </div>
-                  <p className="text-sm text-gray-600 truncate">{message.content}</p>
-                </div>
-                {!message.read && (
-                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-blue-500"></span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-          <a
-            href="#"
-            className="text-sm font-medium text-orange-600 hover:text-orange-500"
-            onClick={() => document.querySelector('button[data-tab="messages"]')?.click()}
-          >
-            View all messages →
-          </a>
-        </div>
       </div>
     </div>
   );

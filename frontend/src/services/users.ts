@@ -1,8 +1,25 @@
 import api from '../api';
-import { AboutProfileResponse, Certificate, Description, Education, Profile } from '../lib/profile';
+import { Profile } from '../lib/profile';
 import { CreateUser, CurrentUser } from '../lib/users';
 
 export interface MentorProfile {
+  ratingStats: {
+    bayesianRating: number;
+    totalReviews: number;
+    rawAverage: number;
+  };
+  reviews: {
+    id: number;
+    rating: number; 
+    comment: string;
+    reply?:string;
+    createdAt: string;
+    updatedAt: string;
+    reviewer: {
+      id: number;
+      fullname: string;
+    }
+  }[];
   id: number;
   countryOfBirth: string;
   subject: string;
@@ -31,9 +48,9 @@ export interface MentorProfile {
     end_time: string;
     is_available: boolean;
   }[];
-  educations: Profile["educations"];
+  educations: Profile['educations'];
   has_certificate: boolean;
-  certificates: Profile["certificates"];
+  certificates: Profile['certificates'];
   isVerified: boolean;
   isActive: boolean;
   createdAt: string;
@@ -55,40 +72,8 @@ export const verify = async (): Promise<CurrentUser> => {
   return user.data;
 };
 
-export const getAboutMentorProfile = async (): Promise<Partial<AboutProfileResponse>> => {
-  const response = await api.get('/mentor/about');
-  return response.data;
-};
-
 export const updateAboutMentorProfile = async <T>(payload: T) => {
   await api.put('/mentor/about', payload);
-};
-
-export const getCertificates = async (): Promise<Partial<Certificate>> => {
-  const response = await api.get('/mentor/certificates');
-  return response.data;
-};
-
-export const updateCertificates = async (data: Partial<Certificate>) => {
-  await api.put('/mentor/certificates', data);
-};
-
-export const getDescription = async (): Promise<Partial<Description>> => {
-  const response = await api.get('/mentor/description');
-  return response.data;
-};
-
-export const createDescription = async (data: Partial<Description>) => {
-  await api.post('/mentor/description', data);
-};
-
-export const getEducations = async (): Promise<Partial<Education>> => {
-  const response = await api.get('/mentor/educations');
-  return response.data;
-};
-
-export const createEducation = async (data: Partial<Education>) => {
-  await api.post('/mentor/educations', data);
 };
 
 export const getPicture = async (): Promise<{ profilePhotoUrl: string }> => {
@@ -111,12 +96,12 @@ export const getAllMentors = async (): Promise<MentorProfile[]> => {
   return response.data;
 };
 
-export const getApprovedMentors= async (): Promise<MentorProfile[]> => {
+export const getApprovedMentors = async (): Promise<MentorProfile[]> => {
   const response = await api.get('/mentor?status=approved');
   return response.data;
 };
 
 export const getMentor = async (id?: string | number): Promise<MentorProfile> => {
-  const response = await api.get('/mentor/'+ id);
+  const response = await api.get('/mentor/' + id);
   return response.data;
 };

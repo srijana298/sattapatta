@@ -5,9 +5,9 @@ import AppDataSource from './src/datasource';
 import { Skill } from './src/skills/entities/skill.entity';
 import { Category } from './src/categories/entities/category.entity';
 import { Mentor } from './src/mentor/entities/mentor.entity';
-
 import { MentorEducation } from './src/mentor/entities/education.entity';
 import { MentorCertificate } from './src/mentor/entities/certificate.entity';
+import { MentorReview } from './src/mentor/entities/rating.entity'; // Add this import
 import { faker } from '@faker-js/faker';
 
 async function seed(): Promise<void> {
@@ -215,11 +215,11 @@ async function seed(): Promise<void> {
       createdSkills.push(newSkill);
     }
 
-    // Create users (20 mentors and 5 regular users)
+    // Create users (20 mentors and 100 regular users for reviews)
     const users: Users[] = [];
 
-    // Create 5 regular users
-    for (let i = 1; i <= 5; i++) {
+    // Create 100 regular users to have enough reviewers
+    for (let i = 1; i <= 100; i++) {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = AppDataSource.manager.create(Users, {
         fullname: faker.person.fullName(),
@@ -231,7 +231,8 @@ async function seed(): Promise<void> {
       users.push(user);
     }
 
-    // Create 20 mentor users
+    // Create mentor users
+    const mentorUsers: Users[] = [];
     for (let i = 1; i <= 20; i++) {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = Users.create({
@@ -242,6 +243,7 @@ async function seed(): Promise<void> {
       });
       await user.save();
       users.push(user);
+      mentorUsers.push(user);
     }
 
     // Create mentor profiles linked to users
@@ -315,11 +317,77 @@ async function seed(): Promise<void> {
 
     const getRandomItem = <T>(array: T[]): T =>
       array[Math.floor(Math.random() * array.length)];
+
     // Helper function to get random year
     const getRandomYear = (min: number, max: number) =>
       Math.floor(Math.random() * (max - min + 1) + min);
 
-    const mentorUsers = users.filter((user) => user.role === 'mentor');
+    // Helper function to get weighted random rating (more likely to be 4-5)
+    const getWeightedRating = (): number => {
+      const rand = Math.random();
+      if (rand < 0.5) return 5; // 50% chance of 5 stars
+      if (rand < 0.75) return 4; // 25% chance of 4 stars
+      if (rand < 0.9) return 3; // 15% chance of 3 stars
+      if (rand < 0.97) return 2; // 7% chance of 2 stars
+      return 1; // 3% chance of 1 star
+    };
+
+    // Review comment templates based on rating
+    const reviewComments = {
+      5: [
+        'Absolutely fantastic mentor! Exceeded all my expectations.',
+        'Amazing experience! Highly knowledgeable and very supportive.',
+        'Outstanding mentor with excellent communication skills.',
+        "Best mentor I've worked with. Highly recommend!",
+        'Incredible knowledge and teaching ability. Five stars!',
+        'Exceptional mentor who goes above and beyond.',
+        "Perfect sessions every time. Couldn't ask for better guidance.",
+        'Brilliant mentor with deep expertise and patience.',
+      ],
+      4: [
+        'Great mentor with solid knowledge and good teaching skills.',
+        'Very helpful and knowledgeable. Would recommend.',
+        'Good experience overall. Learned a lot.',
+        'Professional and effective mentoring sessions.',
+        'Knowledgeable mentor with practical insights.',
+        'Helpful guidance and clear explanations.',
+        'Good mentor who provides valuable feedback.',
+        'Solid mentoring experience with good results.',
+      ],
+      3: [
+        'Decent mentor with adequate knowledge.',
+        'Average experience. Some helpful insights.',
+        'Okay mentoring sessions. Could be more engaging.',
+        'Fair mentor with basic knowledge sharing.',
+        'Reasonable guidance but room for improvement.',
+        'Standard mentoring experience.',
+        'Adequate support but not exceptional.',
+        'Good enough for basic learning needs.',
+      ],
+      2: [
+        'Below expectations. Limited engagement.',
+        'Not very helpful. Lacks depth in explanations.',
+        'Disappointing experience. Could be much better.',
+        'Struggling to provide clear guidance.',
+        'Not meeting my learning expectations.',
+        'Needs improvement in communication and knowledge sharing.',
+        'Unsatisfactory mentoring experience.',
+        'Difficult to follow and understand.',
+      ],
+      1: [
+        'Very poor experience. Not recommended.',
+        'Completely unsatisfactory. Waste of time.',
+        'Terrible mentor with no helpful guidance.',
+        'Extremely disappointing and unprofessional.',
+        "Worst mentoring experience I've had.",
+        'No value provided. Avoid this mentor.',
+        'Completely ineffective mentoring sessions.',
+        'Unacceptable quality of mentoring.',
+      ],
+    };
+
+    const createdMentors: Mentor[] = [];
+
     for (let i = 0; i < mentorUsers.length; i++) {
       const mentorUser = mentorUsers[i];
       const randomSkill = createdSkills[i % createdSkills.length]; // Distribute skills evenly
@@ -343,6 +411,7 @@ async function seed(): Promise<void> {
       });
 
       await mentor.save();
+      createdMentors.push(mentor);
 
       const educationCount = Math.floor(Math.random() * 2) + 1; // 1-2 education records per mentor
       for (let j = 0; j < educationCount; j++) {
@@ -388,8 +457,56 @@ async function seed(): Promise<void> {
       }
     }
 
-    console.log('Seeding completed successfully');
+    // Create reviews for each mentor (40-50 reviews per mentor)
+    console.log('Creating mentor reviews...');
+    const studentUsers = users.filter((user) => user.role === 'student');
+
+    for (const mentor of createdMentors) {
+      const reviewCount = Math.floor(Math.random() * 11) + 40; // 40-50 reviews
+
+      // Shuffle student users to get random reviewers
+      const shuffledStudents = [...studentUsers].sort(
+        () => Math.random() - 0.5,
+      );
+
+      for (let i = 0; i < reviewCount; i++) {
+        const reviewer = shuffledStudents[i % shuffledStudents.length];
+        const rating = getWeightedRating();
+        const comment = getRandomItem(
+          reviewComments[rating as keyof typeof reviewComments],
+        );
+
+        // Random date within the last 2 years
+        const reviewDate = faker.date.between({
+          from: new Date(Date.now() - 2 * 365 * 24 * 60 * 60 * 1000),
+          to: new Date(),
+        });
+
+        const review = new MentorReview();
+        Object.assign(review, {
+          mentor,
+          reviewer,
+          rating,
+          comment,
+          reply:
+            Math.random() > 0.7
+              ? "Thank you for your feedback! I'm glad I could help you in your learning journey."
+              : null,
+          repliedAt:
+            Math.random() > 0.7
+              ? faker.date.between({ from: reviewDate, to: new Date() })
+              : null,
+          createdAt: reviewDate,
+          updatedAt: reviewDate,
+        });
+
+        await review.save();
+      }
+    }
+
     console.log('Seeding completed successfully!');
+    console.log(`Created ${createdMentors.length} mentors with reviews`);
+    console.log(`Total users created: ${users.length}`);
   } catch (error) {
     console.error('Error during seeding:', error);
   } finally {

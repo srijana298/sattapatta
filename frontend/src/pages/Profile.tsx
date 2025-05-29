@@ -27,7 +27,12 @@ const MentorProfile = () => {
 
   const { data: mentorData, isLoading } = useMentor(id);
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating?: number) => {
+    if (rating === undefined || rating === null) {
+      return Array.from({ length: 5 }, (_, i) => (
+        <Star key={i} className="w-4 h-4 text-gray-300" />
+      ));
+    }
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
@@ -86,20 +91,16 @@ const MentorProfile = () => {
                   <Globe className="w-4 h-4" />
                   <span>{mentorData?.skill_category.name}</span>
                 </div>
-                {/* <div className="flex items-center gap-1">
-                  {renderStars(mentorData.average_rating)}
+                <div className="flex items-center gap-1">
+                  {renderStars(mentorData?.ratingStats.bayesianRating)}
                   <span className="ml-1">
-                    {mentorData.average_rating} ({mentorData.total_reviews} reviews)
+                    {mentorData?.ratingStats.rawAverage} ({mentorData?.ratingStats.totalReviews} reviews)
                   </span>
-                </div> */}
+                </div>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              {/* <button className="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors flex items-center gap-2">
-                <MessageCircle className="w-5 h-5" />
-                Book Trial - ₹{mentorData?.trial_rate}
-              </button> */}
               <button className="cursor-pointer bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 Book Session - ₹{mentorData?.hourly_rate}/hr
@@ -130,7 +131,6 @@ const MentorProfile = () => {
               ))}
             </div>
 
-            {/* Tab Content */}
             {activeTab === 'about' && (
               <div className="space-y-8">
                 {/* Introduction */}
@@ -204,40 +204,34 @@ const MentorProfile = () => {
                     <h3 className="text-xl font-semibold text-gray-900">Reviews & Ratings</h3>
                     <div className="text-right">
                       <div className="flex items-center gap-2">
-                        {/* <div className="flex">{renderStars(mentorData.average_rating)}</div> */}
-                        {/* <span className="text-2xl font-bold text-gray-900">{mentorData.average_rating}</span> */}
+                        <div className="flex">{renderStars(mentorData?.ratingStats.bayesianRating)}</div> 
+                        <span className="text-2xl font-bold text-gray-900">{mentorData?.ratingStats.rawAverage}</span>
                       </div>
-                      {/* <p className="text-gray-600 text-sm">{mentorData.total_reviews} total reviews</p> */}
+                      <p className="text-gray-600 text-sm">{mentorData?.ratingStats.totalReviews} total reviews</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Individual Reviews */}
-                {/* <div className="space-y-4">
-                  {reviewsToShow.map((review) => (
+                <div className="space-y-4">
+                  {mentorData?.reviews && mentorData.reviews.map((review) => (
                     <div key={review.id} className="bg-white rounded-lg p-6 shadow-sm">
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h4 className="font-semibold text-gray-900">
-                            {review.reviewer.firstName} {review.reviewer.lastName}
+                            {review.reviewer.fullname} 
                           </h4>
                           <div className="flex items-center gap-2 mt-1">
                             <div className="flex">{renderStars(review.rating)}</div>
                             <span className="text-gray-600 text-sm">
                               {new Date(review.createdAt).toLocaleDateString()}
                             </span>
-                            {review.session_type === 'trial' && (
-                              <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
-                                Trial Session
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
                       <p className="text-gray-700">{review.comment}</p>
                     </div>
                   ))}
-                </div> */}
+                </div>
 
                 {/* {mentorData.reviews.length > 3 && (
                   <button

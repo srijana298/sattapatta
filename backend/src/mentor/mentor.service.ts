@@ -310,13 +310,15 @@ export class MentorService {
     return savedMentor;
   }
 
-  findAll(status: string = 'pending') {
-    return this.mentorRepository.find({
+  async findAll(status: string = 'pending') {
+    const mentors = await this.mentorRepository.find({
       relations: [
         'educations',
         'certificates',
         'availabilities',
         'user',
+        'reviews',
+        'reviews.reviewer',
         'skill_category',
         'skills',
       ],
@@ -331,6 +333,17 @@ export class MentorService {
         hourly_rate: true,
         trial_rate: true,
         createdAt: true,
+        reviews: {
+          id: true,
+          rating: true,
+          comment: true,
+          createdAt: true,
+          updatedAt: true,
+          reviewer: {
+            id: true,
+            fullname: true,
+          },
+        },
         user: {
           id: true,
           email: true,
@@ -341,6 +354,16 @@ export class MentorService {
         status,
       },
     });
+    const response = await Promise.all(
+      mentors.map(async (mentor) => {
+        const ratingStats = await this.calculateBayesianRating(mentor.id);
+        return {
+          ...mentor,
+          ratingStats,
+        };
+      }),
+    );
+    return response;
   }
 
   async calculateBayesianRating(mentorId: number) {
@@ -414,6 +437,7 @@ export class MentorService {
         'availabilities',
         'user',
         'reviews',
+        'reviews.reviewer',
         'skill_category',
         'skills',
       ],
@@ -428,6 +452,17 @@ export class MentorService {
         experience: true,
         motivation: true,
         createdAt: true,
+        reviews: {
+          id: true,
+          rating: true,
+          comment: true,
+          createdAt: true,
+          updatedAt: true,
+          reviewer: {
+            id: true,
+            fullname: true,
+          },
+        },
         user: {
           id: true,
           email: true,

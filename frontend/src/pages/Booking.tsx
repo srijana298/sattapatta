@@ -393,10 +393,8 @@ export default function MentorBookingUI() {
 
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center">
-                      <span className="font-medium">Session Fee:</span>
-                      <span className="text-xl font-bold text-green-600">
-                        ₹{mentor?.hourly_rate || '75'}
-                      </span>
+                      <span className="font-medium">Booking Fee</span>
+                      <span className="text-xl font-bold text-green-600">रु 75</span>
                     </div>
                   </div>
 

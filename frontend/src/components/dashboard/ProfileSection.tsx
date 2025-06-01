@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {  Mail, MapPin, Star} from 'lucide-react';
+import { Mail, MapPin, Star } from 'lucide-react';
 import { mentorData } from '../../data/mentorData';
 import { useAuth } from '../AuthContext';
 import { useMentor } from '../../lib/hooks';
@@ -73,7 +73,7 @@ const ProfileSection: React.FC = () => {
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-sm font-medium text-gray-700">Hourly Rate</span>
-                <span className="text-xl font-semibold text-gray-900">₹{data?.hourly_rate}</span>
+                <span className="text-xl font-semibold text-gray-900">रु{data?.hourly_rate}</span>
               </div>
             </div>
           </div>

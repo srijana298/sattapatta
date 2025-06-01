@@ -60,7 +60,7 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-orange-600">₹{profile.hourly_rate}</div>
+                  <div className="text-3xl font-bold text-orange-600">रु{profile.hourly_rate}</div>
                   <div className="text-sm text-gray-500">per hour</div>
                 </div>
               </div>

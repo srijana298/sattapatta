@@ -151,11 +151,11 @@ const MentorDetail = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-muted/40 rounded-md p-3 text-center">
                     <p className="text-xs text-muted-foreground">Hourly Rate</p>
-                    <p className="text-lg font-bold">₹ {data.hourly_rate}</p>
+                    <p className="text-lg font-bold">रु {data.hourly_rate}</p>
                   </div>
                   {/* <div className="bg-muted/40 rounded-md p-3 text-center">
                     <p className="text-xs text-muted-foreground">Trial Rate</p>
-                    <p className="text-lg font-bold">₹ {data.trial_rate}</p>
+                    <p className="text-lg font-bold">रु {data.trial_rate}</p>
                   </div> */}
                 </div>
               </div>

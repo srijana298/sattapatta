@@ -40,8 +40,8 @@ const MentorProfile = () => {
           i < Math.floor(rating)
             ? 'text-orange-400 fill-orange-400'
             : i < rating
-            ? 'text-orange-400 fill-orange-200'
-            : 'text-gray-300'
+              ? 'text-orange-400 fill-orange-200'
+              : 'text-gray-300'
         }`}
       />
     ));
@@ -94,7 +94,8 @@ const MentorProfile = () => {
                 <div className="flex items-center gap-1">
                   {renderStars(mentorData?.ratingStats.bayesianRating)}
                   <span className="ml-1">
-                    {mentorData?.ratingStats.rawAverage} ({mentorData?.ratingStats.totalReviews} reviews)
+                    {mentorData?.ratingStats.rawAverage} ({mentorData?.ratingStats.totalReviews}{' '}
+                    reviews)
                   </span>
                 </div>
               </div>
@@ -103,7 +104,7 @@ const MentorProfile = () => {
             <div className="flex flex-col sm:flex-row gap-3">
               <button className="cursor-pointer bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
-                Book Session - ₹{mentorData?.hourly_rate}/hr
+                Book Session - रु{mentorData?.hourly_rate}/hr
               </button>
             </div>
           </div>
@@ -204,33 +205,40 @@ const MentorProfile = () => {
                     <h3 className="text-xl font-semibold text-gray-900">Reviews & Ratings</h3>
                     <div className="text-right">
                       <div className="flex items-center gap-2">
-                        <div className="flex">{renderStars(mentorData?.ratingStats.bayesianRating)}</div> 
-                        <span className="text-2xl font-bold text-gray-900">{mentorData?.ratingStats.rawAverage}</span>
+                        <div className="flex">
+                          {renderStars(mentorData?.ratingStats.bayesianRating)}
+                        </div>
+                        <span className="text-2xl font-bold text-gray-900">
+                          {mentorData?.ratingStats.rawAverage}
+                        </span>
                       </div>
-                      <p className="text-gray-600 text-sm">{mentorData?.ratingStats.totalReviews} total reviews</p>
+                      <p className="text-gray-600 text-sm">
+                        {mentorData?.ratingStats.totalReviews} total reviews
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  {mentorData?.reviews && mentorData.reviews.map((review) => (
-                    <div key={review.id} className="bg-white rounded-lg p-6 shadow-sm">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h4 className="font-semibold text-gray-900">
-                            {review.reviewer.fullname} 
-                          </h4>
-                          <div className="flex items-center gap-2 mt-1">
-                            <div className="flex">{renderStars(review.rating)}</div>
-                            <span className="text-gray-600 text-sm">
-                              {new Date(review.createdAt).toLocaleDateString()}
-                            </span>
+                  {mentorData?.reviews &&
+                    mentorData.reviews.map((review) => (
+                      <div key={review.id} className="bg-white rounded-lg p-6 shadow-sm">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">
+                              {review.reviewer.fullname}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="flex">{renderStars(review.rating)}</div>
+                              <span className="text-gray-600 text-sm">
+                                {new Date(review.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        <p className="text-gray-700">{review.comment}</p>
                       </div>
-                      <p className="text-gray-700">{review.comment}</p>
-                    </div>
-                  ))}
+                    ))}
                 </div>
 
                 {/* {mentorData.reviews.length > 3 && (
@@ -311,7 +319,7 @@ const MentorProfile = () => {
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-gray-900">Regular Session</span>
                     <span className="text-2xl font-bold text-gray-900">
-                      ₹{mentorData?.hourly_rate}/hr
+                      रु{mentorData?.hourly_rate}/hr
                     </span>
                   </div>
                   <p className="text-gray-600 text-sm">60-minute mentoring session</p>

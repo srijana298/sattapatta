@@ -208,10 +208,10 @@ const Mentors = () => {
                   <td className="p-4">
                     <div className="space-y-1">
                       <div className="text-sm">
-                        <span className="font-medium">₹ {mentor.hourly_rate}</span> /hour
+                        <span className="font-medium">रु {mentor.hourly_rate}</span> /hour
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        <span>₹ {mentor.trial_rate}</span> trial
+                        <span>रु {mentor.trial_rate}</span> trial
                       </div>
                     </div>
                   </td>

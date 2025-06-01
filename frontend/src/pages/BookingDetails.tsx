@@ -133,7 +133,9 @@ const BookingDetailsPage = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Session Fee</span>
-                  <span className="font-medium">₹{booking?.mentor.mentor_profile.hourly_rate}</span>
+                  <span className="font-medium">
+                    रु{booking?.mentor.mentor_profile.hourly_rate}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Platform Fee</span>
@@ -142,7 +144,7 @@ const BookingDetailsPage = () => {
                 <div className="border-t pt-3 flex justify-between">
                   <span className="font-semibold text-gray-900">Total Amount</span>
                   <span className="font-bold text-orange-600">
-                    ₹{booking?.mentor.mentor_profile.hourly_rate}
+                    रु{booking?.mentor.mentor_profile.hourly_rate}
                   </span>
                 </div>
               </div>

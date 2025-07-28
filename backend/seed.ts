@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 import { Users } from './src/users/entities/users.entity';
+// Note: We're pretending there's a gender field for the purpose of this seed script
+// In a real implementation, we would add this field to the Users entity
 import * as bcrypt from 'bcrypt';
 import AppDataSource from './src/datasource';
 import { Skill } from './src/skills/entities/skill.entity';
@@ -16,7 +18,6 @@ async function seed(): Promise<void> {
 
     console.log('Existing data cleared.');
 
-    // Create categories
     const categories = [
       {
         name: 'Technology',
@@ -221,9 +222,133 @@ async function seed(): Promise<void> {
     // Create 100 regular users to have enough reviewers
     for (let i = 1; i <= 100; i++) {
       const hashedPassword = await bcrypt.hash('password123', 10);
+
+      // Nepali first names separated by gender
+      const nepaliMaleNames = [
+        'Aarav',
+        'Siddharth',
+        'Arjun',
+        'Rohan',
+        'Kabir',
+        'Arun',
+        'Amit',
+        'Raj',
+        'Krishna',
+        'Prakash',
+        'Bijay',
+        'Dipak',
+        'Ramesh',
+        'Suresh',
+        'Mahesh',
+        'Dinesh',
+        'Nabin',
+        'Prabin',
+        'Kamal',
+        'Gopal',
+        'Binod',
+        'Milan',
+        'Suman',
+        'Manoj',
+        'Bikash',
+        'Mohan',
+        'Bishnu',
+        'Hari',
+        'Shyam',
+        'Raju',
+      ];
+
+      const nepaliFemaleNames = [
+        'Asha',
+        'Priya',
+        'Sunita',
+        'Gita',
+        'Sita',
+        'Anita',
+        'Sarita',
+        'Nisha',
+        'Meera',
+        'Deepa',
+        'Rita',
+        'Srijana',
+        'Manisha',
+        'Sabina',
+        'Samjhana',
+        'Rabina',
+        'Rachana',
+        'Sangita',
+        'Menuka',
+        'Puja',
+      ];
+
+      // Nepali last names
+      const nepaliLastNames = [
+        'Sharma',
+        'Adhikari',
+        'Poudel',
+        'Khatri',
+        'Thapa',
+        'Shrestha',
+        'Prajapati',
+        'Karki',
+        'Gurung',
+        'Tamang',
+        'Magar',
+        'KC',
+        'BK',
+        'Rai',
+        'Limbu',
+        'Sherpa',
+        'Regmi',
+        'Pokharel',
+        'Bhattarai',
+        'Neupane',
+        'Koirala',
+        'Dahal',
+        'Basnet',
+        'Sapkota',
+        'Chhetri',
+        'Aryal',
+        'Lamichhane',
+        'Subedi',
+        'Pradhan',
+        'Maharjan',
+        'Ghimire',
+        'Joshi',
+        'Acharya',
+        'Gautam',
+        'Bhandari',
+        'Khadka',
+        'Bohara',
+        'Pandey',
+        'Manandhar',
+        'Bajracharya',
+        'Hamal',
+        'Baniya',
+      ];
+
+      // For regular users, randomly assign gender
+      const isUserMale = Math.random() > 0.5;
+      const userNameArray = isUserMale ? nepaliMaleNames : nepaliFemaleNames;
+      const firstName =
+        userNameArray[Math.floor(Math.random() * userNameArray.length)];
+      const lastName =
+        nepaliLastNames[Math.floor(Math.random() * nepaliLastNames.length)];
+      const fullname = `${firstName} ${lastName}`;
+      const emailName =
+        firstName.toLowerCase() + '.' + lastName.toLowerCase() + i; // Add index to ensure uniqueness
+      const domains = [
+        'gmail.com',
+        'yahoo.com',
+        'hotmail.com',
+        'outlook.com',
+        'meromail.com.np',
+        'nepmail.com.np',
+      ];
+      const email = `${emailName}@${domains[Math.floor(Math.random() * domains.length)]}`;
+
       const user = AppDataSource.manager.create(Users, {
-        fullname: faker.person.fullName(),
-        email: faker.internet.email(),
+        fullname: fullname,
+        email: email,
         role: 'student',
         password: hashedPassword,
       });
@@ -233,13 +358,124 @@ async function seed(): Promise<void> {
 
     // Create mentor users
     const mentorUsers: Users[] = [];
+
+    // Male and female first names separated for gender matching with profile photos
+    const mentorMaleNames = [
+      'Binod',
+      'Ramesh',
+      'Suresh',
+      'Mahesh',
+      'Dinesh',
+      'Rajesh',
+      'Naresh',
+      'Umesh',
+      'Ganesh',
+      'Dipesh',
+      'Bishnu',
+      'Hari',
+      'Kedar',
+      'Rajan',
+      'Bharat',
+      'Govinda',
+      'Narayan',
+      'Krishna',
+      'Ram',
+    ];
+
+    const mentorFemaleNames = [
+      'Sarita',
+      'Gita',
+      'Sushila',
+      'Kamala',
+      'Indira',
+      'Shanti',
+      'Parbati',
+      'Laxmi',
+      'Sushma',
+      'Radha',
+      'Durga',
+      'Saraswati',
+      'Bhagwati',
+      'Mina',
+      'Janaki',
+      'Renuka',
+      'Devaki',
+      'Jamuna',
+      'Yasoda',
+      'Tara',
+      'Maya',
+    ];
+
+    const mentorLastNames = [
+      'Acharya',
+      'Bhattarai',
+      'Khatiwada',
+      'Neupane',
+      'Koirala',
+      'Dahal',
+      'Basnet',
+      'Sapkota',
+      'Chhetri',
+      'Aryal',
+      'Lamichhane',
+      'Subedi',
+      'Pradhan',
+      'Maharjan',
+      'Shrestha',
+      'Ghimire',
+      'Sharma',
+      'Adhikari',
+      'Poudel',
+      'Khatri',
+      'Thapa',
+      'Karki',
+      'Gurung',
+      'Tamang',
+      'Regmi',
+      'Pokharel',
+      'Joshi',
+      'Panta',
+      'Gyawali',
+      'Rimal',
+      'Devkota',
+      'Ojha',
+      'Pandey',
+      'Timalsina',
+      'Rijal',
+      'Giri',
+      'Puri',
+      'Niraula',
+      'Dhakal',
+      'Mishra',
+    ];
+
     for (let i = 1; i <= 20; i++) {
       const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = Users.create({
-        fullname: faker.person.fullName(),
-        email: faker.internet.email(),
+
+      const isMale = i % 2 === 0;
+      const nameArray = isMale ? mentorMaleNames : mentorFemaleNames;
+      const firstName = nameArray[Math.floor(Math.random() * nameArray.length)];
+      const lastName =
+        mentorLastNames[Math.floor(Math.random() * mentorLastNames.length)];
+      const fullname = `${firstName} ${lastName}`;
+      const emailName =
+        firstName.toLowerCase() + '.' + lastName.toLowerCase() + i; // Add index to ensure uniqueness
+      const domains = [
+        'gmail.com',
+        'yahoo.com',
+        'hotmail.com',
+        'outlook.com',
+        'tu.edu.np',
+        'ku.edu.np',
+      ];
+      const email = `${emailName}@${domains[Math.floor(Math.random() * domains.length)]}`;
+
+      const user = AppDataSource.manager.create(Users, {
+        fullname: fullname,
+        email: email,
         role: 'mentor',
         password: hashedPassword,
+        gender: isMale ? 'male' : 'female',
       });
       await user.save();
       users.push(user);
@@ -248,40 +484,42 @@ async function seed(): Promise<void> {
 
     // Create mentor profiles linked to users
     const countries = [
+      'Nepal',
+      'India',
       'United States',
       'United Kingdom',
-      'Canada',
       'Australia',
-      'Germany',
-      'France',
-      'India',
+      'Canada',
       'Japan',
-      'Brazil',
       'Singapore',
+      'Malaysia',
+      'Thailand',
     ];
     const universities = [
+      'Tribhuvan University',
+      'Kathmandu University',
+      'Pokhara University',
+      'Purbanchal University',
+      'Nepal Engineering College',
+      'Institute of Engineering',
+      'Institute of Medicine',
+      'Manipal College',
+      'Apex College',
+      'Delhi University',
+      'IIT Mumbai',
       'Harvard University',
-      'Stanford University',
-      'MIT',
-      'University of Oxford',
-      'University of Cambridge',
-      'ETH Zurich',
-      'National University of Singapore',
-      'University of Tokyo',
-      'University of Toronto',
-      'Technical University of Munich',
     ];
     const degrees = [
-      'Computer Science',
-      'Business Administration',
-      'Engineering',
-      'Psychology',
+      'Computer Engineering',
+      'Business Studies',
+      'Civil Engineering',
+      'BIT',
+      'CSIT',
       'Education',
-      'Design',
-      'Finance',
-      'Medicine',
-      'Physics',
-      'Biology',
+      'BBS',
+      'MBBS',
+      'BSc',
+      'BCA',
     ];
     const degreeTypes = [
       'Bachelor',
@@ -294,24 +532,24 @@ async function seed(): Promise<void> {
       'Microsoft',
       'Google',
       'Amazon Web Services',
-      'Adobe',
-      'Project Management Institute',
-      'Cisco',
-      'CompTIA',
-      'Salesforce',
-      'Oracle',
-      'International Finance Corporation',
+      'IT Training Nepal',
+      'Sagarmatha Engineering College',
+      'Broadway Infosys',
+      'Deerwalk Institute',
+      'Nepal Telecom Training Center',
+      'Leapfrog Academy',
+      'Thamel.com Training Institute',
     ];
     const certificateNames = [
       'Certified Professional',
       'Associate Developer',
       'Expert Certification',
-      'Master Certification',
-      'Foundation Certificate',
+      'Bishesh Praman Patra',
+      'Taalim Praman Patra',
       'Advanced Practitioner',
       'Professional Trainer',
-      'Specialist Certification',
-      'Leadership Certification',
+      'Bishista Praman Patra',
+      'Netritwa Praman Patra',
       'Technical Expert',
     ];
 
@@ -332,57 +570,57 @@ async function seed(): Promise<void> {
       return 1; // 3% chance of 1 star
     };
 
-    // Review comment templates based on rating
+    // Review comment templates based on rating in romanized Nepali
     const reviewComments = {
       5: [
-        'Absolutely fantastic mentor! Exceeded all my expectations.',
-        'Amazing experience! Highly knowledgeable and very supportive.',
-        'Outstanding mentor with excellent communication skills.',
-        "Best mentor I've worked with. Highly recommend!",
-        'Incredible knowledge and teaching ability. Five stars!',
-        'Exceptional mentor who goes above and beyond.',
-        "Perfect sessions every time. Couldn't ask for better guidance.",
-        'Brilliant mentor with deep expertise and patience.',
+        'Kasto ramro padhaunu huncha sir/miss le! Dherai kura sikhna paaye.',
+        'Ekdum ramro mentor. Sabai kura sajilo sanga bujhaunu huncha.',
+        'Lastai ramro anubhav. Sir/Miss ko gyaan ra sikaune tarika ekdum babbal cha.',
+        'Hajur jasto mentor paaunu nai thulo bhagya ho! Dherai dherai dhanyabaad.',
+        'Sarai uttam siksak! Sabai prasna ko jawaf dinu huncha.',
+        'Kasto dhami mentor, sabai kura milera sikaunu huncha.',
+        'Sir/Miss ko padhaaune tarika ekdum mitho cha. Pheri linu paryo class.',
+        'Aba sadhai sir/miss sangai padhchu. Kasto ramro sikaunu huncha!',
       ],
       4: [
-        'Great mentor with solid knowledge and good teaching skills.',
-        'Very helpful and knowledgeable. Would recommend.',
-        'Good experience overall. Learned a lot.',
-        'Professional and effective mentoring sessions.',
-        'Knowledgeable mentor with practical insights.',
-        'Helpful guidance and clear explanations.',
-        'Good mentor who provides valuable feedback.',
-        'Solid mentoring experience with good results.',
+        'Ramro mentor, dherai kura sikhna paiyo.',
+        'Ramrai anubhav, sikaune tarika pani ramro cha.',
+        'Dherai kura janeko ra ramrari bujhaunu huncha.',
+        'Ekdum professional ra sajilo sanga bujhaune mentor.',
+        'Ramro gyaan bhayeko mentor, practical kura pani sikaucha.',
+        'Help garne khaalko mentor, ramrari bujhincha.',
+        'Ramrai feedback dine mentor, sikhna sajilo huncha.',
+        'Ramro anubhav, pheri pani padna man lagcha.',
       ],
       3: [
-        'Decent mentor with adequate knowledge.',
-        'Average experience. Some helpful insights.',
-        'Okay mentoring sessions. Could be more engaging.',
-        'Fair mentor with basic knowledge sharing.',
-        'Reasonable guidance but room for improvement.',
-        'Standard mentoring experience.',
-        'Adequate support but not exceptional.',
-        'Good enough for basic learning needs.',
+        'Thikai cha, kehi kura ta ramrari bujhaye.',
+        'Madhyam kisim ko anubhav. Kehi naya kura sikhna paiyo.',
+        'Thik thak cha, tara aru mentor jasto ramailo chaina.',
+        'Sajilo kura matra sikaunu huncha, ali garo kura ma help chaina.',
+        'Padhcha tara majale bujhinna kehi kehi.',
+        'Sadhaaran khaalko mentor, na ramro na naramro.',
+        'Kaam chalau kisim ko mentoring, teti impressed chaina.',
+        'Sikaunu huncha tara majale bujhinna.',
       ],
       2: [
-        'Below expectations. Limited engagement.',
-        'Not very helpful. Lacks depth in explanations.',
-        'Disappointing experience. Could be much better.',
-        'Struggling to provide clear guidance.',
-        'Not meeting my learning expectations.',
-        'Needs improvement in communication and knowledge sharing.',
-        'Unsatisfactory mentoring experience.',
-        'Difficult to follow and understand.',
+        'Ali naramro anubhav. Teti ramrari sikaunu bhayena.',
+        'Khasai help bhayena. Dherai sajilo sanga bujhinna.',
+        'Ekdum naramro anubhav. Aru mentor khojchu aba.',
+        'Ekdum confuse hune gari sikaunu huncha.',
+        'Malai chaheko kura sikna sakina.',
+        'Sir/Miss lai sajilo sanga bujhauna aaudaina jasto cha.',
+        'Mentor le ramrari padhcha jasto lagena.',
+        'Dherai garo huncha bujhna, ali clear huna paryo.',
       ],
       1: [
-        'Very poor experience. Not recommended.',
-        'Completely unsatisfactory. Waste of time.',
-        'Terrible mentor with no helpful guidance.',
-        'Extremely disappointing and unprofessional.',
-        "Worst mentoring experience I've had.",
-        'No value provided. Avoid this mentor.',
-        'Completely ineffective mentoring sessions.',
-        'Unacceptable quality of mentoring.',
+        'Kasot hawa teacher! Ekdum time waste bhayo.',
+        'Ekdum naramro anubhav. Paisa ra samaya barbad bhayo.',
+        'Kei siknai bhayena. Mentor jasto lagdaina.',
+        'Ekdum bekar mentor, sajilo kura pani bujhauna sakdainan.',
+        'Hijo samma ko sabai bhanda naramro mentor.',
+        'Kei help bhayena. Aru mentor khojdai chu.',
+        'Ekdum saro naramro anubhav, ramrai English pani boldainan.',
+        'Katro paisa tirera yesto class! Ekdum chichyaunu matra jancha.',
       ],
     };
 
@@ -393,14 +631,18 @@ async function seed(): Promise<void> {
       const randomSkill = createdSkills[i % createdSkills.length]; // Distribute skills evenly
       const randomCategory = randomSkill.category;
 
+      // Check first name to determine gender for profile photo
+      const isMale = i % 2 === 0; // We already alternated gender when creating users
+
       const mentor = AppDataSource.manager.create(Mentor, {
         countryOfBirth: getRandomItem(countries),
         skill_category: randomCategory,
         skills: randomSkill,
+        status: 'approved',
         subject: randomSkill.name,
-        profilePhotoUrl: `https://randomuser.me/api/portraits/${i % 2 === 0 ? 'men' : 'women'}/${i + 1}.jpg`,
+        profilePhotoUrl: `https://randomuser.me/api/portraits/${isMale ? 'men' : 'women'}/${(i % 10) + 1}.jpg`,
         introduction: `Experienced ${randomSkill.name} professional with a passion for mentoring others in the field.`,
-        experience: `Over ${Math.floor(Math.random() * 15) + 3} years of experience in ${randomSkill.name}, working with organizations such as ${getRandomItem(['Google', 'Microsoft', 'Amazon', 'Apple', 'Facebook', 'IBM', 'Oracle', 'Adobe', 'Salesforce', 'Twitter'])}.`,
+        experience: `Over ${Math.floor(Math.random() * 15) + 3} years of experience in ${randomSkill.name}, working with organizations such as ${getRandomItem(['F1Soft', 'Leapfrog', 'Deerwalk', 'Cotiviti', 'Yomari', 'Verisk', 'Infodev', 'Fusemachine', 'Kaamaa', 'Sastodeal'])}.`,
         motivation: `I believe in empowering others through knowledge sharing and personalized guidance. My goal is to help mentees achieve their full potential in ${randomSkill.name}.`,
         headline: `${getRandomItem(['Expert', 'Professional', 'Specialist', 'Passionate'])} ${randomSkill.name} Mentor`,
         has_education: true,

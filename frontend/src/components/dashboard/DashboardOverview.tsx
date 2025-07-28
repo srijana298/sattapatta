@@ -1,71 +1,49 @@
-import React from 'react';
-import { Calendar, MessageSquare, Star, Users, DollarSign, Clock } from 'lucide-react';
-import { bookings } from '../../data/bookingsData';
-import { messages } from '../../data/messagesData';
-import { reviews } from '../../data/reviewsData';
+import React, { useEffect, useState } from 'react';
+import { Calendar, Star, Users } from 'lucide-react';
 import { useAuth } from '../AuthContext';
-import { useMentor } from '../../lib/hooks';
+import api from '../../api';
 
 const DashboardOverview: React.FC = () => {
   const { currentUser } = useAuth();
+  const [stats, setStats] = useState({
+    upcomingSessions: 0,
+    uniqueStudentsCount: 0,
+    averageRating: 0,
+    totalReviews: 0
+  });
+  const [loading, setLoading] = useState(true);
 
-  const { data: mentor} = useMentor(currentUser?.mentor_profile?.id);
-  const now = new Date();
-  const in48Hours = new Date(now.getTime() + 48 * 60 * 60 * 1000);
-  const upcomingAppointments = bookings.filter(
-    (booking) => new Date(booking.startTime) >= now && new Date(booking.startTime) <= in48Hours
-  );
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const response = await api.get('/mentor/dashboard-stats');
+        setStats(response.data);
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const unreadMessages = messages.filter((message) => !message.read);
-
-  const totalEarnings = bookings
-    .filter((booking) => booking.status === 'completed')
-    .reduce((sum, booking) => sum + booking.price, 0);
-
-  const averageRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-      : 0;
+    fetchDashboardStats();
+  }, [currentUser]);
 
   const statsCards = [
     {
       title: 'Upcoming Sessions',
-      value: upcomingAppointments.length,
+      value: stats.upcomingSessions,
       icon: <Calendar className="h-6 w-6 text-blue-500" />,
       bgColor: 'bg-blue-50'
     },
     {
-      title: 'Unread Messages',
-      value: unreadMessages.length,
-      icon: <MessageSquare className="h-6 w-6 text-green-500" />,
-      bgColor: 'bg-green-50'
-    },
-    {
       title: 'Total Students',
-      value: bookings.reduce((acc, booking) => {
-        if (!acc.includes(booking.studentId)) {
-          acc.push(booking.studentId);
-        }
-        return acc;
-      }, []).length,
+      value: stats.uniqueStudentsCount,
       icon: <Users className="h-6 w-6 text-purple-500" />,
       bgColor: 'bg-purple-50'
     },
     {
-      title: 'Total Earnings',
-      value: `$${totalEarnings}`,
-      icon: <DollarSign className="h-6 w-6 text-emerald-500" />,
-      bgColor: 'bg-emerald-50'
-    },
-    {
-      title: 'Hours Mentored',
-      value: '32',
-      icon: <Clock className="h-6 w-6 text-indigo-500" />,
-      bgColor: 'bg-indigo-50'
-    },
-    {
       title: 'Rating',
-      value: averageRating.toFixed(1),
+      value: stats.averageRating?.toFixed(1) || '0.0',
       icon: <Star className="h-6 w-6 text-yellow-500" />,
       bgColor: 'bg-yellow-50',
       extra: (
@@ -74,13 +52,13 @@ const DashboardOverview: React.FC = () => {
             <Star
               key={star}
               className={`h-4 w-4 ${
-                star <= Math.round(averageRating)
+                star <= Math.round(stats.averageRating || 0)
                   ? 'text-yellow-500 fill-yellow-500'
                   : 'text-gray-300'
               }`}
             />
           ))}
-          <span className="ml-1 text-xs text-gray-500">({reviews.length})</span>
+          <span className="ml-1 text-xs text-gray-500">({stats.totalReviews})</span>
         </div>
       )
     }

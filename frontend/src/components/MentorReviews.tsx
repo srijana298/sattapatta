@@ -1,10 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Star, Search, Filter } from 'lucide-react';
-import api from '../../api';
-import { useAuth } from '../../components/AuthContext';
-
-type ReviewFilter = 'all' | '5' | '4' | '3' | '2' | '1';
-type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest';
+import api from '../api';
 
 interface Reviewer {
   id: number;
@@ -29,8 +25,14 @@ const ratingDescriptions: Record<number, { label: string; color: string }> = {
   1: { label: 'Poor', color: 'text-red-600 bg-red-50' }
 };
 
-const ReviewsSection: React.FC = () => {
-  const { currentUser } = useAuth();
+interface MentorReviewsProps {
+  mentorId?: number;
+}
+
+type ReviewFilter = 'all' | '5' | '4' | '3' | '2' | '1';
+type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest';
+
+const MentorReviews: React.FC<MentorReviewsProps> = ({ mentorId }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,18 +44,23 @@ const ReviewsSection: React.FC = () => {
     const fetchReviews = async () => {
       try {
         setLoading(true);
-        const mentorId = currentUser?.mentor_profile?.id;
+        // If mentorId is provided, fetch reviews for that mentor
+        // Otherwise, fetch all reviews
+        const url = mentorId ? `/mentor/${mentorId}` : '/mentor';
 
-        if (!mentorId) {
-          setError('Mentor profile not found');
-          setLoading(false);
-          return;
-        }
-
-        const response = await api.get(`/mentor/${mentorId}`);
+        const response = await api.get(url);
 
         // Extract reviews from response
-        const fetchedReviews = response.data.reviews || [];
+        let fetchedReviews: Review[] = [];
+        if (mentorId) {
+          // Single mentor response structure
+          fetchedReviews = response.data.reviews || [];
+        } else {
+          // Multiple mentors response structure - flatten all reviews
+          const mentors = response.data || [];
+          fetchedReviews = mentors.flatMap((mentor) => mentor.reviews || []);
+        }
+
         setReviews(fetchedReviews);
       } catch (err) {
         console.error('Error fetching reviews:', err);
@@ -64,7 +71,7 @@ const ReviewsSection: React.FC = () => {
     };
 
     fetchReviews();
-  }, [currentUser]);
+  }, [mentorId]);
 
   // Filter and sort reviews
   const filteredReviews = reviews
@@ -148,7 +155,7 @@ const ReviewsSection: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Reviews & Testimonials</h1>
+        <h2 className="text-2xl font-bold text-gray-800">Student Reviews</h2>
       </div>
 
       {/* Rating summary */}
@@ -303,7 +310,7 @@ const ReviewsSection: React.FC = () => {
             <div
               key={review.id}
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-transform
-                       duration-200 hover:shadow-md"
+                      duration-200 hover:shadow-md"
             >
               <div className="flex items-start">
                 <div
@@ -374,4 +381,4 @@ const ReviewsSection: React.FC = () => {
   );
 };
 
-export default ReviewsSection;
+export default MentorReviews;

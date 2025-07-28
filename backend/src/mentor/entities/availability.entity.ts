@@ -23,10 +23,4 @@ export class MentorAvailability {
 
   @Column()
   is_available: boolean;
-
-  @ManyToOne(() => Mentor, (mentor) => mentor.availabilities, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  mentor: Mentor;
 }

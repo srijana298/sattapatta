@@ -6,8 +6,10 @@ import Navbar from '../components/Navbar';
 import TutorCard from '../components/TutorCard';
 import { useAuth } from '../components/AuthContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
-import { useApprovedMentors, useMentors } from '../lib/hooks';
+import { useApprovedMentors } from '../lib/hooks';
 import { Navigate } from 'react-router-dom';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { useRef, useState } from 'react';
 
 const LandingPage = () => {
   return (
@@ -256,25 +258,58 @@ const LandingPage = () => {
 
 const MentorPendingStatus = () => {
   return (
-    <div className="max-w-md mx-auto mt-8 p-6 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm">
-      <div className="flex items-center justify-center mb-4">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{
+        duration: 0.6,
+        ease: [0.34, 1.56, 0.64, 1]
+      }}
+      className="max-w-md mx-auto mt-8 p-6 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm"
+    >
+      <motion.div
+        className="flex items-center justify-center mb-4"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.3, duration: 0.5, type: 'spring', stiffness: 200 }}
+      >
         <div className="p-3 bg-amber-100 rounded-full">
           <Clock className="h-8 w-8 text-amber-600" />
         </div>
-      </div>
+      </motion.div>
 
-      <h2 className="text-xl font-semibold text-gray-800 text-center mb-3">
+      <motion.h2
+        className="text-xl font-semibold text-gray-800 text-center mb-3"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+      >
         Application Under Review
-      </h2>
+      </motion.h2>
 
-      <p className="text-gray-600 text-center mb-6 leading-relaxed">
+      <motion.p
+        className="text-gray-600 text-center mb-6 leading-relaxed"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
         Your mentor application is currently being reviewed by our admin team. You'll receive a
         notification within <span className="font-semibold text-amber-700">24 hours</span>
         of your submission.
-      </p>
+      </motion.p>
 
-      <div className="space-y-3 mb-6">
-        <div className="flex items-center">
+      <motion.div
+        className="space-y-3 mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        <motion.div
+          className="flex items-center"
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.7, duration: 0.4 }}
+        >
           <div className="flex-shrink-0">
             <CheckCircle className="h-5 w-5 text-green-500" />
           </div>
@@ -282,9 +317,14 @@ const MentorPendingStatus = () => {
             <p className="text-sm font-medium text-gray-700">Application submitted</p>
             <p className="text-xs text-gray-500">We've received your mentor application</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="flex items-center">
+        <motion.div
+          className="flex items-center"
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.4 }}
+        >
           <div className="flex-shrink-0">
             <div className="h-5 w-5 bg-amber-500 rounded-full flex items-center justify-center">
               <div className="h-2 w-2 bg-white rounded-full animate-pulse"></div>
@@ -294,21 +334,254 @@ const MentorPendingStatus = () => {
             <p className="text-sm font-medium text-gray-700">Under review</p>
             <p className="text-xs text-gray-500">Admin team is reviewing your profile</p>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <div className="bg-white rounded-lg p-4 border border-amber-100">
+      <motion.div
+        className="bg-white rounded-lg p-4 border border-amber-100"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.9, duration: 0.5 }}
+      >
         <p className="text-sm text-gray-600 text-center">
           <span className="font-medium">What happens next?</span>
           <br />
           Our team will review your qualifications and experience. Wait to receive our call for
           updates on your application status.
         </p>
-      </div>
+      </motion.div>
 
-      <p className="text-xs text-gray-500 text-center mt-4">
+      <motion.p
+        className="text-xs text-gray-500 text-center mt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.0, duration: 0.5 }}
+      >
         Questions? Contact our support team for assistance.
-      </p>
+      </motion.p>
+    </motion.div>
+  );
+};
+
+const SearchSection = ({ mentorCount }) => {
+  const [searchValue, setSearchValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
+
+  return (
+    <motion.div
+      className="bg-white shadow-sm py-8"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+    >
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+        >
+          <motion.h1
+            className="text-4xl font-bold text-orange-800 mb-2"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.5, type: 'spring', stiffness: 100 }}
+          >
+            Find Your Perfect Mentor
+          </motion.h1>
+          <motion.p
+            className="text-xl text-gray-600"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            Choose from{' '}
+            <motion.span
+              key={mentorCount}
+              initial={{ scale: 1.2, color: '#ea580c' }}
+              animate={{ scale: 1, color: '#6b7280' }}
+              transition={{ duration: 0.3 }}
+            >
+              {mentorCount || 0}
+            </motion.span>{' '}
+            skilled mentors ready to help you learn
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          className="flex flex-col md:flex-row gap-4 max-w-4xl mx-auto justify-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+        >
+          <motion.div className="flex-1 relative justify-self-center" whileTap={{ scale: 0.995 }}>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.4 }}
+            >
+              <Search
+                size={20}
+                className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-200 ${
+                  isFocused ? 'text-orange-500' : 'text-gray-400'
+                }`}
+              />
+            </motion.div>
+            <motion.input
+              type="text"
+              placeholder="Search for skills, mentors, or topics..."
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              className={`w-full pl-12 pr-4 py-4 border text-lg transition-all duration-300 focus:outline-none rounded-lg ${
+                isFocused
+                  ? 'border-orange-500 ring-2 ring-orange-200 shadow-lg transform scale-[1.01]'
+                  : 'border-gray-300 hover:border-gray-400'
+              }`}
+              whileFocus={{ scale: 1.01 }}
+            />
+            <AnimatePresence>
+              {searchValue && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-2 p-3 z-10"
+                >
+                  <div className="text-sm text-gray-500">Searching for "{searchValue}"...</div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+          <motion.div
+            className="w-auto"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
+            <CustomDropdown
+              className="py-4"
+              options={[
+                { id: 'popularity', label: 'Most Popular' },
+                { id: 'rating', label: 'Highest Rated' },
+                { id: 'price-low', label: 'Price: Low to High' },
+                { id: 'price-high', label: 'Price: High to Low' },
+                { id: 'reviews', label: 'Most Reviews' },
+                { id: 'newest', label: 'Newest First' }
+              ]}
+              defaultValue="popularity"
+              onChange={(value) => console.log('Selected:', value)}
+            />
+          </motion.div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};
+
+const MentorsGrid = ({ mentors, isLoading }) => {
+  const gridRef = useRef(null);
+  const isInView = useInView(gridRef, { once: true, margin: '-50px' });
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <motion.div
+          className="grid gap-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="h-48 bg-gray-100 rounded-lg"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+            >
+              <div className="animate-pulse bg-gray-200 h-full rounded-lg"></div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-8" ref={gridRef}>
+      <motion.div
+        className="grid gap-6"
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.6, staggerChildren: 0.1 }}
+      >
+        <AnimatePresence mode="wait">
+          {mentors?.map((mentor, index) => (
+            <motion.div
+              key={mentor.id}
+              initial={{
+                opacity: 0,
+                y: 30,
+                scale: 0.95
+              }}
+              animate={
+                isInView
+                  ? {
+                      opacity: 1,
+                      y: 0,
+                      scale: 1
+                    }
+                  : {
+                      opacity: 0,
+                      y: 30,
+                      scale: 0.95
+                    }
+              }
+              exit={{
+                opacity: 0,
+                y: -20,
+                scale: 0.95,
+                transition: { duration: 0.2 }
+              }}
+              transition={{
+                delay: index * 0.08,
+                duration: 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
+              whileHover={{
+                y: -4,
+                transition: { duration: 0.2, ease: 'easeOut' }
+              }}
+              className="transform-gpu"
+            >
+              <TutorCard profile={mentor} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </motion.div>
+
+      {mentors?.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center py-12"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <Search className="w-8 h-8 text-gray-400" />
+          </motion.div>
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">No mentors found</h3>
+          <p className="text-gray-500">Try adjusting your search or filters</p>
+        </motion.div>
+      )}
     </div>
   );
 };
@@ -318,7 +591,11 @@ const AuthenticatedPage = () => {
   const { currentUser } = useAuth();
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+        <LoadingSpinner />
+      </motion.div>
+    );
   }
 
   if (currentUser?.role === 'mentor' && currentUser.mentor_profile.status === 'pending') {
@@ -330,56 +607,15 @@ const AuthenticatedPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="bg-white shadow-sm py-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-orange-800 mb-2">Find Your Perfect Mentor</h1>
-            <p className="text-xl text-gray-600">
-              Choose from {data?.length || 0} skilled mentors ready to help you learn
-            </p>
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-4 max-w-4xl mx-auto justify-center">
-            <div className="flex-1 relative justify-self-center ">
-              <Search
-                size={20}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                placeholder="Search for skills, mentors, or topics..."
-                className="w-full pl-12 pr-4 py-4 border border-gray-300 text-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
-              />
-            </div>
-            <div className="w-auto">
-              <CustomDropdown
-                className="py-4"
-                options={[
-                  { id: 'popularity', label: 'Most Popular' },
-                  { id: 'rating', label: 'Highest Rated' },
-                  { id: 'price-low', label: 'Price: Low to High' },
-                  { id: 'price-high', label: 'Price: High to Low' },
-                  { id: 'reviews', label: 'Most Reviews' },
-                  { id: 'newest', label: 'Newest First' }
-                ]}
-                defaultValue="popularity"
-                onChange={(value) => console.log('Selected:', value)}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mentors Grid */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid gap-6">
-          {data?.map((mentor) => (
-            <TutorCard profile={mentor} key={mentor.id} />
-          ))}
-        </div>
-      </div>
-    </div>
+    <motion.div
+      className="bg-gray-50 min-h-screen"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <SearchSection mentorCount={data?.length} />
+      <MentorsGrid mentors={data} isLoading={isLoading} />
+    </motion.div>
   );
 };
 
@@ -387,9 +623,17 @@ export default function Home() {
   const { currentUser } = useAuth();
 
   return (
-    <>
-      <Navbar />
-      {currentUser ? <AuthenticatedPage /> : <LandingPage />}
-    </>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={currentUser ? 'authenticated' : 'landing'}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Navbar />
+        {currentUser ? <AuthenticatedPage /> : <LandingPage />}
+      </motion.div>
+    </AnimatePresence>
   );
 }

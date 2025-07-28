@@ -1,15 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Calendar,
-  CheckCircle,
-  User,
-  Star,
-  MapPin,
-  Award
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Calendar, CheckCircle, User, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useMutation } from 'react-query';
 import { createBooking } from '../services/bookings';
@@ -102,6 +92,7 @@ export default function MentorBookingUI() {
     if (!date) return false;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    today.setDate(today.getDate() + 1);
     return date >= today;
   };
 

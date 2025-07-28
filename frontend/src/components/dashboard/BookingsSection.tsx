@@ -1,15 +1,54 @@
-import React, { useState } from 'react';
-import { Calendar, Filter, Search, User } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Calendar, Filter, Search, User, Video, X } from 'lucide-react';
 import { LoadingSpinner } from '../LoadingSpinner';
-import { useMentorBookings } from '../../lib/hooks';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import api from '../../api';
 
 type BookingStatus = 'all' | 'upcoming' | 'completed' | 'cancelled';
 
 const BookingsSection: React.FC = () => {
   const [status, setStatus] = useState<BookingStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const queryClient = useQueryClient();
 
-  const { data: bookings, isLoading } = useMentorBookings();
+  const { data: bookings, isLoading } = useQuery('mentor-bookings', async () => {
+    const response = await api.get('/mentor/bookings');
+    return response.data;
+  });
+
+  const updateBookingStatus = useMutation(
+    async ({ id, status }: { id: number; status: string }) => {
+      return await api.patch(`/bookings/${id}`, { status });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('mentor-bookings');
+      }
+    }
+  );
+
+  const handleCancelBooking = (bookingId: number) => {
+    if (confirm('Are you sure you want to cancel this booking?')) {
+      updateBookingStatus.mutate({ id: bookingId, status: 'cancelled' });
+    }
+  };
+
+  const handleCompleteBooking = (bookingId: number) => {
+    updateBookingStatus.mutate({ id: bookingId, status: 'completed' });
+  };
+
+  const generateMeetingLink = (booking: any) => {
+    // Create a unique meeting ID based on booking details
+    const meetingData = `${booking.id}-${booking.mentor.id}-${booking.mentee.id}-${booking.start_date}`;
+    // Use a simple hash function for client-side
+    const meetingHash = btoa(meetingData).substring(0, 12);
+    const roomName = `sattapatta-meeting-${meetingHash}`;
+    return `https://meet.jit.si/${roomName}`;
+  };
+
+  const handleJoinMeeting = (booking: any) => {
+    window.open(generateMeetingLink(booking), '_blank');
+  };
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -22,7 +61,13 @@ const BookingsSection: React.FC = () => {
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      return booking.mentee.fullname.toLowerCase().includes(query);
+      return (
+        booking.mentee.fullname.toLowerCase().includes(query) ||
+        booking.mentee.email.toLowerCase().includes(query) ||
+        booking.start_date.toLowerCase().includes(query) ||
+        booking.end_time.toLowerCase().includes(query) ||
+        booking.status.toLowerCase().includes(query)
+      );
     }
 
     return true;
@@ -56,7 +101,7 @@ const BookingsSection: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800">Bookings & Appointments</h1>
         <div>
           {/* <button
-            className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg 
+            className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg
                            transition-colors duration-150 ease-in-out shadow-sm"
             disabled
           >
@@ -93,8 +138,8 @@ const BookingsSection: React.FC = () => {
             </div>
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm 
-                       placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 
+              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm
+                       placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500
                        focus:border-transparent transition duration-150 ease-in-out"
               placeholder="Search bookings..."
               value={searchQuery}
@@ -150,7 +195,7 @@ const BookingsSection: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
                                         ${getStatusBadge(booking.status)}`}
                       >
                         {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
@@ -158,43 +203,39 @@ const BookingsSection: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        {booking.status !== 'completed' && (
+                        {booking.status !== 'completed' && booking.status !== 'cancelled' && (
                           <>
-                            <button
-                              className="text-orange-600 hover:text-orange-900 bg-orange-50 hover:bg-orange-100 
-                                               px-2 py-1 rounded-md transition-colors duration-150 ease-in-out"
-                            >
-                              Join
-                            </button>
-                            <button
-                              className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 
-                                               px-2 py-1 rounded-md transition-colors duration-150 ease-in-out"
-                            >
-                              Reschedule
-                            </button>
-                            <button
-                              className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 
-                                               px-2 py-1 rounded-md transition-colors duration-150 ease-in-out"
-                            >
-                              Cancel
-                            </button>
+                            {(() => {
+                              const bookingDate = new Date(booking.start_date);
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0);
+                              bookingDate.setHours(0, 0, 0, 0);
+
+                              if (bookingDate.getTime() === today.getTime()) {
+                                // Today's booking - show Join Now button
+                                return (
+                                  <button
+                                    onClick={() => handleJoinMeeting(booking)}
+                                    className="flex items-center text-orange-600 hover:text-orange-900 bg-orange-50 hover:bg-orange-100
+                                             px-2 py-1 rounded-md transition-colors duration-150 ease-in-out"
+                                  >
+                                    <Video className="h-4 w-4 mr-1" /> Join Now
+                                  </button>
+                                );
+                              } else {
+                                // Past booking - show Mark as Completed button
+                                return (
+                                  <button
+                                    onClick={() => handleCompleteBooking(booking.id)}
+                                    className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100
+                                             px-2 py-1 rounded-md transition-colors duration-150 ease-in-out"
+                                  >
+                                    Mark as Completed
+                                  </button>
+                                );
+                              }
+                            })()}
                           </>
-                        )}
-                        {booking.status === 'completed' && (
-                          <button
-                            className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 
-                                             px-2 py-1 rounded-md transition-colors duration-150 ease-in-out"
-                          >
-                            Notes
-                          </button>
-                        )}
-                        {booking.status === 'cancelled' && (
-                          <button
-                            className="text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 
-                                             px-2 py-1 rounded-md transition-colors duration-150 ease-in-out"
-                          >
-                            Reschedule
-                          </button>
                         )}
                       </div>
                     </td>

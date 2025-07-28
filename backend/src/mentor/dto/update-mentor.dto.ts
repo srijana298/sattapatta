@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -107,4 +108,33 @@ export class CreateDescriptionDto {
 
   @IsNotEmpty()
   headline: string;
+}
+
+export class AvailabilityDto {
+  @IsNumber()
+  @IsOptional()
+  id?: number;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Day of week is required' })
+  day_of_week: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Start time is required' })
+  start_time: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'End time is required' })
+  end_time: string;
+
+  @IsBoolean()
+  @IsOptional()
+  is_available: boolean = true;
+}
+
+export class DashboardStatsDto {
+  upcomingSessions: number;
+  uniqueStudentsCount: number;
+  averageRating: number;
+  totalReviews: number;
 }

@@ -55,20 +55,6 @@ class EducationDto {
   end_year: string;
 }
 
-class AvailabilityDto {
-  @IsString()
-  day_of_week: string;
-
-  @IsString()
-  start_time: string;
-
-  @IsString()
-  end_time: string;
-
-  @IsBoolean()
-  is_available: boolean;
-}
-
 export class CreateMentorDto {
   @IsString()
   countryOfBirth: string;
@@ -115,9 +101,4 @@ export class CreateMentorDto {
 
   @IsNumber()
   trial_rate: number;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => AvailabilityDto)
-  availability: AvailabilityDto[];
 }

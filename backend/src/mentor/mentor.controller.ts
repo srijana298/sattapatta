@@ -17,6 +17,7 @@ import { MentorService } from './mentor.service';
 import { CreateMentorDto, CreateRatingDto } from './dto/create-mentor.dto';
 import {
   AboutMentorDto,
+  DashboardStatsDto,
   CreateCertificateInputDto,
   CreateDescriptionDto,
   CreateEducationDto,
@@ -25,10 +26,14 @@ import { AuthGuard } from 'src/auth.guard';
 import { AuthRequest } from 'src/AuthRequest';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { BookingsService } from 'src/bookings/bookings.service';
 
 @Controller('mentor')
 export class MentorController {
-  constructor(private readonly mentorService: MentorService) {}
+  constructor(
+    private readonly mentorService: MentorService,
+    private readonly bookingsService: BookingsService,
+  ) {}
 
   @UseGuards(AuthGuard)
   @Post()
@@ -38,17 +43,6 @@ export class MentorController {
   ) {
     const userId = request.user.id;
     return this.mentorService.create(userId, createMentorDto);
-  }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const mentor = await this.mentorService.findOne(+id);
-
-    if (!mentor) {
-      throw new NotFoundException("Mentor doesn't exist");
-    }
-
-    return mentor;
   }
 
   @Get()
@@ -125,6 +119,12 @@ export class MentorController {
       body.educations,
     );
   }
+  @UseGuards(AuthGuard)
+  @Get('/dashboard-stats')
+  getDashboardStats(@Req() req: AuthRequest) {
+    const userId = req.user.id;
+    return this.mentorService.getDashboardStats(userId);
+  }
 
   @UseGuards(AuthGuard)
   @Get('/certificates')
@@ -136,6 +136,28 @@ export class MentorController {
   @Delete('/certificates/:id')
   deleteCertificate(@Param('id') id: string) {
     return this.mentorService.deleteCertificates(+id);
+  }
+  @UseGuards(AuthGuard)
+  @Get('bookings')
+  async findByMentorId(@Req() req: AuthRequest) {
+    const userId = req.user.id;
+    const mentor = await this.mentorService.findProfile(userId);
+    if (!mentor) {
+      throw new NotFoundException("Mentor profile doesn't exist");
+    }
+    return this.bookingsService.findByMentors(mentor.id);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    console.log({ id });
+    const mentor = await this.mentorService.findOne(+id);
+
+    if (!mentor) {
+      throw new NotFoundException("Mentor doesn't exist");
+    }
+
+    return mentor;
   }
 
   @UseGuards(AuthGuard)

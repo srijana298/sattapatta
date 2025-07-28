@@ -11,6 +11,8 @@ import { MentorAvailability } from './entities/availability.entity';
 import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { MentorReview } from './entities/rating.entity';
+import { BookingsService } from 'src/bookings/bookings.service';
+import { Booking } from 'src/bookings/entities/booking.entity';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { MentorReview } from './entities/rating.entity';
     }),
     TypeOrmModule.forFeature([
       Users,
+      Booking,
       Mentor,
       MentorCertificate,
       MentorEducation,
@@ -31,6 +34,6 @@ import { MentorReview } from './entities/rating.entity';
     ]),
   ],
   controllers: [MentorController],
-  providers: [MentorService, UsersService],
+  providers: [MentorService, UsersService, BookingsService],
 })
 export class MentorModule {}

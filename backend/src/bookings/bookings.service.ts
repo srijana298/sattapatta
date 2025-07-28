@@ -126,8 +126,24 @@ export class BookingsService {
     });
   }
 
-  update(id: number, updateBookingDto: UpdateBookingDto) {
-    return `This action updates a #${id} booking`;
+  async update(id: number, updateBookingDto: UpdateBookingDto) {
+    const booking = await this.bookingRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!booking) {
+      return null;
+    }
+
+    const state = {
+      date: updateBookingDto.date,
+      status: updateBookingDto.status,
+    };
+
+    Object.assign(booking, state);
+    await booking.save();
   }
 
   remove(id: number) {

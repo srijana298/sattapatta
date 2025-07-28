@@ -10,31 +10,36 @@ interface Mentor {
 interface Mentee {
   id: number;
   fullname: string;
-  email: string
+  email: string;
 }
 
 interface Booking {
   id: number;
   mentor: Mentor;
   mentee: Mentee;
-  start_date: string; 
-  end_time: string; 
+  start_date: string;
+  end_time: string;
   status: 'pending' | 'confirmed' | 'cancelled' | string; // Extend as needed
   createdAt: string;
   updatedAt: string;
 }
 
-export const getMentorBookings= async (): Promise<Booking[]> => {
+export const getMentorBookings = async (): Promise<Booking[]> => {
   const response = await api.get('/bookings?hasMentors');
   return response.data;
 };
-export const getBooking= async (id?: string | number): Promise<Booking> => {
-  const response = await api.get('/bookings/'+ id);
+export const getBooking = async (id?: string | number): Promise<Booking> => {
+  const response = await api.get('/bookings/' + id);
   return response.data;
 };
 
 export const getBookings = async (): Promise<Booking[]> => {
   const response = await api.get('/bookings');
+  return response.data;
+};
+
+export const getBookingsByMentorId = async (mentorId: number): Promise<Booking[]> => {
+  const response = await api.get(`/bookings/mentor/${mentorId}`);
   return response.data;
 };
 

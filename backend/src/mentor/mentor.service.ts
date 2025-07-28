@@ -4,16 +4,18 @@ import {
   AboutMentorDto,
   CertificateDto,
   CreateDescriptionDto,
+  DashboardStatsDto,
   EducationDto,
   UpdateMentorDto,
 } from './dto/update-mentor.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Between } from 'typeorm';
 import { Mentor } from './entities/mentor.entity';
 import { Repository } from 'typeorm';
 import { Users } from 'src/users/entities/users.entity';
+import { Booking } from 'src/bookings/entities/booking.entity';
 import { MentorCertificate } from './entities/certificate.entity';
 import { MentorEducation } from './entities/education.entity';
-import { MentorAvailability } from './entities/availability.entity';
 import { MentorReview } from './entities/rating.entity';
 
 @Injectable()
@@ -28,14 +30,13 @@ export class MentorService {
     @InjectRepository(Users)
     private readonly userRepository: Repository<Users>,
 
-    @InjectRepository(MentorAvailability)
-    private readonly availabilityRepository: Repository<MentorAvailability>,
-
     @InjectRepository(MentorCertificate)
     private readonly certificateRepository: Repository<MentorCertificate>,
 
     @InjectRepository(MentorReview)
     private readonly mentorReviewRepository: Repository<MentorReview>,
+    @InjectRepository(Booking)
+    private readonly bookingRepository: Repository<Booking>,
   ) {}
 
   async updateStatus(id: number, status: string) {
@@ -242,7 +243,6 @@ export class MentorService {
       motivation,
       headline,
       hourly_rate,
-      availability,
       trial_rate,
     } = createMentorDto;
     const mentor = new Mentor();
@@ -295,18 +295,6 @@ export class MentorService {
       console.log('Saved educations:', saved);
     }
 
-    const _availabilities: MentorAvailability[] = [];
-
-    availability.forEach((avail) => {
-      const data = this.availabilityRepository.create({
-        mentor: {
-          id: savedMentor.id,
-        },
-        ...avail,
-      });
-      _availabilities.push(data);
-    });
-    await this.availabilityRepository.save(_availabilities);
     return savedMentor;
   }
 
@@ -315,7 +303,6 @@ export class MentorService {
       relations: [
         'educations',
         'certificates',
-        'availabilities',
         'user',
         'reviews',
         'reviews.reviewer',
@@ -410,7 +397,61 @@ export class MentorService {
     };
   }
 
-  // Helper method to calculate the mean number of reviews per mentor
+  async getDashboardStats(userId: number): Promise<DashboardStatsDto> {
+    // Find mentor profile associated with this user
+    const mentor = await this.mentorRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['reviews'],
+    });
+
+    if (!mentor) {
+      return {
+        upcomingSessions: 0,
+        uniqueStudentsCount: 0,
+        averageRating: 0,
+        totalReviews: 0,
+      };
+    }
+
+    // Get upcoming sessions (within the next 48 hours)
+    const now = new Date();
+    const in48Hours = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+
+    const upcomingSessions = await this.bookingRepository.count({
+      where: {
+        mentor: { id: mentor.id },
+        start_date: Between(now.toISOString(), in48Hours.toISOString()),
+      },
+    });
+
+    // Get unique students count
+    const bookings = await this.bookingRepository.find({
+      where: {
+        mentor: { id: mentor.id },
+      },
+      relations: ['mentee'],
+    });
+
+    const uniqueStudentIds = new Set();
+    bookings.forEach((booking) => {
+      if (booking.mentee && booking.mentee.id) {
+        uniqueStudentIds.add(booking.mentee.id);
+      }
+    });
+
+    const uniqueStudentsCount = uniqueStudentIds.size;
+
+    // Get rating stats using Bayesian average
+    const ratingStats = await this.calculateBayesianRating(mentor.id);
+
+    return {
+      upcomingSessions,
+      uniqueStudentsCount,
+      averageRating: ratingStats.bayesianRating,
+      totalReviews: ratingStats.totalReviews,
+    };
+  }
+
   async calculateMeanNumberOfReviews() {
     // Get count of reviews for each mentor
     const mentors = await this.mentorRepository.find({
@@ -434,7 +475,6 @@ export class MentorService {
       relations: [
         'educations',
         'certificates',
-        'availabilities',
         'user',
         'reviews',
         'reviews.reviewer',

@@ -13,7 +13,6 @@ import {
 } from 'typeorm';
 import { MentorEducation } from './education.entity';
 import { MentorCertificate } from './certificate.entity';
-import { MentorAvailability } from './availability.entity';
 import { Users } from '../../users/entities/users.entity';
 import { Category } from '../../categories/entities/category.entity';
 import { MentorReview } from './rating.entity';
@@ -62,11 +61,6 @@ export class Mentor extends BaseEntity {
     cascade: true,
   })
   certificates: MentorCertificate[];
-
-  @OneToMany(() => MentorAvailability, (availability) => availability.mentor, {
-    cascade: true,
-  })
-  availabilities: MentorAvailability[];
 
   @Column({ type: 'decimal', default: 1000.0 })
   hourly_rate: number;

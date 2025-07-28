@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { Mail, MapPin, Star } from 'lucide-react';
+import { Mail, MapPin, Star, Edit2 } from 'lucide-react';
 import { mentorData } from '../../data/mentorData';
 import { useAuth } from '../AuthContext';
 import { useMentor } from '../../lib/hooks';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { getImageUrl } from '../../pages/admin/lib/utils';
+import EducationForm from './forms/EducationForm';
+import CertificateForm from './forms/CertificateForm';
 
 const ProfileSection: React.FC = () => {
   const { currentUser } = useAuth();
   const { data, isLoading } = useMentor(currentUser?.mentor_profile?.id);
-
-  const [profile, setProfile] = useState(mentorData);
+  const [isEditingEducation, setIsEditingEducation] = useState(false);
+  const [isEditingCertificate, setIsEditingCertificate] = useState(false);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -45,9 +47,11 @@ const ProfileSection: React.FC = () => {
 
                 <div className="flex items-center justify-center mt-2">
                   <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                  <span className="ml-1 text-sm font-medium text-gray-800">{profile.rating}</span>
+                  <span className="ml-1 text-sm font-medium text-gray-800">
+                    {mentorData.rating}
+                  </span>
                   <span className="ml-1 text-sm text-gray-500">
-                    ({profile.reviewCount} reviews)
+                    ({mentorData.reviewCount} reviews)
                   </span>
                 </div>
               </div>
@@ -102,37 +106,89 @@ const ProfileSection: React.FC = () => {
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-800">Availability</h3>
+            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-lg font-medium text-gray-800">Education</h3>
+              <button
+                onClick={() => setIsEditingEducation(true)}
+                className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
+              >
+                <Edit2 className="h-4 w-4 mr-1" /> Edit
+              </button>
             </div>
             <div className="p-6">
-              <div className="space-y-4">
-                {data?.availabilities.map((slot) => (
-                  <div key={slot.id} className="flex items-center space-x-3">
-                    <>
-                      <div
-                        className={`w-28 font-medium ${
-                          slot.is_available ? 'text-gray-900' : 'text-gray-400'
-                        }`}
-                      >
-                        {slot.day_of_week}
-                      </div>
-                      <div className={slot.is_available ? 'text-gray-700' : 'text-gray-400'}>
-                        {slot.start_time} - {slot.end_time}
-                      </div>
-                      {!slot.is_available && (
-                        <span className="ml-auto text-xs text-gray-500 italic">Inactive</span>
-                      )}
-                    </>
-                  </div>
-                ))}
-              </div>
+              {isEditingEducation ? (
+                <EducationForm mentor={data} onClose={() => setIsEditingEducation(false)} />
+              ) : (
+                <>
+                  {data?.has_education && data?.educations && data?.educations.length > 0 ? (
+                    <div className="space-y-4">
+                      {data.educations.map((education, index) => (
+                        <div
+                          key={index}
+                          className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0"
+                        >
+                          <h4 className="text-base font-medium text-gray-800">
+                            {education.university}
+                          </h4>
+                          <p className="text-sm text-gray-700 mt-1">
+                            {education.degree} • {education.degree_type}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {education.start_year} - {education.end_year}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">
+                      No education information provided.
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
 
-              <div className="mt-4">
-                <p className="text-sm text-gray-500">
-                  Your availability is shown in your local timezone ({profile.timezone}).
-                </p>
-              </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-lg font-medium text-gray-800">Certifications</h3>
+              <button
+                onClick={() => setIsEditingCertificate(true)}
+                className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
+              >
+                <Edit2 className="h-4 w-4 mr-1" /> Edit
+              </button>
+            </div>
+            <div className="p-6">
+              {isEditingCertificate ? (
+                <CertificateForm mentor={data} onClose={() => setIsEditingCertificate(false)} />
+              ) : (
+                <>
+                  {data?.has_certificate && data?.certificates && data?.certificates.length > 0 ? (
+                    <div className="space-y-4">
+                      {data.certificates.map((certificate, index) => (
+                        <div
+                          key={index}
+                          className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0"
+                        >
+                          <h4 className="text-base font-medium text-gray-800">
+                            {certificate.name}
+                          </h4>
+                          <p className="text-sm text-gray-700 mt-1">
+                            {certificate.subject} • Issued by {certificate.issuedBy}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {certificate.start_year} - {certificate.end_year}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-2">{certificate.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">No certifications provided.</p>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>

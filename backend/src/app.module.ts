@@ -23,7 +23,7 @@ import { BookingsModule } from './bookings/bookings.module';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: '88645684',
+      password: '',
       database: 'sattapatta',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: process.env.NODE_ENV === 'development',

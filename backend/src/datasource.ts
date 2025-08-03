@@ -5,7 +5,7 @@ export default new DataSource({
   host: 'localhost',
   port: 3306,
   username: 'root',
-  password: '88645684',
+  password: '',
   database: 'sattapatta',
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
   migrations: [process.cwd() + '/dist/migrations/*.js'],

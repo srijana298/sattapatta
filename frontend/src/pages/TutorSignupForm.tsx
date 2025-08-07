@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ChevronDown,
   Trash2,
-  Clock,
   Check,
   Upload,
   User,
@@ -12,7 +11,6 @@ import {
   GraduationCap,
   FileText,
   Camera,
-  Calendar,
   Plus
 } from 'lucide-react';
 import { useAuth } from '../components/AuthContext';
@@ -39,21 +37,6 @@ const subjectOptions = [
   'Computer Science',
   'Foreign Languages'
 ];
-const timeSlots = [
-  '9:00 AM',
-  '10:00 AM',
-  '11:00 AM',
-  '12:00 PM',
-  '1:00 PM',
-  '2:00 PM',
-  '3:00 PM',
-  '4:00 PM',
-  '5:00 PM',
-  '6:00 PM',
-  '7:00 PM',
-  '8:00 PM'
-];
-const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const Rupees = ({ className }: { className?: string }) => {
   return (
@@ -99,7 +82,7 @@ export default function TutorSignupForm() {
     },
     onSuccess: () => {
       toast.success('Mentor Profile created successfully');
-      navigate('/dashboard');
+      navigate('/');
     },
     onError: () => {
       toast.error('Error creating mentor profile');

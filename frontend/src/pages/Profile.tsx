@@ -228,7 +228,7 @@ const MentorProfile = () => {
                     {renderStars(mentorData?.ratingStats.bayesianRating)}
                   </div>
                   <span className="ml-1">
-                    {mentorData?.ratingStats.rawAverage} ({mentorData?.ratingStats.totalReviews}{' '}
+                    {mentorData?.ratingStats.bayesianRating} ({mentorData?.ratingStats.totalReviews}{' '}
                     reviews)
                   </span>
                 </div>
@@ -428,7 +428,7 @@ const MentorProfile = () => {
                             {renderStars(mentorData?.ratingStats.bayesianRating)}
                           </div>
                           <span className="text-2xl font-bold text-gray-900">
-                            {mentorData?.ratingStats.rawAverage}
+                            {mentorData?.ratingStats.bayesianRating}
                           </span>
                         </div>
                         <p className="text-gray-600 text-sm">

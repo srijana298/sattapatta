@@ -37,17 +37,7 @@ export const profileSchema = zod
     motivation: zod.string().min(1, 'Motivation is required'),
     headline: zod.string().min(1, 'Headline is required'),
     hourly_rate: zod.number().default(1000),
-    trial_rate: zod.number().default(50),
-    availability: zod
-      .array(
-        zod.object({
-          day_of_week: zod.string().min(1, 'Day of week is required'),
-          start_time: zod.string().min(1, 'Start time is required'),
-          end_time: zod.string().min(1, 'End time is required'),
-          is_available: zod.boolean().default(true)
-        })
-      )
-      .min(1, 'At least one availability is required')
+    trial_rate: zod.number().default(50)
   })
   .superRefine((data, ctx) => {
     if (!data.has_education) {

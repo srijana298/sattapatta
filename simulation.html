@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Average Mean vs Bayesian Average: Review Platform Analysis</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Times New Roman', serif;
+                line-height: 1.6;
+                color: #333;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            }
+
+            h1 {
+                text-align: center;
+                color: #2c3e50;
+                margin-bottom: 30px;
+                font-size: 2.5em;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            h2 {
+                color: #34495e;
+                margin: 30px 0 15px 0;
+                padding-bottom: 10px;
+                border-bottom: 3px solid #3498db;
+                font-size: 1.8em;
+            }
+
+            h3 {
+                color: #2980b9;
+                margin: 20px 0 10px 0;
+                font-size: 1.3em;
+            }
+
+            .abstract {
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                padding: 25px;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                border-left: 5px solid #3498db;
+                font-style: italic;
+            }
+
+            .formula {
+                background: #f8f9fa;
+                padding: 20px;
+                margin: 15px 0;
+                border-radius: 8px;
+                border-left: 4px solid #e74c3c;
+                font-family: 'Courier New', monospace;
+                text-align: center;
+                font-size: 1.1em;
+            }
+
+            .simulation-panel {
+                background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+                padding: 25px;
+                margin: 20px 0;
+                border-radius: 12px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .controls {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            label {
+                font-weight: bold;
+                color: #2c3e50;
+            }
+
+            input,
+            button {
+                padding: 10px;
+                border: 2px solid #bdc3c7;
+                border-radius: 6px;
+                font-size: 14px;
+            }
+
+            button {
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                color: white;
+                cursor: pointer;
+                border: none;
+                transition: all 0.3s ease;
+                font-weight: bold;
+            }
+
+            button:hover {
+                background: linear-gradient(135deg, #2980b9, #1f639a);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .results-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin-top: 20px;
+            }
+
+            .result-card {
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                border-top: 4px solid #e74c3c;
+            }
+
+            .result-card h4 {
+                color: #c0392b;
+                margin-bottom: 10px;
+                font-size: 1.2em;
+            }
+
+            .metric {
+                font-size: 2em;
+                font-weight: bold;
+                color: #2c3e50;
+                text-align: center;
+                margin: 10px 0;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                background: white;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            th,
+            td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ecf0f1;
+            }
+
+            th {
+                background: linear-gradient(135deg, #34495e, #2c3e50);
+                color: white;
+                font-weight: bold;
+            }
+
+            tr:hover {
+                background-color: #f8f9fa;
+            }
+
+            .comparison-table {
+                margin: 20px 0;
+            }
+
+            .algorithm-box {
+                background: #2c3e50;
+                color: #ecf0f1;
+                padding: 20px;
+                border-radius: 8px;
+                font-family: 'Courier New', monospace;
+                margin: 15px 0;
+                overflow-x: auto;
+            }
+
+            .highlight {
+                background-color: #f1c40f;
+                padding: 2px 4px;
+                border-radius: 3px;
+                color: #2c3e50;
+                font-weight: bold;
+            }
+
+            .chart-container {
+                margin: 20px 0;
+                text-align: center;
+            }
+
+            .bar-chart {
+                display: inline-block;
+                margin: 0 20px;
+                text-align: center;
+            }
+
+            .bar {
+                width: 60px;
+                background: linear-gradient(to top, #e74c3c, #c0392b);
+                margin: 0 auto 10px;
+                border-radius: 4px 4px 0 0;
+                transition: all 0.3s ease;
+            }
+
+            .bar:hover {
+                transform: scale(1.05);
+                box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+            }
+
+            .data-section {
+                background: #ecf0f1;
+                padding: 15px;
+                border-radius: 8px;
+                margin: 15px 0;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+
+            .rating-distribution {
+                display: flex;
+                justify-content: space-around;
+                margin: 20px 0;
+                flex-wrap: wrap;
+            }
+
+            .rating-item {
+                text-align: center;
+                margin: 10px;
+            }
+
+            .star-rating {
+                color: #f39c12;
+                font-size: 1.2em;
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Comparative Analysis: Average Mean vs Bayesian Average in Review Platforms</h1>
+
+            <div class="abstract">
+                <h3>Abstract</h3>
+                <p>
+                    This study presents a comprehensive comparison between traditional Average Mean
+                    and Bayesian Average methodologies for evaluating user reviews in digital
+                    platforms. Through simulation of 100 user reviews, we demonstrate the superior
+                    robustness of Bayesian averaging in handling sparse data and preventing
+                    manipulation, particularly relevant for mentor evaluation systems where review
+                    counts may vary significantly.
+                </p>
+            </div>
+
+            <h2>1. Theoretical Foundation</h2>
+
+            <h3>1.1 Average Mean (Arithmetic Mean)</h3>
+            <p>
+                The arithmetic mean represents the simplest approach to aggregating review scores:
+            </p>
+            <div class="formula">μ = (1/n) × Σ(ri) where ri ∈ [1,5]</div>
+            <p>
+                Where μ is the mean rating, n is the number of reviews, and ri represents individual
+                review scores.
+            </p>
+
+            <h3>1.2 Bayesian Average</h3>
+            <p>
+                Bayesian averaging incorporates prior knowledge to address the cold start problem
+                and provide more reliable estimates with limited data:
+            </p>
+            <div class="formula">BA = (C × m + Σ(ri)) / (C + n)</div>
+            <p>
+                Where BA is the Bayesian average, C is the confidence parameter (typically
+                representing minimum review threshold), m is the prior mean (global platform
+                average), and n is the number of reviews for the specific item.
+            </p>
+
+            <h2>2. Interactive Simulation</h2>
+
+            <div class="simulation-panel">
+                <h3>Mentor Review Simulation Parameters</h3>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="reviewCount">Number of Reviews:</label>
+                        <input type="number" id="reviewCount" value="100" min="10" max="500" />
+                    </div>
+                    <div class="control-group">
+                        <label for="priorMean">Prior Mean (m):</label>
+                        <input
+                            type="number"
+                            id="priorMean"
+                            value="3.5"
+                            step="0.1"
+                            min="1"
+                            max="5"
+                        />
+                    </div>
+                    <div class="control-group">
+                        <label for="confidence">Confidence (C):</label>
+                        <input type="number" id="confidence" value="25" min="1" max="100" />
+                    </div>
+                    <div class="control-group">
+                        <label for="distribution">Rating Distribution:</label>
+                        <select id="distribution">
+                            <option value="normal">Normal Distribution</option>
+                            <option value="skewed-high">Skewed High (Positive Reviews)</option>
+                            <option value="skewed-low">Skewed Low (Critical Reviews)</option>
+                            <option value="bimodal">Bimodal (Polarized)</option>
+                        </select>
+                    </div>
+                    <button onclick="generateSimulation()">Generate New Simulation</button>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h4>Average Mean</h4>
+                        <div class="metric" id="avgMean">4.2</div>
+                        <p>Simple arithmetic average of all review scores</p>
+                    </div>
+                    <div class="result-card">
+                        <h4>Bayesian Average</h4>
+                        <div class="metric" id="bayesianAvg">4.1</div>
+                        <p>Weighted average incorporating prior knowledge</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h4>Visual Comparison</h4>
+                    <div style="display: flex; justify-content: center; gap: 50px">
+                        <div class="bar-chart">
+                            <div class="bar" id="meanBar" style="height: 100px"></div>
+                            <div>Average Mean</div>
+                        </div>
+                        <div class="bar-chart">
+                            <div class="bar" id="bayesBar" style="height: 95px"></div>
+                            <div>Bayesian Average</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>3. Generated Review Data Sample</h2>
+            <div class="data-section">
+                <h4>Rating Distribution</h4>
+                <div class="rating-distribution" id="ratingDist">
+                    <!-- Distribution will be populated by JavaScript -->
+                </div>
+                <h4>Raw Review Data (First 20 reviews)</h4>
+                <div id="reviewData">
+                    <!-- Review data will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <h2>4. Comparative Analysis</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Average Mean</th>
+                        <th>Bayesian Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Calculation Complexity</strong></td>
+                        <td>O(n) - Simple summation</td>
+                        <td>O(n) - Weighted summation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cold Start Problem</strong></td>
+                        <td>Vulnerable - Few reviews create instability</td>
+                        <td>Robust - Prior knowledge provides stability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Manipulation Resistance</strong></td>
+                        <td>Low - Easily skewed by fake reviews</td>
+                        <td>High - Prior dampens outlier impact</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Requirements</strong></td>
+                        <td>Minimal - Only item-specific reviews</td>
+                        <td>Moderate - Requires platform-wide statistics</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Interpretability</strong></td>
+                        <td>High - Intuitive understanding</td>
+                        <td>Medium - Requires parameter explanation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fairness for New Items</strong></td>
+                        <td>Poor - Extreme volatility</td>
+                        <td>Excellent - Gradual convergence</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>5. Algorithm Implementation</h2>
+
+            <h3>5.1 Average Mean Algorithm</h3>
+            <div class="algorithm-box">
+                <pre>
+ALGORITHM: Calculate_Average_Mean
+INPUT: reviews[] - array of review scores (1-5)
+OUTPUT: mean_rating - arithmetic mean of reviews
+
+BEGIN
+    total_sum = 0
+    review_count = length(reviews)
+
+    FOR each review in reviews DO
+        total_sum = total_sum + review.rating
+    END FOR
+
+    IF review_count > 0 THEN
+        mean_rating = total_sum / review_count
+    ELSE
+        mean_rating = 0  // Handle empty review case
+    END IF
+
+    RETURN mean_rating
+END
+</pre
+                >
+            </div>
+
+            <h3>5.2 Bayesian Average Algorithm</h3>
+            <div class="algorithm-box">
+                <pre>
+ALGORITHM: Calculate_Bayesian_Average
+INPUT: reviews[] - array of review scores (1-5)
+       prior_mean (m) - global platform average
+       confidence (C) - minimum review threshold
+OUTPUT: bayesian_rating - Bayesian average rating
+
+BEGIN
+    total_sum = 0
+    review_count = length(reviews)
+
+    FOR each review in reviews DO
+        total_sum = total_sum + review.rating
+    END FOR
+
+    // Apply Bayesian formula
+    numerator = (confidence * prior_mean) + total_sum
+    denominator = confidence + review_count
+
+    IF denominator > 0 THEN
+        bayesian_rating = numerator / denominator
+    ELSE
+        bayesian_rating = prior_mean
+    END IF
+
+    RETURN bayesian_rating
+END
+</pre
+                >
+            </div>
+
+            <h2>6. Results and Discussion</h2>
+
+            <div id="analysisResults">
+                <p>The simulation demonstrates several key findings:</p>
+                <ul>
+                    <li>
+                        <span class="highlight">Stability</span>: Bayesian averaging provides more
+                        stable ratings, especially with fewer reviews
+                    </li>
+                    <li>
+                        <span class="highlight">Convergence</span>: As review count increases, both
+                        methods converge towards similar values
+                    </li>
+                    <li>
+                        <span class="highlight">Bias Mitigation</span>: The prior mean in Bayesian
+                        averaging helps prevent extreme ratings from dominating
+                    </li>
+                    <li>
+                        <span class="highlight">Platform Health</span>: Bayesian averaging promotes
+                        a more balanced ecosystem by preventing gaming
+                    </li>
+                </ul>
+            </div>
+
+            <h2>7. Conclusion</h2>
+            <p>
+                While Average Mean offers simplicity and interpretability, Bayesian Average provides
+                superior performance in real-world scenarios characterized by sparse data, potential
+                manipulation, and the need for fair comparison across items with varying review
+                volumes. For mentor evaluation platforms, where maintaining fairness and preventing
+                gaming is crucial, Bayesian averaging represents the optimal approach for review
+                aggregation.
+            </p>
+
+            <div
+                style="
+                    margin-top: 40px;
+                    padding: 20px;
+                    background: #2c3e50;
+                    color: white;
+                    border-radius: 8px;
+                    text-align: center;
+                "
+            >
+                <p>
+                    <strong>Interactive Academic Simulation</strong> | Designed for Project Defense
+                    | <em>Click "Generate New Simulation" to explore different scenarios</em>
+                </p>
+            </div>
+        </div>
+
+        <script>
+            let currentReviews = [];
+
+            function generateReviews(count, distribution) {
+                const reviews = [];
+
+                for (let i = 0; i < count; i++) {
+                    let rating;
+
+                    switch (distribution) {
+                        case 'normal':
+                            // Normal distribution around 3.5-4
+                            rating = Math.max(
+                                1,
+                                Math.min(5, Math.round(3.5 + (Math.random() - 0.5) * 2.5))
+                            );
+                            break;
+                        case 'skewed-high':
+                            // Skewed towards higher ratings
+                            rating =
+                                Math.random() < 0.7
+                                    ? Math.random() < 0.5
+                                        ? 5
+                                        : 4
+                                    : Math.ceil(Math.random() * 3);
+                            break;
+                        case 'skewed-low':
+                            // Skewed towards lower ratings
+                            rating =
+                                Math.random() < 0.6
+                                    ? Math.random() < 0.5
+                                        ? 1
+                                        : 2
+                                    : Math.ceil(Math.random() * 3) + 2;
+                            break;
+                        case 'bimodal':
+                            // Polarized ratings (mostly 1s and 5s)
+                            rating = Math.random() < 0.5 ? 1 : 5;
+                            if (Math.random() < 0.2) rating = Math.ceil(Math.random() * 3) + 1;
+                            break;
+                        default:
+                            rating = Math.ceil(Math.random() * 5);
+                    }
+
+                    reviews.push({
+                        id: i + 1,
+                        rating: rating,
+                        reviewer: `User_${String(i + 1).padStart(3, '0')}`,
+                        timestamp: new Date(
+                            Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
+                        ).toLocaleDateString()
+                    });
+                }
+
+                return reviews;
+            }
+
+            function calculateAverageMean(reviews) {
+                if (reviews.length === 0) return 0;
+                const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+                return sum / reviews.length;
+            }
+
+            function calculateBayesianAverage(reviews, priorMean, confidence) {
+                const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+                const n = reviews.length;
+                return (confidence * priorMean + sum) / (confidence + n);
+            }
+
+            function updateRatingDistribution(reviews) {
+                const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                reviews.forEach((review) => distribution[review.rating]++);
+
+                const distElement = document.getElementById('ratingDist');
+                distElement.innerHTML = '';
+
+                for (let rating = 1; rating <= 5; rating++) {
+                    const item = document.createElement('div');
+                    item.className = 'rating-item';
+                    item.innerHTML = `
+                    <div class="star-rating">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</div>
+                    <div><strong>${distribution[rating]}</strong> reviews</div>
+                    <div>${((distribution[rating] / reviews.length) * 100).toFixed(1)}%</div>
+                `;
+                    distElement.appendChild(item);
+                }
+            }
+
+            function updateReviewData(reviews) {
+                const reviewElement = document.getElementById('reviewData');
+                let html =
+                    '<table style="width: 100%; font-size: 0.9em;"><tr><th>ID</th><th>User</th><th>Rating</th><th>Date</th></tr>';
+
+                reviews.forEach((review) => {
+                    html += `<tr>
+                    <td>${review.id}</td>
+                    <td>${review.reviewer}</td>
+                    <td>${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)} (${review.rating})</td>
+                    <td>${review.timestamp}</td>
+                </tr>`;
+                });
+
+                html += '</table>';
+                // if (reviews.length > 20) {
+                //     html += `<p style="text-align: center; margin-top: 10px; font-style: italic;">... and ${reviews.length - 20} more reviews</p>`;
+                // }
+
+                reviewElement.innerHTML = html;
+            }
+
+            function generateSimulation() {
+                const reviewCount = parseInt(document.getElementById('reviewCount').value);
+                const priorMean = parseFloat(document.getElementById('priorMean').value);
+                const confidence = parseInt(document.getElementById('confidence').value);
+                const distribution = document.getElementById('distribution').value;
+
+                // Generate new review data
+                currentReviews = generateReviews(reviewCount, distribution);
+
+                // Calculate averages
+                const avgMean = calculateAverageMean(currentReviews);
+                const bayesianAvg = calculateBayesianAverage(currentReviews, priorMean, confidence);
+
+                // Update display
+                document.getElementById('avgMean').textContent = avgMean.toFixed(2);
+                document.getElementById('bayesianAvg').textContent = bayesianAvg.toFixed(2);
+
+                // Update chart bars
+                const maxHeight = 120;
+                document.getElementById('meanBar').style.height = `${(avgMean / 5) * maxHeight}px`;
+                document.getElementById('bayesBar').style.height =
+                    `${(bayesianAvg / 5) * maxHeight}px`;
+
+                // Update data displays
+                updateRatingDistribution(currentReviews);
+                updateReviewData(currentReviews);
+
+                // Update analysis
+                const difference = Math.abs(avgMean - bayesianAvg);
+                const analysisElement = document.getElementById('analysisResults');
+
+                let analysis = `<p>Current simulation results with ${reviewCount} reviews:</p><ul>`;
+                analysis += `<li><span class="highlight">Average Mean</span>: ${avgMean.toFixed(3)}</li>`;
+                analysis += `<li><span class="highlight">Bayesian Average</span>: ${bayesianAvg.toFixed(3)}</li>`;
+                analysis += `<li><span class="highlight">Difference</span>: ${difference.toFixed(3)} (${((difference / avgMean) * 100).toFixed(1)}%)</li>`;
+
+                if (reviewCount < 30) {
+                    analysis += `<li><span class="highlight">Observation</span>: With fewer reviews, Bayesian averaging provides more conservative estimates</li>`;
+                } else if (difference < 0.1) {
+                    analysis += `<li><span class="highlight">Observation</span>: With sufficient reviews, both methods converge to similar values</li>`;
+                } else {
+                    analysis += `<li><span class="highlight">Observation</span>: Significant difference indicates potential bias in review distribution</li>`;
+                }
+
+                analysis += '</ul>';
+                analysisElement.innerHTML = analysis;
+            }
+
+            // Initialize simulation on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                generateSimulation();
+            });
+        </script>
+    </body>
+</html>

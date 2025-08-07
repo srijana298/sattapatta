@@ -48,10 +48,10 @@ const ProfileSection: React.FC = () => {
                 <div className="flex items-center justify-center mt-2">
                   <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                   <span className="ml-1 text-sm font-medium text-gray-800">
-                    {mentorData.rating}
+                    {data?.ratingStats.bayesianRating}
                   </span>
                   <span className="ml-1 text-sm text-gray-500">
-                    ({mentorData.reviewCount} reviews)
+                    ({data?.reviews.length} reviews)
                   </span>
                 </div>
               </div>

@@ -50,8 +50,10 @@ export default function TutorCard({ profile }: { profile: MentorProfile }) {
                   <div className="flex items-center space-x-4 text-gray-600 mb-3">
                     <div className="flex items-center">
                       <Star className="w-5 h-5 text-yellow-400 fill-current mr-1" />
-                      <span className="font-semibold text-gray-900">4.9</span>
-                      <span className="text-sm ml-1">(24 reviews)</span>
+                      <span className="font-semibold text-gray-900">
+                        {profile.ratingStats.bayesianRating}
+                      </span>
+                      <span className="text-sm ml-1">({profile.reviews.length} reviews)</span>
                     </div>
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-1" />

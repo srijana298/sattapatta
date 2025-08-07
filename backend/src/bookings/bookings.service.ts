@@ -48,12 +48,19 @@ export class BookingsService {
     return this.bookingRepository.find({
       relations: ['mentee', 'mentor', 'mentor.mentor_profile'],
       where: {
-        mentor: { id: mentor_id },
+        mentor: {
+          mentor_profile: {
+            id: mentor_id,
+          },
+        },
       },
       select: {
         mentor: {
           id: true,
           fullname: true,
+          mentor_profile: {
+            id: true,
+          },
           email: true,
         },
         mentee: {

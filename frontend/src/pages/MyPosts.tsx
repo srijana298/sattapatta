@@ -9,28 +9,26 @@ import { MentorProfile } from '../services/users';
 import { createRating } from '../services/mentor';
 import { mentorData } from '../data/mentorData';
 import toast from 'react-hot-toast';
+import { getImageUrl } from './admin/lib/utils';
 
 const RatingModal = ({ mentor, onClose, onSubmit }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
-  
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-in">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-semibold text-gray-900">Rate your experience</h3>
-          <button 
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100"
-          >
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
-        
+
         <div className="flex items-center mb-6 bg-orange-50 rounded-xl p-4">
-          <img 
-            src={mentor.profilePhotoUrl} 
+          <img
+            src={mentor.profilePhotoUrl}
             alt={mentor.fullname}
             className="w-14 h-14 rounded-full object-cover border-2 border-orange-300"
           />
@@ -39,7 +37,7 @@ const RatingModal = ({ mentor, onClose, onSubmit }) => {
             <p className="text-sm text-gray-600">{mentor.headline}</p>
           </div>
         </div>
-        
+
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">Your rating</label>
           <div className="flex items-center space-x-1">
@@ -54,16 +52,14 @@ const RatingModal = ({ mentor, onClose, onSubmit }) => {
               >
                 <Star
                   className={`w-8 h-8 ${
-                    star <= (hover || rating)
-                      ? 'text-yellow-500 fill-yellow-500'
-                      : 'text-gray-300'
+                    star <= (hover || rating) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'
                   }`}
                 />
               </button>
             ))}
           </div>
         </div>
-        
+
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Your feedback (optional)
@@ -76,7 +72,7 @@ const RatingModal = ({ mentor, onClose, onSubmit }) => {
             placeholder="Share your experience with this mentor..."
           ></textarea>
         </div>
-        
+
         <button
           onClick={() => onSubmit({ rating, comment })}
           disabled={rating === 0}
@@ -100,17 +96,13 @@ const MyBookingsPage = () => {
   });
 
   const { mutateAsync, isLoading: isRating } = useMutation({
-    mutationFn: (data: {
-      comment: string;
-      rating: number;
-      mentorId: number;
-    }) => {
+    mutationFn: (data: { comment: string; rating: number; mentorId: number }) => {
       return createRating(data);
     },
     onSuccess: () => {
-      toast.success("Thank you for your feedback!");
+      toast.success('Thank you for your feedback!');
     }
-  })
+  });
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -121,17 +113,17 @@ const MyBookingsPage = () => {
   const processedBookings = useMemo(() => {
     // Your existing processing code
     if (!bookings) return [];
-    
+
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
-    
-    return bookings.map(booking => {
+    today.setHours(0, 0, 0, 0);
+
+    return bookings.map((booking) => {
       const bookingDate = new Date(booking.start_date);
 
       if (bookingDate < today && booking.status === 'confirmed') {
         return {
           ...booking,
-          status: 'completed',
+          status: 'completed'
         };
       }
 
@@ -145,15 +137,19 @@ const MyBookingsPage = () => {
           status: 'upcoming'
         };
       }
-      
+
       return booking;
     });
   }, [bookings]);
 
   // Your existing helper functions
-  const getStatusBadge = (status) => { /* ... */ };
-  const getStatusText = (status) => { /* ... */ };
-  
+  const getStatusBadge = (status) => {
+    /* ... */
+  };
+  const getStatusText = (status) => {
+    /* ... */
+  };
+
   const filteredBookings = processedBookings?.filter((booking) => {
     const matchesSearch = booking.mentor.fullname.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = selectedFilter === 'all' || booking.status === selectedFilter;
@@ -164,9 +160,9 @@ const MyBookingsPage = () => {
   // Group bookings by mentor
   const bookingsByMentor = useMemo(() => {
     if (!filteredBookings) return {};
-    
+
     return filteredBookings.reduce((groups, booking) => {
-      const mentorId = booking.mentor.mentor_profile.id;
+      const mentorId = booking.mentor.mentor_profile?.id;
       if (!groups[mentorId]) {
         groups[mentorId] = {
           mentorInfo: {
@@ -179,20 +175,20 @@ const MyBookingsPage = () => {
           hasCompletedSession: false
         };
       }
-      
+
       groups[mentorId].bookings.push(booking);
-      
+
       // Check if there's at least one completed session
       if (booking.status === 'completed') {
         groups[mentorId].hasCompletedSession = true;
       }
-      
+
       return groups;
     }, {});
   }, [filteredBookings]);
 
-   const toggleMentorExpanded = (mentorId) => {
-    setExpandedMentors(prev => ({
+  const toggleMentorExpanded = (mentorId) => {
+    setExpandedMentors((prev) => ({
       ...prev,
       [mentorId]: !prev[mentorId]
     }));
@@ -202,15 +198,12 @@ const MyBookingsPage = () => {
     setRatingMentor(mentorInfo);
   };
 
-
-  const handleRatingSubmit = async (ratingData:{
-    comment: string; 
-    rating: number; 
-  } ) => {
+  const handleRatingSubmit = async (ratingData: { comment: string; rating: number }) => {
     setRatingMentor(null);
     await mutateAsync({
       mentorId: ratingMentor!.id,
-      ...ratingData});
+      ...ratingData
+    });
   };
 
   if (isLoading || isRating) {
@@ -223,7 +216,7 @@ const MyBookingsPage = () => {
       <div className="min-h-screen bg-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Your existing UI elements - tabs, search, etc. */}
-          
+
           <div className="space-y-6">
             {Object.keys(bookingsByMentor).length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-orange-100 p-12 text-center">
@@ -240,12 +233,12 @@ const MyBookingsPage = () => {
                   {/* Mentor header - always visible */}
                   <div className="p-6 border-b border-gray-100">
                     <div className="flex items-center justify-between">
-                      <div 
+                      <div
                         className="flex items-center space-x-4 flex-1 cursor-pointer"
                         onClick={() => toggleMentorExpanded(mentorGroup.mentorInfo.id)}
                       >
                         <img
-                          src={mentorGroup.mentorInfo.profilePhotoUrl}
+                          src={getImageUrl(mentorGroup.mentorInfo.profilePhotoUrl)}
                           alt={mentorGroup.mentorInfo.fullname}
                           className="w-16 h-16 rounded-full object-cover border-2 border-orange-200"
                         />
@@ -253,18 +246,17 @@ const MyBookingsPage = () => {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {mentorGroup.mentorInfo.fullname}
                           </h3>
-                          <p className="text-gray-600">
-                            {mentorGroup.mentorInfo.headline}
-                          </p>
+                          <p className="text-gray-600">{mentorGroup.mentorInfo.headline}</p>
                           <div className="flex items-center mt-1 text-sm">
                             <Users className="w-4 h-4 text-orange-500 mr-1" />
                             <span className="text-orange-700 font-medium">
-                              {mentorGroup.bookings.length} {mentorGroup.bookings.length === 1 ? 'Session' : 'Sessions'}
+                              {mentorGroup.bookings.length}{' '}
+                              {mentorGroup.bookings.length === 1 ? 'Session' : 'Sessions'}
                             </span>
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center space-x-4">
                         {/* Rating button - only shows if there's at least one completed session */}
                         {mentorGroup.hasCompletedSession && (
@@ -276,8 +268,8 @@ const MyBookingsPage = () => {
                             <span className="font-medium text-sm">Rate Mentor</span>
                           </button>
                         )}
-                        
-                        <button 
+
+                        <button
                           onClick={() => toggleMentorExpanded(mentorGroup.mentorInfo.id)}
                           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                         >
@@ -307,7 +299,7 @@ const MyBookingsPage = () => {
                                 <span>{booking.end_time}</span>
                               </div>
                             </div>
-                            
+
                             <span
                               className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadge(
                                 booking.status
@@ -341,7 +333,9 @@ const MyBookingsPage = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking Summary</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{processedBookings.length}</div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {processedBookings.length}
+                  </div>
                   <div className="text-sm text-gray-600">Total Bookings</div>
                 </div>
                 <div className="text-center">
@@ -367,12 +361,12 @@ const MyBookingsPage = () => {
           )}
         </div>
       </div>
-      
+
       {/* Rating Modal */}
       {ratingMentor && (
-        <RatingModal 
-          mentor={ratingMentor} 
-          onClose={() => setRatingMentor(null)} 
+        <RatingModal
+          mentor={ratingMentor}
+          onClose={() => setRatingMentor(null)}
           onSubmit={handleRatingSubmit}
         />
       )}

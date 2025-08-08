@@ -26,9 +26,10 @@ export const sendMessage = async (
     participant: number;
     content: string;
   }
-): Promise<void> => {
-  await api.post(`/conversations/${conversationId}/messages`, {
+) => {
+  const response = await api.post(`/conversations/${conversationId}/messages`, {
     participant: message.participant,
     content: message.content
   });
+  return response.data;
 };

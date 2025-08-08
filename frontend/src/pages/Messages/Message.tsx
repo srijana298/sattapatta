@@ -168,11 +168,12 @@ const Message = () => {
     mutationFn: async () => {
       if (id && sender?.id) {
         setIsSending(true);
-        await sendMessage(id!, {
+        const response = await sendMessage(id!, {
           participant: sender.id,
           content: messageText
         });
         setIsSending(false);
+        return response;
       }
     }
   });
@@ -202,7 +203,28 @@ const Message = () => {
 
     socket.on('message', (_message: string) => {
       const message: Message = JSON.parse(_message);
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => {
+        // Check if this is a real message that replaces a temporary one
+        const tempMessage = prev.find(
+          (msg) =>
+            msg.id.toString().startsWith('temp-') &&
+            msg.content === message.content &&
+            msg.participant.user.id === message.participant.user.id
+        );
+
+        if (tempMessage) {
+          // Replace the temporary message with the real one
+          return prev.map((msg) => (msg.id === tempMessage.id ? message : msg));
+        }
+
+        // Check if the message already exists in the state to prevent duplicates
+        if (prev.some((existingMsg) => existingMsg.id === message.id)) {
+          return prev;
+        }
+
+        // Otherwise, add the new message
+        return [...prev, message];
+      });
     });
 
     socket.on('user-typing', (data) => {
@@ -277,8 +299,10 @@ const Message = () => {
     setMessageText('');
     setIsTyping(false);
 
+    // Create a temporary ID for the optimistic message
+    const tempId = `temp-${Date.now()}`;
     const optimisticMessage: Message = {
-      id: Date.now(),
+      id: tempId,
       content: tempMessage,
       created_at: new Date().toISOString(),
       participant: {
@@ -289,13 +313,28 @@ const Message = () => {
       }
     };
 
+    // Add optimistic message to UI
     setMessages((prev) => [...prev, optimisticMessage]);
 
     try {
-      await mutateAsync();
+      // Send the actual message to the server
+      const response = await mutateAsync();
+
+      // If we get a response with an ID, we can replace our optimistic message
+      // Note: The socket will likely have already handled this, but this is a fallback
+      if (response && response.id) {
+        setMessages((prev) => {
+          // If the real message is already in the array (from socket), remove the temp one
+          if (prev.some((msg) => msg.id === response.id)) {
+            return prev.filter((msg) => msg.id !== tempId);
+          }
+          // Otherwise replace the temp message with the real one
+          return prev.map((msg) => (msg.id === tempId ? response : msg));
+        });
+      }
     } catch (error) {
       // Remove optimistic message on error
-      setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+      setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
       setMessageText(tempMessage); // Restore message text
     }
   };

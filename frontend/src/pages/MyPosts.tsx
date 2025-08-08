@@ -7,7 +7,6 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 import { Link } from 'react-router-dom';
 import { MentorProfile } from '../services/users';
 import { createRating } from '../services/mentor';
-import { mentorData } from '../data/mentorData';
 import toast from 'react-hot-toast';
 import { getImageUrl } from './admin/lib/utils';
 
@@ -28,7 +27,7 @@ const RatingModal = ({ mentor, onClose, onSubmit }) => {
 
         <div className="flex items-center mb-6 bg-orange-50 rounded-xl p-4">
           <img
-            src={mentor.profilePhotoUrl}
+            src={getImageUrl(mentor.profilePhotoUrl)}
             alt={mentor.fullname}
             className="w-14 h-14 rounded-full object-cover border-2 border-orange-300"
           />
